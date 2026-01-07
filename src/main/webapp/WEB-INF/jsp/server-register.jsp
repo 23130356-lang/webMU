@@ -10,50 +10,53 @@
     <title>Đăng Ký Quảng Cáo Server | MU Ads Portal</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
     <style>
         body {
             font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); /* Deep Blue Gradient */
+            background: linear-gradient(135deg, #141E30 0%, #243B55 100%); /* Darker, more serious gaming theme */
             min-height: 100vh;
             padding: 40px 0;
+            color: #333;
         }
 
         .main-card {
             border: none;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
             overflow: hidden;
+            background: #fff;
         }
 
         .card-header-custom {
-            background: #fff;
-            padding: 25px;
-            border-bottom: 1px solid #eee;
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            padding: 30px;
             text-align: center;
+            color: white;
+            border-bottom: 5px solid #ffa502; /* Accent color */
         }
 
         .card-header-custom h2 {
-            color: #1e3c72;
             font-weight: 700;
             margin: 0;
             text-transform: uppercase;
             letter-spacing: 1px;
+            font-size: 1.8rem;
         }
 
         .card-header-custom p {
-            color: #777;
-            margin-top: 5px;
-            font-size: 0.9rem;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            opacity: 0.9;
         }
 
         .form-section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #2a5298;
-            margin-bottom: 15px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid #eef2f7;
             display: flex;
@@ -61,23 +64,34 @@
         }
 
         .form-section-title i {
-            margin-right: 10px;
+            margin-right: 12px;
             background: #eef2f7;
-            padding: 8px;
+            padding: 10px;
             border-radius: 50%;
             color: #1e3c72;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .form-label {
-            font-weight: 500;
+            font-weight: 600;
             font-size: 0.9rem;
-            color: #555;
+            color: #444;
+            margin-bottom: 0.5rem;
         }
 
         .input-group-text {
-            background-color: #f8f9fa;
+            background-color: #f1f4f8;
             border-color: #dee2e6;
-            color: #6c757d;
+            color: #555;
+        }
+
+        .form-control, .form-select {
+            padding: 0.6rem 0.75rem;
+            border: 1px solid #dee2e6;
         }
 
         .form-control:focus, .form-select:focus {
@@ -88,26 +102,33 @@
         .btn-submit {
             background: linear-gradient(to right, #11998e, #38ef7d);
             border: none;
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            padding: 14px 40px;
+            font-size: 1.2rem;
+            font-weight: 700;
             color: white;
             border-radius: 50px;
             transition: all 0.3s ease;
             width: 100%;
-            box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4);
+            text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(56, 239, 125, 0.3);
         }
 
         .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(56, 239, 125, 0.6);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(56, 239, 125, 0.5);
         }
 
         .schedule-box {
             background: #f8faff;
             border: 1px dashed #cce0ff;
-            border-radius: 8px;
-            padding: 15px;
+            border-radius: 10px;
+            padding: 20px;
+            height: 100%;
+        }
+
+        .schedule-box.important {
+            background: #fff5f5;
+            border-color: #ffcccc;
         }
     </style>
 </head>
@@ -121,26 +142,26 @@
 
                 <div class="card-header-custom">
                     <h2><i class="fa-solid fa-dragon me-2"></i> Đăng Ký Server Mới</h2>
-                    <p>Điền thông tin chi tiết để quảng bá máy chủ của bạn đến cộng đồng</p>
+                    <p>Khởi tạo chiến dịch quảng bá máy chủ MU Online của bạn ngay hôm nay</p>
                 </div>
 
                 <div class="card-body p-4 p-md-5">
 
                     <div class="mb-5">
                         <div class="form-section-title">
-                            <i class="fa-solid fa-circle-info"></i> 1. Thông Tin Cơ Bản
+                            <i class="fa-solid fa-circle-info"></i> 1. Thông Tin Chung
                         </div>
 
                         <div class="row g-3">
                             <div class="col-md-8">
-                                <label class="form-label">Tên hiển thị (Server Name) <span class="text-danger">*</span></label>
+                                <label class="form-label">Tên Máy Chủ (Server Name) <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fa-solid fa-server"></i></span>
                                     <input type="text" class="form-control" name="serverName" placeholder="VD: Máy chủ Huyền Thoại - Đua Top Alpha" required>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Tên cụm (MU Name)</label>
+                                <label class="form-label">Tên Cụm (MU Name)</label>
                                 <input type="text" class="form-control" name="muName" placeholder="VD: MU Hà Nội" required>
                             </div>
 
@@ -150,14 +171,14 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">Trang chủ</label>
+                                <label class="form-label">Website Trang Chủ</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fa-solid fa-globe"></i></span>
                                     <input type="url" class="form-control" name="websiteUrl" placeholder="https://..." required>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Fanpage</label>
+                                <label class="form-label">Fanpage Facebook</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fa-brands fa-facebook"></i></span>
                                     <input type="url" class="form-control" name="fanpageUrl" placeholder="https://facebook.com/..." required>
@@ -168,7 +189,7 @@
 
                     <div class="mb-5">
                         <div class="form-section-title">
-                            <i class="fa-solid fa-calendar-days"></i> 2. Lịch Trình Alpha & Open Beta
+                            <i class="fa-solid fa-calendar-days"></i> 2. Lịch Trình Ra Mắt
                         </div>
 
                         <div class="row g-4">
@@ -189,8 +210,8 @@
                             </div>
 
                             <div class="col-md-6">
-                                <div class="schedule-box" style="background: #fff4f4; border-color: #ffcccc;">
-                                    <h6 class="text-danger fw-bold mb-3"><i class="fa-solid fa-fire me-2"></i>Open Beta (Quan trọng)</h6>
+                                <div class="schedule-box important">
+                                    <h6 class="text-danger fw-bold mb-3"><i class="fa-solid fa-fire me-2"></i>Open Beta (Chính thức)</h6>
                                     <div class="row g-2">
                                         <div class="col-7">
                                             <label class="small text-muted">Ngày Open</label>
@@ -208,40 +229,40 @@
 
                     <div class="mb-5">
                         <div class="form-section-title">
-                            <i class="fa-solid fa-gears"></i> 3. Cấu Hình Máy Chủ
+                            <i class="fa-solid fa-gears"></i> 3. Cấu Hình & Tính Năng
                         </div>
 
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label">Phiên bản (Version)</label>
                                 <select class="form-select" name="versionId">
-                                    <c:forEach items="${versions}" var="v" varStatus="loop">
-                                        <option value="${loop.index + 1}">${v}</option>
+                                    <c:forEach items="${versions}" var="v">
+                                        <option value="${v.id}">${v.versionName}</option>
                                     </c:forEach>
                                 </select>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Exp Rate (x?)</label>
-                                <input type="number" class="form-control" name="expRate" value="150">
+                                <input type="number" class="form-control" name="expRate" value="150" placeholder="150">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Drop Rate (%)</label>
-                                <input type="number" class="form-control" name="dropRate" value="20">
+                                <input type="number" class="form-control" name="dropRate" value="20" placeholder="20">
                             </div>
 
                             <div class="col-md-4">
                                 <label class="form-label">Kiểu Reset</label>
                                 <select class="form-select" name="resetId">
-                                    <c:forEach items="${resetTypes}" var="r" varStatus="loop">
-                                        <option value="${loop.index + 1}">${r}</option>
+                                    <c:forEach items="${resetTypes}" var="r">
+                                        <option value="${r.id}">${r.resetName}</option>
                                     </c:forEach>
                                 </select>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Kiểu Point</label>
                                 <select class="form-select" name="pointId">
-                                    <c:forEach items="${pointTypes}" var="p" varStatus="loop">
-                                        <option value="${loop.index + 1}">${p}</option>
+                                    <c:forEach items="${pointTypes}" var="p">
+                                        <option value="${p.id}">${p.pointName}</option>
                                     </c:forEach>
                                 </select>
                             </div>
@@ -253,22 +274,22 @@
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-bold">Bài viết giới thiệu (Hỗ trợ HTML)</label>
+                        <label class="form-label fw-bold">Bài viết giới thiệu (Hỗ trợ HTML cơ bản)</label>
                         <textarea class="form-control" name="description" rows="5" placeholder="Viết nội dung quảng cáo chi tiết, tính năng nổi bật, lộ trình server..."></textarea>
                     </div>
 
                     <div class="text-center mt-5">
                         <button type="submit" class="btn btn-submit">
-                            <i class="fa-solid fa-paper-plane me-2"></i> ĐĂNG KÝ & THANH TOÁN
+                            <i class="fa-solid fa-paper-plane me-2"></i> HOÀN TẤT ĐĂNG KÝ
                         </button>
-                        <p class="text-muted mt-3 small">Phí đăng ký: 500 Gcoin / Lượt hiển thị tin VIP</p>
+                        <p class="text-muted mt-3 small">Bằng việc đăng ký, bạn đồng ý với quy định của MU Ads Portal.</p>
                     </div>
 
                 </div>
             </form>
 
             <div class="text-center text-white-50 mt-4 mb-5">
-                <small>&copy; 2026 MU Ads Portal. All rights reserved.</small>
+                <small>&copy; 2026 MU Ads Portal. System by Gemini.</small>
             </div>
 
         </div>

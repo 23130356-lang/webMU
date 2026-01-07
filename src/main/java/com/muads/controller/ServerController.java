@@ -1,7 +1,12 @@
-package com.muads.controller; // CHÚ Ý PACKAGE NÀY
+package com.muads.controller;
 
-import com.muads.entity.Server;
+import com.muads.dto.ServerRegisterDTO;
+import com.muads.entity.User;
+import com.muads.repository.MuVersionRepository;
+import com.muads.repository.PointTypeRepository;
+import com.muads.repository.ResetTypeRepository;
 import com.muads.service.ServerService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,9 +15,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.Arrays;
-import java.util.List;
-
 @Controller
 @RequestMapping("/server")
 public class ServerController {
@@ -20,32 +22,44 @@ public class ServerController {
     @Autowired
     private ServerService serverService;
 
-    // Hiển thị form đăng ký
+    // Inject Repository để lấy dữ liệu đổ vào Dropdown
+    @Autowired
+    private MuVersionRepository versionRepo;
+    @Autowired
+    private ResetTypeRepository resetRepo;
+    @Autowired
+    private PointTypeRepository pointRepo;
+
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
-        // Tạo dữ liệu giả cho Dropdown (sau này lấy từ DB bảng categories)
-        List<String> versions = Arrays.asList("Season 6.9", "Season 18", "Season 19");
-        List<String> resetTypes = Arrays.asList("Reset Vip", "Keep Point", "Non-Reset");
-        List<String> pointTypes = Arrays.asList("65k Point", "Point Thường");
+        // Đổ dữ liệu danh mục vào select-box
+        model.addAttribute("versions", versionRepo.findAll());
+        model.addAttribute("resetTypes", resetRepo.findAll());
+        model.addAttribute("pointTypes", pointRepo.findAll());
 
-        model.addAttribute("versions", versions);
-        model.addAttribute("resetTypes", resetTypes);
-        model.addAttribute("pointTypes", pointTypes);
+        // Gửi một DTO rỗng để form hứng dữ liệu
+        model.addAttribute("serverDTO", new ServerRegisterDTO());
 
-        // Thêm object rỗng để hứng dữ liệu từ form
-        model.addAttribute("server", new Server());
-
-        return "server-register"; // Trả về file jsp
+        return "server-register";
     }
 
-    // Xử lý khi bấm nút "Đăng Ký"
     @PostMapping("/create")
-    public String createServer(@ModelAttribute Server server) {
-        System.out.println("Đang lưu Server: " + server.getServerName());
+    public String createServer(@ModelAttribute("serverDTO") ServerRegisterDTO serverDTO,
+                               HttpSession session) { // Thêm tham số Session
 
-        serverService.registerNewServer(server);
+        // 1. Kiểm tra xem đã login chưa
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            return "redirect:/login"; // Chưa login thì đá về trang login
+        }
 
-        // Lưu xong chuyển hướng về trang chủ hoặc trang thông báo thành công
-        return "redirect:/login?success=true";
+        try {
+            // 2. Truyền cả User vào service
+            serverService.registerServer(serverDTO, currentUser);
+            return "redirect:/server/register?success=true";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/server/register?error=true";
+        }
     }
 }
