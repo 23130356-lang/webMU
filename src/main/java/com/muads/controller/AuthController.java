@@ -1,10 +1,10 @@
 package com.muads.controller;
 
 import com.muads.dto.UserLoginDTO;
-import com.muads.dto.UserRegisterDTO; // Import cái cũ
+import com.muads.dto.UserRegisterDTO;
 import com.muads.entity.User;
 import com.muads.service.UserService;
-import jakarta.servlet.http.HttpSession; // Import Session
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,7 +18,7 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    // --- Phần Đăng Ký (Code cũ) ---
+    // --- Phần Đăng Ký ---
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
         model.addAttribute("userDTO", new UserRegisterDTO());
@@ -36,7 +36,7 @@ public class AuthController {
         }
     }
 
-    // --- PHẦN LOGIN (Code Mới) ---
+    // --- PHẦN LOGIN ---
 
     // 1. Hiển thị form login
     @GetMapping("/login")
@@ -45,23 +45,38 @@ public class AuthController {
         return "login";
     }
 
-    // 2. Xử lý đăng nhập
+
     @PostMapping("/login")
     public String processLogin(@ModelAttribute("loginDTO") UserLoginDTO loginDTO,
                                HttpSession session,
                                Model model) {
         try {
-            // Gọi service kiểm tra
+            System.out.println("--- BẮT ĐẦU XỬ LÝ LOGIN ---");
+            System.out.println("Username nhập vào: " + loginDTO.getUsername());
+
+            // 1. Gọi Service kiểm tra
             User user = userService.login(loginDTO);
 
-            // QUAN TRỌNG: Lưu user vào Session
+            // 2. Nếu không lỗi -> Login thành công -> Lưu vào Session
             session.setAttribute("currentUser", user);
 
-            // Đăng nhập xong thì về trang chủ hoặc trang quản lý server
-            return "redirect:/server/register";
+            // In ra thông tin User lấy được từ DB để kiểm tra
+            System.out.println("Login thành công! User tìm thấy: " + user.getUsername());
+            System.out.println("Role trong Database là: " + user.getRole());
+
+            // 3. Phân quyền chuyển hướng
+            // So sánh Enum trực tiếp (Chuẩn nhất)
+            if (user.getRole() == User.Role.ADMIN) {
+                System.out.println(">> ĐIỀU HƯỚNG: Đang chuyển sang trang ADMIN (/admin/pending)");
+                return "redirect:/admin/pending";
+            } else {
+                System.out.println(">> ĐIỀU HƯỚNG: Đang chuyển sang trang HOME (/)");
+                return "redirect:/server/register";
+            }
 
         } catch (RuntimeException e) {
-            // Đăng nhập lỗi -> ở lại trang login và báo lỗi
+            // Trường hợp đăng nhập sai
+            System.out.println(">> LỖI LOGIN: " + e.getMessage());
             model.addAttribute("errorMessage", e.getMessage());
             return "login";
         }

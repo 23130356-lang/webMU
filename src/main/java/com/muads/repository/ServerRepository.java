@@ -1,21 +1,49 @@
 package com.muads.repository;
 
 import com.muads.entity.Server;
+import com.muads.entity.Server.Status;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ServerRepository extends JpaRepository<Server, Long> {
-    // Tìm tất cả server theo trạng thái (VD: Chỉ lấy server đã duyệt hiển thị lên trang chủ)
-    List<Server> findByStatus(Server.Status status);
 
-    // Tìm server của một user cụ thể (Để user quản lý server của họ)
-    List<Server> findByUser_Id(Integer userId);
+    // 1. CƠ BẢN: Tìm tất cả server đang bật (isActive = true)
+    // Dùng cho: Các danh sách chung, dropdown menu
+    List<Server> findByIsActiveTrue();
 
-    // Tìm kiếm server theo tên (Cho chức năng search)
-    @Query("SELECT s FROM Server s WHERE s.serverName LIKE %?1%")
-    List<Server> searchByName(String keyword);
+    // 2. TRANG CHỦ: Lấy danh sách server Active + Đã duyệt (APPROVED hoặc ACTIVE)
+    // Có hỗ trợ phân trang (Pageable) để load nhanh hơn
+    Page<Server> findByStatusAndIsActiveTrue(Status status, Pageable pageable);
+
+    // Hoặc nếu bạn muốn lấy nhiều trạng thái (VD: lấy cả APPROVED và ACTIVE)
+    Page<Server> findByStatusInAndIsActiveTrue(List<Status> statuses, Pageable pageable);
+
+    // 3. TÌM KIẾM: Tìm theo tên server (không phân biệt hoa thường) VÀ đang bật
+    // Dùng cho: Thanh tìm kiếm trên trang chủ
+    List<Server> findByServerNameContainingIgnoreCaseAndIsActiveTrue(String keyword);
+
+    // 4. NGƯỜI DÙNG: Lấy danh sách server của một User cụ thể (Trang quản lý cá nhân)
+    // Ở đây không cần check isActive vì chủ server cần thấy cả server đang tắt
+    List<Server> findByUserId(Long userId);
+
+    // 5. ADMIN: Đếm số lượng server đang chờ duyệt (PENDING)
+    long countByStatus(Status status);
+
+    // 6. CUSTOM QUERY (Nâng cao):
+    // Ví dụ: Tìm server mới nhất đang hoạt động để ghim lên đầu trang
+    @Query("SELECT s FROM Server s WHERE s.isActive = true AND s.status = 'ACTIVE' ORDER BY s.createdAt DESC")
+    List<Server> findLatestActiveServers(Pageable pageable);
+
+    // 7. KIỂM TRA: Check xem tên server đã tồn tại chưa (tránh trùng lặp khi tạo mới)
+    boolean existsByServerName(String serverName);
+    List<Server> findByStatus(Status status);
+
 }

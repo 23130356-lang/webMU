@@ -47,6 +47,14 @@ public class ServerController {
     public String createServer(@ModelAttribute("serverDTO") ServerRegisterDTO serverDTO,
                                HttpSession session) { // Thêm tham số Session
 
+// --- ĐOẠN DEBUG (BẮT BUỘC THÊM VÀO ĐỂ KIỂM TRA) ---
+        System.out.println("================ DEBUG START ================");
+        System.out.println("Tên Server: " + serverDTO.getServerName());
+        System.out.println("Ngày Alpha (DTO): " + serverDTO.getAlphaDate()); // Xem có null không?
+        System.out.println("Giờ Alpha (DTO): " + serverDTO.getAlphaTime());   // Xem có null không?
+        System.out.println("Ngày Beta (DTO): " + serverDTO.getBetaDate());
+        System.out.println("================ DEBUG END ==================");
+        // --------------------------------------------------
         // 1. Kiểm tra xem đã login chưa
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) {

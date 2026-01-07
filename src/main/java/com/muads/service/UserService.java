@@ -6,6 +6,7 @@ import com.muads.entity.User;
 import com.muads.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -13,54 +14,48 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public void registerUser(UserRegisterDTO dto) {
-        // 1. Kiểm tra username đã tồn tại chưa
+    /**
+     * Xử lý Đăng ký tài khoản mới
+     */
+    @Transactional
+    public User registerUser(UserRegisterDTO dto) {
+        // 1. Kiểm tra trùng lặp
         if (userRepository.existsByUsername(dto.getUsername())) {
-            throw new RuntimeException("Tên tài khoản đã tồn tại!");
+            throw new RuntimeException("Tên đăng nhập đã tồn tại!");
         }
-
-        // 2. Kiểm tra email đã tồn tại chưa
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("Email này đã được sử dụng!");
+            throw new RuntimeException("Email đã được sử dụng!");
         }
 
-        // 3. Kiểm tra mật khẩu nhập lại có khớp không
-        if (!dto.getPassword().equals(dto.getConfirmPassword())) {
-            throw new RuntimeException("Mật khẩu nhập lại không khớp!");
-        }
-
-        // 4. Tạo User Entity để lưu
+        // 2. Map từ DTO sang Entity
         User user = new User();
         user.setUsername(dto.getUsername());
-
-        // Lưu ý: Trong thực tế bạn nên mã hóa mật khẩu ở đây (VD: BCrypt)
-        // Hiện tại ta lưu text thường để test trước.
-        user.setPassword(dto.getPassword());
-
+        user.setPassword(dto.getPassword()); // Lưu ý: Nên mã hóa password ở đây nếu có Spring Security
         user.setEmail(dto.getEmail());
-        user.setPhone(dto.getPhone());
-        user.setCoin(0); // Mặc định 0 xu
-        user.setRole(User.Role.USER); // Mặc định là member thường
-        user.setStatus(1); // Mặc định hoạt động
+        user.setBalance(0.0); // Số dư mặc định bằng 0
 
-        userRepository.save(user);
+        // QUAN TRỌNG: Gán Role mặc định là MEMBER
+        // (Dùng Enum chuẩn User.Role.MEMBER thay vì string)
+        user.setRole(User.Role.USER);
+
+        // 3. Lưu xuống DB
+        return userRepository.save(user);
     }
 
+    /**
+     * Xử lý Đăng nhập
+     */
     public User login(UserLoginDTO dto) {
         // 1. Tìm user theo username
-        User user = userRepository.findByUsername(dto.getUsername())
-                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại!"));
+        User user = userRepository.findByUsername(dto.getUsername());
 
-        // 2. So sánh mật khẩu (Đang dùng text thường, sau này nâng cấp BCrypt sau)
-        if (!user.getPassword().equals(dto.getPassword())) {
-            throw new RuntimeException("Mật khẩu không chính xác!");
+        // 2. Kiểm tra password
+        // (Nếu sau này dùng BCryptPasswordEncoder thì dùng passwordEncoder.matches())
+        if (user == null || !user.getPassword().equals(dto.getPassword())) {
+            throw new RuntimeException("Sai tên đăng nhập hoặc mật khẩu!");
         }
 
-        // 3. Kiểm tra xem tài khoản có bị khóa không
-        if (user.getStatus() != 1) {
-            throw new RuntimeException("Tài khoản này đã bị khóa!");
-        }
-
-        return user; // Trả về user nếu mọi thứ OK
+        // 3. Trả về user nếu đúng
+        return user;
     }
 }
