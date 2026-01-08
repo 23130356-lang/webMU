@@ -14,9 +14,6 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    /**
-     * Xử lý Đăng ký tài khoản mới
-     */
     @Transactional
     public User registerUser(UserRegisterDTO dto) {
         // 1. Kiểm tra trùng lặp
@@ -32,11 +29,9 @@ public class UserService {
         user.setUsername(dto.getUsername());
         user.setPassword(dto.getPassword()); // Lưu ý: Nên mã hóa password ở đây nếu có Spring Security
         user.setEmail(dto.getEmail());
-        user.setBalance(0.0); // Số dư mặc định bằng 0
-
-        // QUAN TRỌNG: Gán Role mặc định là MEMBER
-        // (Dùng Enum chuẩn User.Role.MEMBER thay vì string)
+        user.setCoin(0);
         user.setRole(User.Role.USER);
+
 
         // 3. Lưu xuống DB
         return userRepository.save(user);

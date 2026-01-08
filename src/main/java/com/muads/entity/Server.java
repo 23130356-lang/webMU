@@ -71,10 +71,8 @@ public class Server {
 
     // Enum mở rộng thêm trạng thái ACTIVE và INACTIVE
     public enum Status {
-        PENDING,    // Chờ duyệt
-        APPROVED,   // Đã duyệt (nhưng có thể chưa chạy)
-        ACTIVE,     // Đang hoạt động chính thức
-        REJECTED,   // Bị từ chối
-        INACTIVE    // Ngừng hoạt động
+        PENDING,   // Chờ duyệt
+        APPROVED,  // Đã duyệt (Thay vì ACTIVE)
+        REJECTED   // Từ chối
     }
 }

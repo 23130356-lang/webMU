@@ -59,27 +59,37 @@ public class AdminController {
         return "admin/server-detail";
     }
 
-    // --- 3. DUYỆT BÀI (APPROVE) ---
+    // --- 3. Hành động: DUYỆT BÀI (Approve) ---
     @PostMapping("/approve/{id}")
     public String approveServer(@PathVariable Long id, HttpSession session) {
+        // Check quyền admin
         if (!isAdmin(session)) return "redirect:/login";
 
         Server server = serverRepository.findById(id).orElse(null);
         if (server != null) {
-            server.setStatus(Server.Status.ACTIVE);
+            // CẬP NHẬT TRẠNG THÁI MỚI
+            server.setStatus(Server.Status.APPROVED); // <-- Sửa ACTIVE thành APPROVED
+
+            // LƯU VÀO DATABASE
             serverRepository.save(server);
         }
         return "redirect:/admin/pending";
     }
 
-    // --- 4. TỪ CHỐI / XÓA (REJECT) ---
+    // --- 4. Hành động: TỪ CHỐI (Reject) ---
     @PostMapping("/reject/{id}")
     public String rejectServer(@PathVariable Long id, HttpSession session) {
         if (!isAdmin(session)) return "redirect:/login";
 
-        // Xóa luôn khỏi database
-        serverRepository.deleteById(id);
+        Server server = serverRepository.findById(id).orElse(null);
+        if (server != null) {
+            // Cách 1: Xóa luôn khỏi DB (như code cũ)
+            // serverRepository.deleteById(id);
 
+            // Cách 2: Cập nhật trạng thái REJECTED (để lưu lịch sử) -> Khuyên dùng cách này nếu DB đã có ENUM REJECTED
+            server.setStatus(Server.Status.REJECTED);
+            serverRepository.save(server);
+        }
         return "redirect:/admin/pending";
     }
 }

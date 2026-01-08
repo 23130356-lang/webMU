@@ -31,9 +31,8 @@ public class User {
     @Column(name = "full_name")
     private String fullName;
 
-    @Column(columnDefinition = "DOUBLE DEFAULT 0.0")
-    private Double balance = 0.0; // Số dư tài khoản (Set mặc định là 0)
-
+    @Column(name = "coin", columnDefinition = "INT DEFAULT 0")
+    private Integer coin = 0;
     // --- CẤU HÌNH ENUM ROLE CHUẨN ---
     public enum Role {
         ADMIN,  // Dành cho admin

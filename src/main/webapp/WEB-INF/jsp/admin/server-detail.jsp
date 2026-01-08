@@ -59,29 +59,35 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card mb-3 shadow-sm">
-                    <div class="card-header bg-info text-white fw-bold">Thông tin Người đăng</div>
-                    <div class="card-body">
-                        <c:if test="${not empty sv.user}">
-                            <p><strong>User:</strong> ${sv.user.username}</p>
-                            <p><strong>Email:</strong> ${sv.user.email}</p>
-                            <p><strong>Số dư:</strong> ${sv.user.balance} xu</p>
-                        </c:if>
-                        <c:if test="${empty sv.user}">
-                            <p class="text-danger">Không tìm thấy chủ server</p>
-                        </c:if>
-                    </div>
-                </div>
+           <div class="col-md-4">
+    <div class="card mb-3 shadow-sm">
+        <div class="card-header bg-info text-white fw-bold">Thông tin Người đăng</div>
+        <div class="card-body">
+            <c:if test="${not empty sv.user}">
+                <p><strong>User:</strong> ${sv.user.username}</p>
+                <p><strong>Email:</strong> ${sv.user.email}</p>
+
+                <p><strong>Coin:</strong>
+                    <span class="text-warning fw-bold">${sv.user.coin} Xu</span>
+                </p>
+            </c:if>
+
+            <c:if test="${empty sv.user}">
+                <p class="text-danger">Không tìm thấy chủ server</p>
+            </c:if>
+        </div>
+    </div>
+
+    </div>
 
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
                         <form action="/admin/approve/${sv.id}" method="post" class="d-grid mb-2">
-                            <button class="btn btn-success btn-lg fw-bold">✔ DUYỆT BÀI</button>
+                            <button type="submit" class="btn btn-success btn-lg fw-bold">✔ DUYỆT BÀI</button>
                         </form>
 
                         <form action="/admin/reject/${sv.id}" method="post" class="d-grid">
-                            <button class="btn btn-danger" onclick="return confirm('Bạn chắc chắn muốn xóa Server này?')">✘ TỪ CHỐI / XÓA</button>
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn muốn từ chối server này?')">✘ TỪ CHỐI</button>
                         </form>
                     </div>
                 </div>
