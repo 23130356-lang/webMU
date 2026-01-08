@@ -11,15 +11,28 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
+        /* 1. Thiết lập Body là một cột dọc full màn hình */
         body {
             background: linear-gradient(135deg, #141E30 0%, #243B55 100%);
-            height: 100vh;
+            min-height: 100vh; /* Quan trọng: Chiều cao tối thiểu bằng màn hình */
+            margin: 0;
+
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Roboto', sans-serif;
+            flex-direction: column; /* Xếp Header trên, Nội dung dưới */
         }
+
+        /* 2. Wrapper chiếm toàn bộ khoảng trống còn lại */
+        .main-content-wrapper {
+            flex: 1; /* Tự động giãn ra lấp đầy khoảng trống giữa Header và đáy màn hình */
+            display: flex; /* Biến nó thành khung chứa linh hoạt */
+            width: 100%;
+            padding: 20px; /* Cách lề 1 chút trên điện thoại */
+        }
+
+        /* 3. Card đăng nhập - Dùng margin: auto để tự căn giữa */
         .auth-card {
+            margin: auto; /* CODE QUAN TRỌNG NHẤT: Tự động đẩy về giữa trung tâm theo cả 4 phía */
+
             background: white;
             border-radius: 15px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.5);
@@ -27,6 +40,8 @@
             width: 100%;
             max-width: 500px;
         }
+
+        /* --- Các phần trang trí bên trong Card giữ nguyên --- */
         .auth-header {
             background: linear-gradient(to right, #1e3c72, #2a5298);
             padding: 30px;
@@ -47,8 +62,10 @@
             box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4);
         }
     </style>
+
 </head>
 <body>
+<jsp:include page="header.jsp" />
 
 <div class="auth-card">
     <div class="auth-header">

@@ -11,104 +11,120 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
+        /* 1. BODY: Chỉ thiết lập nền, KHÔNG dùng Flexbox ở đây để tránh méo Header */
         body {
-            background: linear-gradient(135deg, #141E30 0%, #243B55 100%);
-            height: 100vh;
+            background: #0f1215; /* Màu nền chung */
+            margin: 0;
+            padding: 0;
+            /* Reset font về mặc định để không ảnh hưởng Header */
+            font-family: var(--bs-body-font-family);
+        }
+
+        /* 2. LOGIN WRAPPER: Đây là không gian riêng của phần Login */
+        .login-page-wrapper {
+            /* Tính toán chiều cao: Full màn hình trừ đi chiều cao Header (ước lượng 80px) */
+            min-height: calc(100vh - 80px);
+
+            /* Bây giờ mới dùng Flexbox để căn giữa Form */
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
+
+            /* Font chữ riêng cho vùng Login, không ảnh hưởng Header */
             font-family: 'Roboto', sans-serif;
         }
+
+        /* 3. CARD STYLE (Giữ nguyên như cũ) */
         .auth-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            overflow: hidden;
             width: 100%;
             max-width: 450px;
+            background-color: #041421;
+            border: 1px solid #444;
+            border-top: 4px solid #cc0000;
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            color: #fff;
         }
+
+        /* ... Các CSS trang trí Form giữ nguyên ... */
         .auth-header {
-            background: linear-gradient(to right, #1e3c72, #2a5298);
-            padding: 30px;
+            background: linear-gradient(to bottom, #a00000, #750000);
+            padding: 25px;
             text-align: center;
-            color: white;
+            border-bottom: 1px solid #500;
         }
-        .btn-submit {
-            background: linear-gradient(to right, #11998e, #38ef7d);
-            border: none;
-            padding: 12px;
-            color: white;
-            font-weight: bold;
-            border-radius: 50px;
-            width: 100%;
-            transition: all 0.3s;
-        }
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4);
-        }
-        .form-control:focus {
-            border-color: #2a5298;
-            box-shadow: 0 0 0 0.2rem rgba(42, 82, 152, 0.25);
-        }
+        .auth-header h3 { color: #ffd700; font-weight: 800; text-transform: uppercase; margin: 0; }
+        .auth-header p { color: #e0e0e0; font-size: 0.9rem; margin-top: 5px; }
+        .form-label { color: #ccc !important; font-size: 0.8rem; text-transform: uppercase; }
+        .input-group-text { background-color: #1a2c3d; border: 1px solid #444; color: #cc0000; }
+        .form-control { background-color: #0d1f2e; border: 1px solid #444; color: #fff !important; }
+        .form-control:focus { border-color: #cc0000; box-shadow: 0 0 5px rgba(204, 0, 0, 0.5); }
+        .btn-submit { background: linear-gradient(to bottom, #cc0000, #990000); border: 1px solid #ff3333; color: white; padding: 12px; font-weight: 800; width: 100%; text-transform: uppercase; }
+        .btn-submit:hover { background: linear-gradient(to bottom, #ff0000, #cc0000); }
+        .text-primary { color: #ffd700 !important; }
+        .text-primary:hover { color: #fff !important; text-decoration: underline !important; }
     </style>
 </head>
+
 <body>
 
-<div class="auth-card">
-    <div class="auth-header">
-        <h3><i class="fa-solid fa-right-to-bracket me-2"></i>ĐĂNG NHẬP</h3>
-        <p class="mb-0">Chào mừng trở lại với MU Ads Portal</p>
-    </div>
+<jsp:include page="header.jsp" />
 
-    <div class="p-4 p-md-5">
+<div class="login-page-wrapper">
 
-        <c:if test="${param.registerSuccess == 'true'}">
-            <div class="alert alert-success text-center">
-                Đăng ký thành công! Vui lòng đăng nhập.
-            </div>
-        </c:if>
+    <div class="auth-card">
+        <div class="auth-header">
+            <h3><i class="fa-solid fa-shield-halved me-2"></i>ĐĂNG NHẬP</h3>
+            <p>Hệ thống quản lý MU Online</p>
+        </div>
 
-        <c:if test="${not empty errorMessage}">
-            <div class="alert alert-danger text-center">
-                <i class="fa-solid fa-circle-exclamation me-1"></i> ${errorMessage}
-            </div>
-        </c:if>
-
-        <form action="${pageContext.request.contextPath}/login" method="post">
-
-            <div class="mb-4">
-                <label class="form-label fw-bold text-secondary">Tài khoản</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-light"><i class="fa-solid fa-user"></i></span>
-                    <input type="text" class="form-control" name="username" placeholder="Nhập username" required>
+        <div class="p-4">
+            <c:if test="${param.registerSuccess == 'true'}">
+                <div class="alert alert-success bg-dark text-success border-success text-center">
+                    <i class="fa-solid fa-check-circle"></i> Đăng ký thành công!
                 </div>
-            </div>
+            </c:if>
 
-            <div class="mb-4">
-                <label class="form-label fw-bold text-secondary">Mật khẩu</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-light"><i class="fa-solid fa-lock"></i></span>
-                    <input type="password" class="form-control" name="password" placeholder="Nhập mật khẩu" required>
+            <c:if test="${not empty errorMessage}">
+                <div class="alert alert-danger bg-dark text-danger border-danger text-center">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i> ${errorMessage}
                 </div>
-            </div>
+            </c:if>
 
-            <div class="d-flex justify-content-between mb-4 small">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="remember">
-                    <label class="form-check-label" for="remember">Ghi nhớ tôi</label>
+            <form action="${pageContext.request.contextPath}/login" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Tài khoản</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                        <input type="text" class="form-control" name="username" placeholder="Nhập username" required>
+                    </div>
                 </div>
-                <a href="#" class="text-decoration-none text-primary">Quên mật khẩu?</a>
-            </div>
 
-            <button type="submit" class="btn btn-submit mb-4">ĐĂNG NHẬP</button>
+                <div class="mb-3">
+                    <label class="form-label">Mật khẩu</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" class="form-control" name="password" placeholder="Nhập mật khẩu" required>
+                    </div>
+                </div>
 
-            <div class="text-center">
-                <small>Chưa có tài khoản? <a href="${pageContext.request.contextPath}/register" class="text-decoration-none fw-bold text-primary">Đăng ký ngay</a></small>
-            </div>
-        </form>
+                <div class="d-flex justify-content-between mb-4 small">
+                    <div class="form-check">
+                        <input class="form-check-input bg-dark border-secondary" type="checkbox" id="remember">
+                        <label class="form-check-label text-secondary" for="remember">Ghi nhớ tôi</label>
+                    </div>
+                    <a href="#" class="text-decoration-none text-primary">Quên mật khẩu?</a>
+                </div>
+
+                <button type="submit" class="btn btn-submit mb-3">ĐĂNG NHẬP NGAY</button>
+
+                <div class="text-center text-secondary small">
+                    Chưa có tài khoản? <a href="${pageContext.request.contextPath}/register" class="fw-bold text-primary">Đăng ký mới</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-
 </body>
 </html>

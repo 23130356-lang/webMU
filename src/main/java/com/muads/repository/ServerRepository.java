@@ -48,4 +48,22 @@ public interface ServerRepository extends JpaRepository<Server, Long> {
     List<Server> findByStatus(Status status);
     List<Server> findByStatusOrderByCreatedAtDesc(Status status);
     List<Server> findByIsActiveTrueAndExpiredAtBefore(LocalDateTime now);
+    // 1. Lấy danh sách Server VIP (Gói VIP hoặc SUPER_VIP), Đã duyệt, Đang active
+// 1. Lấy SUPER VIP (Cao cấp nhất)
+    @Query("SELECT s FROM Server s WHERE s.status = 'APPROVED' AND s.isActive = true " +
+            "AND s.bannerPackage = 'SUPER_VIP' " +
+            "ORDER BY s.approvedAt DESC")
+    List<Server> findSuperVipServers();
+
+    // 2. Lấy VIP (Cấp trung)
+    @Query("SELECT s FROM Server s WHERE s.status = 'APPROVED' AND s.isActive = true " +
+            "AND s.bannerPackage = 'VIP' " +
+            "ORDER BY s.approvedAt DESC")
+    List<Server> findVipServers();
+
+    // 3. Lấy THƯỜNG (Cơ bản)
+    @Query("SELECT s FROM Server s WHERE s.status = 'APPROVED' AND s.isActive = true " +
+            "AND s.bannerPackage = 'BASIC' " +
+            "ORDER BY s.approvedAt DESC")
+    List<Server> findNormalServers();
 }
