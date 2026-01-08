@@ -293,7 +293,7 @@
                         </div>
                     </div>
                     <div class="mb-4">
-                        <label class="form-label fw-bold">Bài viết giới thiệu (Hỗ trợ HTML cơ bản)</label>
+                        <label class="form-label fw-bold">Bài viết giới thiệu </label>
                         <textarea class="form-control" name="description" rows="5" placeholder="Viết nội dung quảng cáo chi tiết, tính năng nổi bật, lộ trình server..."></textarea>
                     </div>
 
@@ -309,7 +309,7 @@
             </form>
 
             <div class="text-center text-white-50 mt-4 mb-5">
-                <small>&copy; 2026 MU Ads Portal. System by Gemini.</small>
+                <small>&copy; 2026 MU Ads Portal. System by LeThanhTruong.</small>
             </div>
 
         </div>

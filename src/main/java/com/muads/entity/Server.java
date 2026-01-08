@@ -39,20 +39,29 @@ public class Server {
     @Column(name = "banner_image")
     private String bannerImage;
 
-    // --- CẬP NHẬT 1: Thêm thuộc tính isActive riêng biệt ---
-    // Dùng để Soft Delete hoặc Tắt/Bật server nhanh mà không mất trạng thái duyệt
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
-    // --- CẬP NHẬT 2: Thêm ACTIVE vào Enum Status ---
     @Enumerated(EnumType.STRING)
     private Status status = Status.PENDING;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "banner_package")
+    private BannerPackage bannerPackage = BannerPackage.BASIC;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    // --- [MỚI] THÊM 2 TRƯỜNG QUẢN LÝ THỜI GIAN ---
+    @Column(name = "approved_at")
+    private LocalDateTime approvedAt; // Thời điểm Admin bấm nút duyệt
+
+    @Column(name = "expired_at")
+    private LocalDateTime expiredAt; // Thời điểm server sẽ tự động bị tắt
+    // ----------------------------------------------
 
     @OneToOne(mappedBy = "server", cascade = CascadeType.ALL)
     private ServerSchedule schedule;
@@ -71,27 +80,24 @@ public class Server {
         updatedAt = LocalDateTime.now();
     }
 
-    // Enum mở rộng thêm trạng thái ACTIVE và INACTIVE
     public enum Status {
-        PENDING,   // Chờ duyệt
-        APPROVED,  // Đã duyệt (Thay vì ACTIVE)
-        REJECTED   // Từ chối
+        PENDING, APPROVED, REJECTED
     }
+
     @Getter
     public enum BannerPackage {
-        BASIC(1000, "Cơ bản (1.000 Xu)"),      // Cấp 1
-        VIP(5000, "VIP (5.000 Xu)"),           // Cấp 2
-        SUPER_VIP(10000, "Super VIP (10.000 Xu)"); // Cấp 3
+        BASIC(1000, "Cơ bản (1.000 Xu)", 7),       // 7 Ngày
+        VIP(5000, "VIP (5.000 Xu)", 10),           // 10 Ngày
+        SUPER_VIP(10000, "Super VIP (10.000 Xu)", 14); // 14 Ngày
 
         private final int price;
         private final String label;
+        private final int durationDays; // Thêm thuộc tính ngày
 
-        BannerPackage(int price, String label) {
+        BannerPackage(int price, String label, int durationDays) {
             this.price = price;
             this.label = label;
+            this.durationDays = durationDays;
         }
     }
-    @Enumerated(EnumType.STRING)
-    @Column(name = "banner_package")
-    private BannerPackage bannerPackage = BannerPackage.BASIC; // Mặc định là cơ bản
 }

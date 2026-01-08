@@ -90,6 +90,7 @@
                     <div class="card-body">
                         <c:if test="${not empty sv.user}">
                             <p><strong>User:</strong> ${sv.user.username}</p>
+                              <p><strong>Phone:</strong> ${sv.user.phone}</p>
                             <p><strong>Email:</strong> ${sv.user.email}</p>
 
                             <div class="alert alert-light border text-center mb-0">
@@ -104,52 +105,50 @@
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0">
-                    <div class="card-header bg-success text-white fw-bold">
-                        <i class="bi bi-lightning-charge"></i> Xử lý
-                    </div>
-                    <div class="card-body">
+               <div class="card-footer bg-white p-4">
+    <div class="d-flex justify-content-end gap-2">
 
-                        <c:choose>
-                            <%-- TRƯỜNG HỢP 1: ĐỦ TIỀN --%>
-                            <c:when test="${sv.user.coin >= sv.bannerPackage.price}">
-                                <div class="alert alert-info text-center py-2" style="font-size: 0.9rem;">
-                                    <i class="bi bi-check-circle"></i> Khách đủ tiền thanh toán.<br>
-                                    <strong>Phí duyệt: ${sv.bannerPackage.price} Xu</strong>
-                                </div>
+        <c:choose>
 
-                                <form action="/admin/approve/${sv.id}" method="post" class="d-grid mb-2">
-                                    <button type="submit" class="btn btn-success btn-lg fw-bold"
-                                            onclick="return confirm('Xác nhận duyệt và trừ ${sv.bannerPackage.price} Xu?')">
-                                        ✔ DUYỆT BÀI
-                                    </button>
-                                </form>
-                            </c:when>
+            <%-- TRƯỜNG HỢP 1: CHỜ DUYỆT (Hiện nút thao tác) --%>
+            <c:when test="${sv.status == 'PENDING'}">
 
-                            <%-- TRƯỜNG HỢP 2: KHÔNG ĐỦ TIỀN --%>
-                            <c:otherwise>
-                                <div class="alert alert-danger text-center py-2">
-                                    <strong><i class="bi bi-x-circle"></i> KHÔNG ĐỦ TIỀN</strong><br>
-                                    Cần: ${sv.bannerPackage.price} Xu<br>
-                                    Thiếu: <span class="fw-bold">${sv.bannerPackage.price - sv.user.coin} Xu</span>
-                                </div>
+                <form action="/admin/reject/${sv.id}" method="post" onsubmit="return confirm('Bạn chắc chắn muốn từ chối server này?');">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-x-circle"></i> Từ chối
+                    </button>
+                </form>
 
-                                <div class="d-grid mb-2">
-                                    <button class="btn btn-secondary btn-lg" disabled>
-                                        🚫 Không thể duyệt
-                                    </button>
-                                </div>
-                            </c:otherwise>
-                        </c:choose>
+                <form action="/admin/approve/${sv.id}" method="post" onsubmit="return confirm('Xác nhận duyệt và trừ tiền thành viên?');">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Duyệt ngay
+                    </button>
+                </form>
 
-                        <form action="/admin/reject/${sv.id}" method="post" class="d-grid">
-                            <button type="submit" class="btn btn-outline-danger"
-                                    onclick="return confirm('Bạn muốn từ chối/xóa server này?')">
-                                ✘ TỪ CHỐI / XÓA
-                            </button>
-                        </form>
-                    </div>
+            </c:when>
+
+            <%-- TRƯỜNG HỢP 2: ĐÃ DUYỆT (Chỉ hiện thông báo, ẩn nút) --%>
+            <c:when test="${sv.status == 'APPROVED'}">
+                <div class="alert alert-success m-0 py-2 px-4 d-flex align-items-center">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <strong>Đã duyệt</strong>
+                    <span class="ms-2 small">(Ngày hết hạn: ${sv.expiredAt.toLocalDate()})</span>
                 </div>
+                <a href="/admin/approved" class="btn btn-secondary">Quay lại</a>
+            </c:when>
+
+            <%-- TRƯỜNG HỢP 3: ĐÃ TỪ CHỐI --%>
+            <c:when test="${sv.status == 'REJECTED'}">
+                <div class="alert alert-danger m-0 py-2 px-4">
+                    <i class="bi bi-x-circle-fill me-2"></i> Đã từ chối
+                </div>
+                <a href="/admin/pending" class="btn btn-secondary">Quay lại</a>
+            </c:when>
+
+        </c:choose>
+
+    </div>
+</div>
             </div>
         </div>
     </div>

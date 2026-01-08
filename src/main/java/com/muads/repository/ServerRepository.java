@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,5 +46,6 @@ public interface ServerRepository extends JpaRepository<Server, Long> {
     // 7. KIỂM TRA: Check xem tên server đã tồn tại chưa (tránh trùng lặp khi tạo mới)
     boolean existsByServerName(String serverName);
     List<Server> findByStatus(Status status);
-
+    List<Server> findByStatusOrderByCreatedAtDesc(Status status);
+    List<Server> findByIsActiveTrueAndExpiredAtBefore(LocalDateTime now);
 }

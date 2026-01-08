@@ -7,6 +7,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ServerService {
 
@@ -88,5 +90,9 @@ public class ServerService {
 
         // Lưu server lần cuối để chốt tất cả thay đổi (bao gồm cả Stat nhờ Cascade)
         serverRepository.save(server);
+    }
+    public List<Server> getApprovedServers() {
+        // Gọi hàm vừa viết ở Repository
+        return serverRepository.findByStatusOrderByCreatedAtDesc(Server.Status.APPROVED);
     }
 }

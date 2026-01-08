@@ -28,6 +28,9 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false, unique = true)
+    private String phone;
+
     @Column(name = "full_name")
     private String fullName;
 
