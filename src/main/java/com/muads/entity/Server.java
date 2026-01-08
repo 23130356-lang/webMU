@@ -2,6 +2,8 @@ package com.muads.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -75,4 +77,21 @@ public class Server {
         APPROVED,  // Đã duyệt (Thay vì ACTIVE)
         REJECTED   // Từ chối
     }
+    @Getter
+    public enum BannerPackage {
+        BASIC(1000, "Cơ bản (1.000 Xu)"),      // Cấp 1
+        VIP(5000, "VIP (5.000 Xu)"),           // Cấp 2
+        SUPER_VIP(10000, "Super VIP (10.000 Xu)"); // Cấp 3
+
+        private final int price;
+        private final String label;
+
+        BannerPackage(int price, String label) {
+            this.price = price;
+            this.label = label;
+        }
+    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "banner_package")
+    private BannerPackage bannerPackage = BannerPackage.BASIC; // Mặc định là cơ bản
 }

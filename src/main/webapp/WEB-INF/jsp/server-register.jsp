@@ -272,13 +272,33 @@
                             </div>
                         </div>
                     </div>
+                    <div class="card mb-4 border-warning">
+                        <div class="card-header bg-warning text-dark fw-bold">
+                            <i class="bi bi-star-fill"></i> Chọn Gói Quảng Cáo
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="bannerPackage" class="form-label fw-bold">Loại hiển thị:</label>
+                                <select name="bannerPackage" id="bannerPackage" class="form-select" required>
+                                    <option value="BASIC" selected>Gói Cơ Bản - 1.000 Xu (Mặc định)</option>
 
+                                    <option value="VIP">Gói VIP - 5.000 Xu (Nổi bật, chữ đậm)</option>
+
+                                    <option value="SUPER_VIP">Gói Super VIP - 10.000 Xu (Ghim đầu trang)</option>
+                                </select>
+                                <div class="form-text text-danger">
+                                    * Phí sẽ được trừ trực tiếp vào Coin của bạn khi Admin duyệt bài.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="mb-4">
                         <label class="form-label fw-bold">Bài viết giới thiệu (Hỗ trợ HTML cơ bản)</label>
                         <textarea class="form-control" name="description" rows="5" placeholder="Viết nội dung quảng cáo chi tiết, tính năng nổi bật, lộ trình server..."></textarea>
                     </div>
 
                     <div class="text-center mt-5">
+
                         <button type="submit" class="btn btn-submit">
                             <i class="fa-solid fa-paper-plane me-2"></i> HOÀN TẤT ĐĂNG KÝ
                         </button>

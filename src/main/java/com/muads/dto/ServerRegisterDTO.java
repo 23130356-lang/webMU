@@ -11,7 +11,7 @@ public class ServerRegisterDTO {
     private String websiteUrl;
     private String fanpageUrl;
     private String description;
-
+    private String bannerPackage;
     // Định dạng phải khớp với <input type="date"> và <input type="time">
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate alphaDate;
@@ -81,4 +81,12 @@ public class ServerRegisterDTO {
 
     public String getAntiHack() { return antiHack; }
     public void setAntiHack(String antiHack) { this.antiHack = antiHack; }
+    public String getBannerPackage() {
+        return bannerPackage;
+    }
+
+    public void setBannerPackage(String bannerPackage) {
+        this.bannerPackage = bannerPackage;
+    }
+
 }

@@ -24,7 +24,7 @@ public class ServerService {
     @Transactional
     public void registerServer(ServerRegisterDTO dto, User owner) {
 
-        // --- BƯỚC 1: TẠO SERVER VÀ LƯU ĐỂ LẤY ID ---
+        // --- BƯỚC 1: TẠO SERVER VÀ CẤU HÌNH CƠ BẢN ---
         Server server = new Server();
         server.setServerName(dto.getServerName());
         server.setMuName(dto.getMuName());
@@ -32,11 +32,27 @@ public class ServerService {
         server.setWebsiteUrl(dto.getWebsiteUrl());
         server.setFanpageUrl(dto.getFanpageUrl());
         server.setDescription(dto.getDescription());
-        server.setStatus(Server.Status.PENDING);
-        server.setUser(owner);
+        server.setStatus(Server.Status.PENDING); // Mặc định là chờ duyệt
+        server.setUser(owner); // Gán chủ sở hữu
+
+        // --- [MỚI] XỬ LÝ GÓI BANNER (QUAN TRỌNG) ---
+        // Logic: Lấy chuỗi từ DTO (ví dụ "VIP") -> Chuyển thành Enum (BannerPackage.VIP)
+        try {
+            if (dto.getBannerPackage() != null && !dto.getBannerPackage().isEmpty()) {
+                // Chuyển đổi String sang Enum
+                server.setBannerPackage(Server.BannerPackage.valueOf(dto.getBannerPackage()));
+            } else {
+                // Nếu không chọn gì -> Mặc định là BASIC
+                server.setBannerPackage(Server.BannerPackage.BASIC);
+            }
+        } catch (IllegalArgumentException e) {
+            // Nếu dữ liệu gửi lên bị sai (hack/lỗi) -> Mặc định về BASIC để không lỗi server
+            server.setBannerPackage(Server.BannerPackage.BASIC);
+        }
 
         // Lưu lần 1: Để database sinh ra ID cho Server (VD: ID = 10)
         server = serverRepository.save(server);
+
 
         // --- BƯỚC 2: TẠO SCHEDULE VÀ GẮN ID SERVER VÀO ---
         ServerSchedule schedule = new ServerSchedule();
@@ -47,17 +63,13 @@ public class ServerService {
         schedule.setBetaDate(dto.getBetaDate());
         schedule.setBetaTime(dto.getBetaTime());
 
-        // QUAN TRỌNG NHẤT: GÁN 2 CHIỀU ĐỂ KHÔNG BỊ MẤT LIÊN KẾT
-
-        // 1. Nói cho Schedule biết cha nó là ai (Để điền vào cột server_id trong DB)
-        schedule.setServer(server);
-
-        // 2. Nói cho Server biết nó có đứa con này (Để Java cập nhật bộ nhớ)
-        server.setSchedule(schedule);
+        // GÁN 2 CHIỀU ĐỂ KHÔNG BỊ MẤT LIÊN KẾT
+        schedule.setServer(server); // Nói cho Schedule biết cha nó là ai
+        server.setSchedule(schedule); // Nói cho Server biết nó có đứa con này
 
         // --- BƯỚC 3: LƯU SCHEDULE ---
-        // Lúc này schedule đã cầm ID của server, nên khi lưu nó sẽ điền đúng server_id
         scheduleRepository.save(schedule);
+
 
         // --- BƯỚC 4: XỬ LÝ STAT (Tương tự) ---
         ServerStat stat = new ServerStat();
@@ -65,18 +77,16 @@ public class ServerService {
         stat.setDropRate(dto.getDropRate());
         stat.setAntiHack(dto.getAntiHack());
 
-        // Map các ID dropdown...
+        // Map các ID dropdown (Xử lý null safe)
         if (dto.getVersionId() != null) stat.setMuVersion(versionRepo.findById(dto.getVersionId()).orElse(null));
         if (dto.getResetId() != null) stat.setResetType(resetRepo.findById(dto.getResetId()).orElse(null));
         if (dto.getPointId() != null) stat.setPointType(pointRepo.findById(dto.getPointId()).orElse(null));
 
-        // Gán 2 chiều cho Stat luôn cho chắc
+        // Gán 2 chiều cho Stat
         stat.setServer(server);
         server.setServerStat(stat);
 
-        // Bạn có thể lưu stat thủ công hoặc lưu server lần cuối để chốt
+        // Lưu server lần cuối để chốt tất cả thay đổi (bao gồm cả Stat nhờ Cascade)
         serverRepository.save(server);
-
     }
-
 }
