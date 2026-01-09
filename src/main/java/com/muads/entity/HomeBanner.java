@@ -29,7 +29,9 @@ public class HomeBanner {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
-
+    @ManyToOne
+    @JoinColumn(name = "user_id") // Tên cột trong DB sẽ là user_id
+    private User user;
     // Constructor, Getters, Setters
     public HomeBanner() {}
 
@@ -46,4 +48,20 @@ public class HomeBanner {
     public void setDisplayOrder(Integer displayOrder) { this.displayOrder = displayOrder; }
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
+    // ... các getter/setter cũ ...
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

@@ -127,6 +127,12 @@
                 Đang hoạt động
             </a>
         </li>
+        <li class="nav-item">
+            <a href="/admin/banners" class="nav-link">
+                <i class="bi bi-check-circle-fill"></i>
+                Quản lý banner
+            </a>
+        </li>
 
         <li class="px-4 py-2 mt-2 text-uppercase text-muted" style="font-size: 0.75rem; font-weight: 700;">Hệ thống</li>
 

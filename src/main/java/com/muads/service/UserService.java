@@ -53,4 +53,7 @@ public class UserService {
         // 3. Trả về user nếu đúng
         return user;
     }
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
 }

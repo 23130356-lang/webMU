@@ -15,18 +15,14 @@
             background-color: #f0f2f5;
             font-family: 'Segoe UI', sans-serif;
         }
-
-        /* Tiêu đề trang */
         .page-header {
             text-align: center;
             margin: 30px 0;
             text-transform: uppercase;
             color: #041421;
         }
-
-        /* KHỐI BANNER (CARD) */
         .banner-slot {
-            background-color: #051b2c; /* Màu nền xanh đen */
+            background-color: #051b2c;
             color: white;
             border: 1px solid #0d3b5e;
             padding: 20px;
@@ -36,17 +32,14 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 200px; /* Chiều cao tối thiểu */
+            min-height: 200px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             transition: transform 0.2s;
         }
-
         .banner-slot:hover {
             transform: translateY(-5px);
             border-color: #ffc107;
         }
-
-        /* Tên banner (Màu vàng) */
         .slot-title {
             color: #ffc107;
             font-weight: 800;
@@ -54,18 +47,13 @@
             text-transform: uppercase;
             margin-bottom: 10px;
         }
-
-        /* Thông số kỹ thuật */
         .slot-info {
             font-size: 0.9rem;
             color: #aebfd1;
             margin-bottom: 15px;
             line-height: 1.6;
         }
-
         .slot-size { color: #fff; font-weight: bold; }
-
-        /* Thời gian slot */
         .slot-time-label {
             color: #ffc107;
             font-size: 0.85rem;
@@ -77,11 +65,9 @@
             color: #fff;
             margin-bottom: 20px;
         }
-
-        /* Cột bên trái và phải cần cao hơn để giống sidebar */
         .sidebar-slot {
             height: 100%;
-            min-height: 450px; /* Cao bằng tổng 2 cái giữa cộng lại */
+            min-height: 450px;
         }
     </style>
 </head>
@@ -95,23 +81,35 @@
     <c:if test="${not empty successMessage}">
         <div class="alert alert-success text-center">${successMessage}</div>
     </c:if>
+    <c:if test="${not empty errorMessage}">
+        <div class="alert alert-danger text-center">${errorMessage}</div>
+    </c:if>
 
-    <div class="row g-3"> <div class="col-md-3">
-        <div class="banner-slot sidebar-slot">
-            <div class="slot-title">Banner Trái</div>
-            <div class="slot-info">
-                Số lượng: 3/3<br>
-                Kích thước: <span class="slot-size">280 x 500 px</span>
+    <div class="row g-3">
+        <div class="col-md-3">
+            <div class="banner-slot sidebar-slot">
+                <div class="slot-title">Banner Trái</div>
+                <div class="slot-info">
+                    Số lượng: 3/3<br>
+                    Kích thước: <span class="slot-size">280 x 500 px</span>
+                </div>
+                <div class="slot-time-label">Thời gian có Slot:</div>
+                <div class="slot-time-value">${availability['LEFT_SIDEBAR']}</div>
+
+                <%-- Sử dụng JSTL chuẩn để kiểm tra userPrincipal --%>
+                <c:choose>
+                    <c:when test="${pageContext.request.userPrincipal != null}">
+                        <button class="btn btn-warning fw-bold w-75"
+                                onclick="openRegisterModal('LEFT_SIDEBAR', 'Banner Trái')">
+                            THUÊ NGAY
+                        </button>
+                    </c:when>
+                    <c:otherwise>
+                        <a href="/login" class="btn btn-secondary w-75">ĐĂNG NHẬP ĐỂ THUÊ</a>
+                    </c:otherwise>
+                </c:choose>
             </div>
-            <div class="slot-time-label">Thời gian có Slot:</div>
-            <div class="slot-time-value">${availability['LEFT_SIDEBAR']}</div>
-
-            <button class="btn btn-warning fw-bold w-75"
-                    onclick="openRegisterModal('LEFT_SIDEBAR', 'Banner Trái')">
-                THUÊ NGAY
-            </button>
         </div>
-    </div>
 
         <div class="col-md-6">
             <div class="d-flex flex-column h-100 gap-3">
@@ -125,10 +123,17 @@
                     <div class="slot-time-label">Thời gian có Slot:</div>
                     <div class="slot-time-value text-danger">${availability['HERO']}</div>
 
-                    <button class="btn btn-warning fw-bold px-5"
-                            onclick="openRegisterModal('HERO', 'Banner Giữa To')">
-                        THUÊ NGAY
-                    </button>
+                    <c:choose>
+                        <c:when test="${pageContext.request.userPrincipal != null}">
+                            <button class="btn btn-warning fw-bold w-75"
+                                    onclick="openRegisterModal('HERO', 'Banner Giữa To')">
+                                THUÊ NGAY
+                            </button>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="/login" class="btn btn-secondary w-75">ĐĂNG NHẬP ĐỂ THUÊ</a>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
 
                 <div class="banner-slot flex-fill">
@@ -140,10 +145,17 @@
                     <div class="slot-time-label">Thời gian có Slot:</div>
                     <div class="slot-time-value text-success">${availability['STD']}</div>
 
-                    <button class="btn btn-warning fw-bold px-5"
-                            onclick="openRegisterModal('STD', 'Banner Giữa Nhỏ')">
-                        THUÊ NGAY
-                    </button>
+                    <c:choose>
+                        <c:when test="${pageContext.request.userPrincipal != null}">
+                            <button class="btn btn-warning fw-bold w-75"
+                                    onclick="openRegisterModal('STD', 'Banner Giữa Nhỏ')">
+                                THUÊ NGAY
+                            </button>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="/login" class="btn btn-secondary w-75">ĐĂNG NHẬP ĐỂ THUÊ</a>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </div>
         </div>
@@ -158,10 +170,17 @@
                 <div class="slot-time-label">Thời gian có Slot:</div>
                 <div class="slot-time-value text-success">${availability['RIGHT_SIDEBAR']}</div>
 
-                <button class="btn btn-warning fw-bold w-75"
-                        onclick="openRegisterModal('RIGHT_SIDEBAR', 'Banner Phải')">
-                    THUÊ NGAY
-                </button>
+                <c:choose>
+                    <c:when test="${pageContext.request.userPrincipal != null}">
+                        <button class="btn btn-warning fw-bold w-75"
+                                onclick="openRegisterModal('RIGHT_SIDEBAR', 'Banner Phải')">
+                            THUÊ NGAY
+                        </button>
+                    </c:when>
+                    <c:otherwise>
+                        <a href="/login" class="btn btn-secondary w-75">ĐĂNG NHẬP ĐỂ THUÊ</a>
+                    </c:otherwise>
+                </c:choose>
             </div>
         </div>
 
@@ -177,6 +196,7 @@
             </div>
             <div class="modal-body">
                 <form action="/banner-register" method="post">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                     <input type="hidden" name="positionCode" id="hiddenPosCode">
 
                     <div class="mb-3">
@@ -202,15 +222,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Hàm mở Modal và điền tự động vị trí
     function openRegisterModal(code, name) {
-        // 1. Điền tên vị trí vào tiêu đề Modal
         document.getElementById('modalPosName').innerText = name;
-
-        // 2. Điền mã code vào input ẩn
         document.getElementById('hiddenPosCode').value = code;
-
-        // 3. Mở Modal lên
         var myModal = new bootstrap.Modal(document.getElementById('registerModal'));
         myModal.show();
     }

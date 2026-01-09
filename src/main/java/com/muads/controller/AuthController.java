@@ -71,7 +71,7 @@ public class AuthController {
             if (user.getRole() == User.Role.ADMIN) {
                 return "redirect:/admin/pending";
             } else {
-                return "redirect:/server/register";
+                return "redirect:/banner-register";
             }
 
         } catch (RuntimeException e) {
