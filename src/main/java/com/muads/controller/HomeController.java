@@ -2,6 +2,7 @@ package com.muads.controller;
 
 import com.muads.entity.HomeBanner;
 import com.muads.entity.Server;
+import com.muads.repository.HomeBannerRepository;
 import com.muads.repository.MuVersionRepository;
 import com.muads.repository.ResetTypeRepository;
 import com.muads.repository.ServerRepository;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import com.muads.service.HomeBannerService;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +30,8 @@ public class HomeController {
 
     @Autowired
     private ResetTypeRepository resetRepo;
-
+    @Autowired
+    private HomeBannerRepository bannerRepo;
     @GetMapping("/")
     public String home(Model model) {
         // --- PHẦN 1: DỮ LIỆU CHO HEADER ---
@@ -75,5 +79,16 @@ public class HomeController {
         model.addAttribute("menuTypes", resetRepo.findAll());
         return "login";
     }
+    public Map<String, List<HomeBanner>> getBannersForHomePage() {
+        Map<String, List<HomeBanner>> map = new HashMap<>();
 
+        // Lấy danh sách từ DB theo các Position Code đã quy định
+        // Lưu ý: Position Code trong DB phải khớp chính xác với chuỗi ở đây
+        map.put("LEFT_SIDEBAR", bannerRepo.findByPositionCodeAndActiveTrueOrderByDisplayOrderAsc("LEFT_SIDEBAR"));
+        map.put("RIGHT_SIDEBAR", bannerRepo.findByPositionCodeAndActiveTrueOrderByDisplayOrderAsc("RIGHT_SIDEBAR"));
+        map.put("STD", bannerRepo.findByPositionCodeAndActiveTrueOrderByDisplayOrderAsc("STD"));
+        map.put("HERO", bannerRepo.findByPositionCodeAndActiveTrueOrderByDisplayOrderAsc("HERO"));
+
+        return map;
+    }
 }

@@ -86,7 +86,7 @@ public class Server {
 
     @Getter
     public enum BannerPackage {
-        BASIC(1000, "Cơ bản (1.000 Xu)", 7),       // 7 Ngày
+        BASIC(0, "Cơ bản (Miễn phí)", 7),       // 7 Ngày
         VIP(5000, "VIP (5.000 Xu)", 10),           // 10 Ngày
         SUPER_VIP(10000, "Super VIP (10.000 Xu)", 14); // 14 Ngày
 

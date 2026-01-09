@@ -280,7 +280,7 @@
                             <div class="mb-3">
                                 <label for="bannerPackage" class="form-label fw-bold">Loại hiển thị:</label>
                                 <select name="bannerPackage" id="bannerPackage" class="form-select" required>
-                                    <option value="BASIC" selected>Gói Cơ Bản - 1.000 Xu (Mặc định)</option>
+                                    <option value="BASIC" selected>Gói Cơ Bản - Miễn phí (Mặc định)</option>
 
                                     <option value="VIP">Gói VIP - 5.000 Xu (Nổi bật, chữ đậm)</option>
 
