@@ -3,6 +3,8 @@ package com.muads.controller;
 import com.muads.dto.UserLoginDTO;
 import com.muads.dto.UserRegisterDTO;
 import com.muads.entity.User;
+import com.muads.repository.MuVersionRepository;
+import com.muads.repository.ResetTypeRepository;
 import com.muads.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class AuthController {
+    @Autowired
+    private MuVersionRepository versionRepo;
 
+    @Autowired
+    private ResetTypeRepository resetRepo;
     @Autowired
     private UserService userService;
 
@@ -42,6 +48,8 @@ public class AuthController {
     @GetMapping("/login")
     public String showLoginForm(Model model) {
         model.addAttribute("loginDTO", new UserLoginDTO());
+        model.addAttribute("menuVersions", versionRepo.findAll());
+        model.addAttribute("menuTypes", resetRepo.findAll());
         return "login";
     }
 
@@ -51,8 +59,7 @@ public class AuthController {
                                HttpSession session,
                                Model model) {
         try {
-            System.out.println("--- BẮT ĐẦU XỬ LÝ LOGIN ---");
-            System.out.println("Username nhập vào: " + loginDTO.getUsername());
+
 
             // 1. Gọi Service kiểm tra
             User user = userService.login(loginDTO);
@@ -60,23 +67,14 @@ public class AuthController {
             // 2. Nếu không lỗi -> Login thành công -> Lưu vào Session
             session.setAttribute("currentUser", user);
 
-            // In ra thông tin User lấy được từ DB để kiểm tra
-            System.out.println("Login thành công! User tìm thấy: " + user.getUsername());
-            System.out.println("Role trong Database là: " + user.getRole());
-
-            // 3. Phân quyền chuyển hướng
             // So sánh Enum trực tiếp (Chuẩn nhất)
             if (user.getRole() == User.Role.ADMIN) {
-                System.out.println(">> ĐIỀU HƯỚNG: Đang chuyển sang trang ADMIN (/admin/pending)");
                 return "redirect:/admin/pending";
             } else {
-                System.out.println(">> ĐIỀU HƯỚNG: Đang chuyển sang trang HOME (/)");
                 return "redirect:/server/register";
             }
 
         } catch (RuntimeException e) {
-            // Trường hợp đăng nhập sai
-            System.out.println(">> LỖI LOGIN: " + e.getMessage());
             model.addAttribute("errorMessage", e.getMessage());
             return "login";
         }

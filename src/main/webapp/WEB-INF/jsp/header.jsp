@@ -4,41 +4,33 @@
 <style>
     /* --- PHẦN 1: CÔ LẬP VÀ RESET --- */
     #mu-header-isolate {
-        /* Cắt đứt mọi thừa kế font chữ/màu sắc từ Body trang Login */
-        all: initial; /* (Tuỳ chọn) Reset toàn bộ về mặc định trình duyệt */
-
+        all: initial;
         display: block;
         width: 100%;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-        font-size: 16px !important;
+        font-size: 14px !important; /* Giảm size tổng thể */
         line-height: 1.5 !important;
         color: #fff !important;
         text-align: left !important;
         background-color: #041421 !important;
         box-sizing: border-box;
-
-        /* Đảm bảo nằm trên cùng */
         position: relative;
         z-index: 9999;
     }
 
-    /* Reset toàn bộ thẻ con bên trong về box-sizing chuẩn */
     #mu-header-isolate *,
     #mu-header-isolate *::before,
     #mu-header-isolate *::after {
         box-sizing: border-box;
     }
 
-    /* Reset thẻ A (Link) để không dính màu xanh/gạch chân của Bootstrap */
     #mu-header-isolate a {
         text-decoration: none !important;
         color: #fff !important;
-        font-weight: normal;
-        font-style: normal;
         cursor: pointer;
     }
 
-    /* --- PHẦN 2: STYLE CỤ THỂ (Đều bắt đầu bằng #mu-header-isolate) --- */
+    /* --- PHẦN 2: STYLE CỤ THỂ --- */
 
     /* Navbar Container */
     #mu-header-isolate .mu-navbar {
@@ -50,10 +42,11 @@
     /* Brand / Logo */
     #mu-header-isolate .navbar-brand {
         font-weight: 800 !important;
-        font-size: 1.5rem !important;
+        font-size: 1.4rem !important; /* Giảm nhẹ logo */
         text-transform: uppercase !important;
-        margin-right: 1rem !important;
+        margin-right: 15px !important; /* Giảm khoảng cách lề phải */
         display: inline-block;
+        white-space: nowrap;
     }
     #mu-header-isolate .brand-yellow { color: #ffd700 !important; }
     #mu-header-isolate .brand-white { color: #ffffff !important; }
@@ -61,20 +54,22 @@
         font-size: 0.6rem !important;
         color: #aaa !important;
         font-weight: normal !important;
-        letter-spacing: 1px !important;
+        letter-spacing: 0.5px !important;
         line-height: 1 !important;
         display: block;
     }
 
-    /* Menu Item */
+    /* Menu Item - Đã chỉnh nhỏ gọn */
     #mu-header-isolate .nav-link {
         color: #ffffff !important;
         font-weight: 700 !important;
         text-transform: uppercase !important;
-        font-size: 0.9rem !important;
-        padding: 18px 15px !important;
+        font-size: 13px !important; /* Size chữ menu nhỏ gọn */
+        padding: 15px 10px !important; /* Khoảng cách gọn gàng hơn */
         transition: all 0.3s;
-        display: block;
+        display: flex;
+        align-items: center;
+        white-space: nowrap; /* Chống xuống dòng tuyệt đối */
     }
 
     #mu-header-isolate .nav-link:hover {
@@ -84,8 +79,24 @@
 
     #mu-header-isolate .nav-link i {
         color: #ff0000 !important;
-        margin-right: 5px;
-        font-size: 0.7rem;
+        margin-right: 4px;
+        font-size: 10px !important; /* Icon nhỏ lại */
+        margin-top: -2px;
+    }
+
+    /* Style riêng cho nút Thuê Quảng Cáo */
+    #mu-header-isolate .nav-link.ads-link {
+        color: #ffc107 !important; /* Màu vàng */
+    }
+    #mu-header-isolate .nav-link.ads-link i {
+        color: #ffc107 !important;
+    }
+    #mu-header-isolate .nav-link.ads-link:hover {
+        background-color: #ffc107 !important;
+        color: #000 !important; /* Hover thành nền vàng chữ đen */
+    }
+    #mu-header-isolate .nav-link.ads-link:hover i {
+        color: #000 !important;
     }
 
     /* Dropdown Menu */
@@ -100,15 +111,14 @@
 
     #mu-header-isolate .dropdown-item {
         color: #fff !important;
-        padding: 12px 20px !important;
+        padding: 10px 15px !important;
         border-bottom: 1px solid rgba(255,255,255,0.1) !important;
         font-weight: 600 !important;
         text-transform: uppercase !important;
-        font-size: 0.85rem !important;
+        font-size: 12px !important;
         background: transparent !important;
         display: block;
         width: 100%;
-        clear: both;
     }
 
     #mu-header-isolate .dropdown-item:hover {
@@ -123,7 +133,8 @@
         font-weight: bold !important;
         text-transform: uppercase !important;
         border-radius: 2px !important;
-        padding: 8px 20px !important;
+        padding: 6px 12px !important; /* Nút gọn hơn */
+        font-size: 13px !important;
         border: 1px solid #ff3333 !important;
         box-shadow: 0 0 10px rgba(255, 0, 0, 0.3) !important;
         display: inline-block;
@@ -138,13 +149,14 @@
         display: flex;
         align-items: center;
         color: white !important;
+        font-size: 13px !important;
     }
     #mu-header-isolate .user-avatar {
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
         background-color: #ddd;
         border-radius: 50%;
-        margin-right: 8px;
+        margin-right: 6px;
         object-fit: cover;
     }
 
@@ -153,27 +165,12 @@
         color: #fff !important;
         font-weight: bold;
         margin-right: 10px;
-        font-size: 0.9rem;
+        font-size: 13px !important;
+        white-space: nowrap;
     }
-    .mu-header-container {
-        /* Reset cứng các thuộc tính có thể bị thừa kế */
-        display: block !important;
-        width: 100% !important;
-        font-family: 'Segoe UI', sans-serif !important;
-        line-height: 1.5 !important;
-        text-align: left !important;
-        font-size: 16px !important;
-
-        /* Đảm bảo nó nằm trên cùng */
-        position: sticky;
-        top: 0;
-        z-index: 1030;
-    }
-
 </style>
 
 <div id="mu-header-isolate">
-
     <nav class="navbar navbar-expand-lg mu-navbar sticky-top">
         <div class="container">
             <a class="navbar-brand" href="/">
@@ -187,7 +184,6 @@
 
             <div class="collapse navbar-collapse" id="muNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
                     <li class="nav-item">
                         <a class="nav-link" href="/">
                             <i class="bi bi-diamond-fill"></i> MU Mới Ra
@@ -226,6 +222,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/huong-dan">
                             <i class="bi bi-diamond-fill"></i> Hướng Dẫn
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link ads-link" href="/banner-register">
+                            <i class="bi bi-star-fill"></i> Thuê Quảng Cáo
                         </a>
                     </li>
                 </ul>

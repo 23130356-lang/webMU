@@ -8,7 +8,8 @@
     <title>Hướng Dẫn & Quy Định - MUMOIRA.TV</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
         body {
             background-color: #0d1117; /* Nền tối */
@@ -173,12 +174,33 @@
                 <div class="card bg-secondary bg-opacity-10 border-secondary p-3">
                     <h4 class="mt-0">Thông tin chuyển khoản:</h4>
                     <ul class="list-unstyled">
-                        <li class="mb-2">🏦 <strong>Ngân hàng:</strong> MB BANK (Quân Đội)</li>
-                        <li class="mb-2">💳 <strong>Số tài khoản:</strong> <span class="text-info fw-bold fs-5">9999.8888.6666</span></li>
-                        <li class="mb-2">👤 <strong>Chủ tài khoản:</strong> NGUYEN VAN A</li>
-                        <li>📝 <strong>Nội dung CK:</strong> <code class="fs-5 text-warning">NAP [Tên_Tài_Khoản_Của_Bạn]</code></li>
+                        <li class="mb-2" style="color: #d1d1d1 !important;">
+                            🏦 <strong>Ngân hàng:</strong> MB BANK (Quân Đội)
+                        </li>
+
+                        <li class="mb-2">
+                            💳
+                            <strong style="color:#dcdcdc !important;">Số tài khoản:</strong>
+                            <span style="color:#ffd158 !important;">9999.8888.6666</span>
+                        </li>
+
+                        <li class="mb-2" style="color:#c6c6c6 !important;">
+                            👤 <strong>Chủ tài khoản:</strong> NGUYEN VAN A
+                        </li>
+                        <li>
+                            📝
+                            <strong style="color:#dfdfdf !important;">
+                                Nội dung CK:
+                            </strong>
+                            <code style="color:#e17b88 !important; font-size:1.25rem;">
+                                NAP [Tên_Tài_Khoản_Của_Bạn]
+                            </code>
+                        </li>
+
                     </ul>
-                    <small class="text-muted fst-italic">* Xu sẽ được cộng tự động sau 1-3 phút.</small>
+                    <small class="fst-italic" style="color:#dfdfdf !important;">
+                        * Xu sẽ được cộng tự động sau 1-3 phút.
+                    </small>
                 </div>
             </div>
 
@@ -198,7 +220,7 @@
 
 <footer class="bg-dark text-center text-secondary py-4 mt-5 border-top border-secondary">
     <div class="container">
-        <p class="mb-0">© 2026 MUMOIRA.TV - Bản quyền thuộc về đội ngũ Admin.</p>
+        <p class="mb-0">© 2026 MUXUA.CO - Bản quyền thuộc về đội ngũ Admin.</p>
     </div>
 </footer>
 

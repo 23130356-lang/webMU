@@ -1,5 +1,6 @@
 package com.muads.controller;
 
+import com.muads.entity.HomeBanner;
 import com.muads.entity.Server;
 import com.muads.repository.MuVersionRepository;
 import com.muads.repository.ResetTypeRepository;
@@ -8,11 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-
+import com.muads.service.HomeBannerService;
 import java.util.List;
+import java.util.Map;
+
 
 @Controller
 public class HomeController {
+    @Autowired
+    private HomeBannerService bannerService;
 
     @Autowired
     private ServerRepository serverRepository;
@@ -46,7 +51,13 @@ public class HomeController {
 
         model.addAttribute("vipServers", vipServers);
         model.addAttribute("listServers", normalServers); // Đặt tên là listServers cho khớp logic chung
+// 2. Logic lấy Banner mới thêm vào
+        Map<String, List<HomeBanner>> banners = bannerService.getBannersForHomePage();
 
+        model.addAttribute("bannersLeft", banners.get("LEFT_SIDEBAR"));
+        model.addAttribute("bannersRight", banners.get("RIGHT_SIDEBAR"));
+        model.addAttribute("bannersHero", banners.get("HERO"));
+        model.addAttribute("bannersStd", banners.get("STD")); // Standard bar
         return "home"; // Trả về file home.jsp
     }
     @GetMapping("/huong-dan")
@@ -58,4 +69,11 @@ public class HomeController {
         // 2. Trả về view
         return "guide";
     }
+    @GetMapping( "/register/login")
+    public String login(Model model) {
+        model.addAttribute("menuVersions", versionRepo.findAll());
+        model.addAttribute("menuTypes", resetRepo.findAll());
+        return "login";
+    }
+
 }
