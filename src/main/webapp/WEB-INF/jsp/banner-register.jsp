@@ -6,209 +6,238 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Thuê Quảng Cáo | MU Ads Portal</title>
+    <title>Thuê Quảng Cáo | Muxua.co Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --mu-gold: #cfaa56;
-            --mu-red: #8b0000;
-            --mu-dark: #05070a;
-            --mu-glass: rgba(10, 15, 20, 0.85);
-            --mu-glass-hover: rgba(20, 30, 40, 0.95);
+            /* Palette màu MU Sang trọng */
+            --mu-bg: #050505;
+            --mu-panel-bg: rgba(15, 10, 10, 0.9);
+
+            --mu-gold: #ffcc00;
+            --mu-gold-dark: #b8860b;
+            --mu-text-gold: #deb887;
+
+            --mu-red: #ff0000;
+            --mu-red-dark: #550000;
+
+            --mu-border: #3d2b1f; /* Màu nâu đất viền */
+            --mu-glow-gold: 0 0 20px rgba(255, 204, 0, 0.3);
+            --mu-glow-red: 0 0 25px rgba(255, 0, 0, 0.5);
         }
 
         body {
-            background-color: var(--mu-dark);
-            font-family: 'Inter', sans-serif;
-            color: #e0e0e0;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Background chung */
-        .page-wrapper {
-            min-height: 100vh;
-            padding: 40px 0;
-            background: url('https://wallpaperaccess.com/full/1524368.jpg') no-repeat center center/cover;
+            background-color: var(--mu-bg);
+            /* Nền tối tỏa ra sắc đỏ nhẹ từ tâm */
+            background-image: radial-gradient(circle at 50% 30%, #2a0505 0%, #000000 70%);
             background-attachment: fixed;
-            position: relative;
+            font-family: 'Rajdhani', sans-serif;
+            color: #ccc;
+            min-height: 100vh;
         }
 
-        .page-wrapper::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.95) 100%);
-            z-index: 0;
-        }
-
-        .container { position: relative; z-index: 1; }
-
-        /* Tiêu đề trang */
-        .page-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
+        /* === PAGE HEADER === */
         .page-header h3 {
             font-family: 'Cinzel', serif;
-            color: var(--mu-gold);
-            font-weight: 700;
+            font-weight: 900;
             text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(207, 170, 86, 0.5);
-            font-size: 2rem;
+            /* Hiệu ứng chữ mạ vàng */
+            background: linear-gradient(180deg, #fff 10%, #ffcc00 50%, #b8860b 90%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 204, 0, 0.3);
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        .page-header p {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 3px;
+            color: #888;
+            font-size: 0.85rem;
+            border-bottom: 1px solid #333;
+            display: inline-block;
+            padding-bottom: 10px;
         }
 
-        /* === BANNER SLOT STYLES === */
+        /* === BANNER SLOT (CORE STYLE) === */
         .banner-slot {
-            background: var(--mu-glass);
-            border: 1px solid #333;
-            border-radius: 6px;
-            padding: 25px;
-            text-align: center;
+            background: var(--mu-panel-bg);
+            border: 1px solid var(--mu-border);
+            padding: 20px;
+            position: relative;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            justify-content: space-between;
+            transition: all 0.3s ease-in-out;
             backdrop-filter: blur(5px);
-            height: 100%; /* Để cột fill chiều cao */
+
+            /* Cắt vát 4 góc kiểu game */
+            clip-path: polygon(
+                    20px 0, 100% 0,
+                    100% calc(100% - 20px), calc(100% - 20px) 100%,
+                    0 100%, 0 20px
+            );
+
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            height: 65%;
         }
 
+        /* Hiệu ứng Hover: Lóe sáng vàng */
         .banner-slot:hover {
             transform: translateY(-5px);
-            background: var(--mu-glass-hover);
             border-color: var(--mu-gold);
-            box-shadow: 0 0 20px rgba(207, 170, 86, 0.2);
+            box-shadow: var(--mu-glow-gold);
+            z-index: 10;
         }
 
-        /* Border màu trên đầu card */
-        .banner-slot::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #555, transparent);
+        /* Trang trí góc nhỏ */
+        .banner-slot::before {
+            content: ''; position: absolute; top: 0; left: 0;
+            width: 15px; height: 15px;
+            border-top: 2px solid #555; border-left: 2px solid #555;
+            opacity: 0.5;
         }
+        .banner-slot:hover::before { border-color: var(--mu-gold); }
 
+        /* Typography trong Slot */
         .slot-title {
             font-family: 'Cinzel', serif;
-            color: #fff;
             font-weight: 700;
-            font-size: 1.3rem;
+            color: #e0e0e0;
+            font-size: 1.25rem;
             text-transform: uppercase;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
-        }
-
-        .slot-vip .slot-title { color: #ff3333; text-shadow: 0 0 5px rgba(255,51,51,0.5); }
-        .slot-vip { border: 1px solid rgba(255, 51, 51, 0.3); }
-        .slot-vip:hover { border-color: #ff3333; }
-
-        .slot-info {
-            font-size: 0.9rem;
-            color: #aaa;
+            border-bottom: 1px solid #444;
+            padding-bottom: 8px;
             margin-bottom: 15px;
+            text-align: center;
         }
-        .slot-size { color: var(--mu-gold); font-weight: 600; }
+        .banner-slot:hover .slot-title { color: var(--mu-gold); border-color: var(--mu-gold-dark); }
+
+        .slot-info { font-size: 0.95rem; color: #888; margin-bottom: 15px; }
+        .slot-size { color: var(--mu-text-gold); font-weight: 600; font-family: 'Rajdhani', sans-serif; letter-spacing: 1px; }
 
         .qty-badge {
-            background: #333;
-            color: #fff;
-            border: 1px solid #555;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            margin-left: 5px;
+            background: #222; border: 1px solid #444;
+            color: #fff; padding: 2px 8px; font-size: 0.8rem;
+            vertical-align: middle;
         }
 
-        .slot-status-label { font-size: 0.8rem; text-transform: uppercase; color: #777; margin-bottom: 5px; }
-        .slot-status-text { font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: bold; margin-bottom: 20px; }
+        /* Trạng thái */
+        .slot-status-label { font-size: 0.75rem; text-transform: uppercase; color: #666; letter-spacing: 1px; text-align: center; }
+        .slot-status-text {
+            font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: bold; margin-bottom: 20px; text-align: center;
+        }
+        .status-available { color: #00ff00; text-shadow: 0 0 8px rgba(0,255,0,0.4); }
+        .status-full { color: #ffaa00; text-shadow: 0 0 8px rgba(255,170,0,0.4); }
+        .status-vip { color: #ff3333; text-shadow: 0 0 10px rgba(255,51,51,0.6); }
 
-        /* Màu trạng thái */
-        .status-available { color: #00ff00; text-shadow: 0 0 5px rgba(0,255,0,0.3); }
-        .status-full { color: #ffcc00; text-shadow: 0 0 5px rgba(255,204,0,0.3); }
-        .status-vip { color: #ff3333; text-shadow: 0 0 5px rgba(255,51,51,0.3); }
+        /* === SLOT VIP SPECIAL === */
+        .slot-vip {
+            background: linear-gradient(180deg, rgba(40,0,0,0.8) 0%, rgba(10,0,0,0.9) 100%);
+            border-color: var(--mu-red-dark);
+        }
+        .slot-vip .slot-title { color: var(--mu-red); font-size: 1.5rem; text-shadow: 0 0 10px rgba(139,0,0,0.5); }
+        .slot-vip:hover {
+            border-color: var(--mu-red);
+            box-shadow: var(--mu-glow-red);
+        }
+        .slot-vip:hover .slot-title { color: #ff5555; text-shadow: 0 0 15px red; }
 
-        /* Nút bấm Custom */
+        /* === BUTTONS === */
         .btn-mu-action {
-            background: linear-gradient(180deg, var(--mu-red) 0%, #550000 100%);
-            border: 1px solid #ff3333;
-            color: #fff;
-            font-weight: bold;
-            text-transform: uppercase;
+            background: linear-gradient(90deg, #550000 0%, #8b0000 100%);
+            color: #e0e0e0;
+            border: 1px solid #a00000;
             font-family: 'Cinzel', serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             transition: all 0.3s;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
         }
         .btn-mu-action:hover {
-            background: linear-gradient(180deg, #cc0000 0%, #800000 100%);
-            box-shadow: 0 0 15px rgba(255, 51, 51, 0.6);
-            color: white;
+            background: linear-gradient(90deg, #8b0000 0%, #ff0000 100%);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255,0,0,0.6);
+            border-color: #ff3333;
         }
 
         .btn-mu-waitlist {
-            background: linear-gradient(180deg, #1e3c72 0%, #122546 100%);
-            border: 1px solid #4a90e2;
-            color: #fff;
-            font-weight: bold;
-            text-transform: uppercase;
+            background: linear-gradient(90deg, #0f2027 0%, #203a43 100%);
+            border: 1px solid #444;
+            color: #ccc;
             font-family: 'Cinzel', serif;
+            text-transform: uppercase;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
         }
         .btn-mu-waitlist:hover {
-            box-shadow: 0 0 15px rgba(74, 144, 226, 0.6);
-            color: white;
+            background: #2c5364; color: #fff; border-color: #666;
+            box-shadow: 0 0 15px rgba(44, 83, 100, 0.5);
         }
 
         .btn-mu-login {
-            background: transparent;
-            border: 1px solid #555;
-            color: #aaa;
-            text-transform: uppercase;
-            font-size: 0.9rem;
+            border: 1px dashed #555; color: #888; text-transform: uppercase; font-size: 0.85rem;
         }
-        .btn-mu-login:hover {
-            border-color: var(--mu-gold);
-            color: var(--mu-gold);
+        .btn-mu-login:hover { border-color: var(--mu-gold); color: var(--mu-gold); }
+
+        /* === MARKETING SECTION === */
+        .marketing-section {
+            margin-top: 5rem;
+            padding: 3rem;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--mu-gold-dark);
+            position: relative;
+        }
+        /* Góc trang trí cho Marketing Section */
+        .marketing-section::after {
+            content: ''; position: absolute; top: -1px; left: -1px; width: 30px; height: 30px;
+            border-top: 3px solid var(--mu-gold); border-left: 3px solid var(--mu-gold);
+        }
+        .marketing-section::before {
+            content: ''; position: absolute; bottom: -1px; right: -1px; width: 30px; height: 30px;
+            border-bottom: 3px solid var(--mu-gold); border-right: 3px solid var(--mu-gold);
         }
 
-        /* === MODAL STYLE === */
-        .modal-content {
-            background-color: #111;
-            border: 1px solid #333;
-            color: #fff;
-            box-shadow: 0 0 30px rgba(0,0,0,0.9);
-        }
-        .modal-header { border-bottom: 1px solid #333; }
-        .btn-close-white { filter: invert(1); }
-
-        .modal-custom-header {
-            background: linear-gradient(90deg, #550000, #220000);
+        .marketing-title {
             color: var(--mu-gold);
             font-family: 'Cinzel', serif;
+            text-align: center;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(184, 134, 11, 0.3);
+            margin-bottom: 2rem;
         }
-        .modal-custom-header.waitlist {
-            background: linear-gradient(90deg, #002244, #001122);
-            color: #4a90e2;
+        .marketing-subtitle {
+            font-family: 'Cinzel', serif;
+            border-left: 4px solid var(--mu-red);
+            padding-left: 15px;
+            margin-top: 30px;
+            margin-bottom: 15px;
         }
+        .marketing-list li { margin-bottom: 10px; font-size: 1.05rem; }
+        .highlight-text { color: var(--mu-text-gold); font-weight: bold; }
 
+        /* === MODAL === */
+        .modal-content {
+            background: #0f0f0f;
+            border: 1px solid var(--mu-gold-dark);
+            box-shadow: 0 0 50px rgba(0,0,0,0.9);
+        }
+        .modal-custom-header {
+            background: linear-gradient(90deg, #330000, #110000);
+            border-bottom: 1px solid #333;
+        }
         .form-control {
-            background-color: rgba(255,255,255,0.05);
-            border: 1px solid #444;
-            color: #fff;
+            background: #1a1a1a; border: 1px solid #333; color: #eee;
         }
         .form-control:focus {
-            background-color: rgba(255,255,255,0.1);
-            border-color: var(--mu-gold);
-            color: #fff;
-            box-shadow: none;
+            background: #222; border-color: var(--mu-gold); color: #fff; box-shadow: none;
         }
     </style>
 </head>
@@ -216,12 +245,12 @@
 
 <jsp:include page="header.jsp" />
 
-<div class="page-wrapper">
+<div class="page-wrapper pt-5 pb-5">
     <div class="container">
 
-        <div class="page-header">
-            <h3><i class="fa-solid fa-scroll me-2"></i> Bảng Giá & Đăng Ký Quảng Cáo</h3>
-            <p class="text-secondary small text-uppercase">Nâng tầm thương hiệu Server của bạn</p>
+        <div class="page-header text-center">
+            <h3><i class="fa-solid fa-dragon me-2"></i> Bảng Giá & Đăng Ký Quảng Cáo</h3>
+            <p>Khẳng định đẳng cấp Server - Tiếp cận cộng đồng Game thủ</p>
         </div>
 
         <c:if test="${not empty successMessage}">
@@ -237,37 +266,36 @@
 
         <div class="row g-4 align-items-stretch">
 
-            <div class="col-md-3">
-                <div class="banner-slot">
-                    <div class="slot-title">Banner Trái</div>
-                    <div class="slot-info">
-                        <div><i class="bi bi-aspect-ratio me-1"></i> <span class="slot-size">280 x 500 px</span></div>
-                        <div class="mt-1">Đã đặt: <span class="qty-badge">${qtyInfo['LEFT_SIDEBAR']}</span></div>
+            <div class="col-md-3 d-flex align-items-center">
+                <div class="banner-slot w-100" style="height: auto;">
+                    <div>
+                        <div class="slot-title">Banner Trái</div>
+                        <div class="text-center px-2">
+                            <div class="slot-info">
+                                <i class="bi bi-aspect-ratio me-1"></i> <span class="slot-size">280 x 500 px</span>
+                            </div>
+                            <div class="slot-info">
+                                Đã đặt: <span class="qty-badge">${qtyInfo['LEFT_SIDEBAR']}</span>
+                            </div>
+                            <div class="slot-status-label mt-3">Tình trạng</div>
+                            <div class="slot-status-text ${isFullLeft ? 'status-full' : 'status-available'}">
+                                ${availability['LEFT_SIDEBAR']}
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="slot-status-label">Tình trạng</div>
-                    <div class="slot-status-text ${isFullLeft ? 'status-full' : 'status-available'}">
-                        ${availability['LEFT_SIDEBAR']}
-                    </div>
-
-                    <div class="w-100 mt-auto">
+                    <div class="w-100 mt-4">
                         <c:choose>
                             <c:when test="${not empty currentUser && !isFullLeft}">
-                                <button class="btn btn-mu-action w-100 py-2"
-                                        onclick="openRegisterModal('LEFT_SIDEBAR', 'Banner Trái', false)">
-                                    Thuê Ngay
-                                </button>
+                                <button class="btn btn-mu-action w-100 py-2" onclick="openRegisterModal('LEFT_SIDEBAR', 'Banner Trái', false)">Thuê Ngay</button>
                             </c:when>
                             <c:when test="${not empty currentUser && isFullLeft}">
-                                <button class="btn btn-mu-waitlist w-100 py-2"
-                                        onclick="openRegisterModal('LEFT_SIDEBAR', 'Banner Trái', true)">
-                                    <i class="bi bi-hourglass-split"></i> Đặt Chỗ Trước
+                                <button class="btn btn-mu-waitlist w-100 py-2" onclick="openRegisterModal('LEFT_SIDEBAR', 'Banner Trái', true)">
+                                    <i class="bi bi-hourglass-split"></i> Đặt Chỗ
                                 </button>
-                                <div class="mt-2 text-muted fst-italic small" style="font-size: 0.75rem">Xếp hàng chờ slot trống</div>
+                                <div class="text-center mt-2 text-muted fst-italic" style="font-size: 0.75rem">Vào hàng chờ</div>
                             </c:when>
-                            <c:otherwise>
-                                <a href="/login" class="btn btn-mu-login w-100">Đăng nhập để thuê</a>
-                            </c:otherwise>
+                            <c:otherwise><a href="/login" class="btn btn-mu-login w-100">Đăng nhập</a></c:otherwise>
                         </c:choose>
                     </div>
                 </div>
@@ -277,113 +305,146 @@
                 <div class="d-flex flex-column h-100 gap-4">
 
                     <div class="banner-slot slot-vip flex-fill">
-                        <div class="position-absolute top-0 end-0 p-2 text-danger"><i class="fa-solid fa-crown fa-lg"></i></div>
+                        <div class="position-absolute top-0 end-0 p-3 text-danger" style="filter: drop-shadow(0 0 5px red);"><i class="fa-solid fa-crown fa-2x"></i></div>
 
-                        <div class="slot-title">Banner Giữa (VIP)</div>
-                        <div class="slot-info">
-                            <div><i class="bi bi-aspect-ratio me-1"></i> <span class="slot-size">1200 x 250 px</span></div>
-                            <div class="mt-1">Đã đặt: <span class="qty-badge bg-danger text-white border-danger">${qtyInfo['HERO']}</span></div>
+                        <div>
+                            <div class="slot-title">BANNER GIỮA (VIP)</div>
+                            <div class="text-center px-4">
+                                <div class="slot-info text-light">
+                                    <i class="bi bi-aspect-ratio me-1"></i> <span class="slot-size text-warning" style="font-size: 1.1rem">1200 x 250 px</span>
+                                </div>
+                                <div class="slot-info">
+                                    Đã đặt: <span class="qty-badge bg-danger border-danger">${qtyInfo['HERO']}</span>
+                                </div>
+                                <div class="slot-status-label mt-3 text-warning">Tình trạng</div>
+                                <div class="slot-status-text ${isFullHero ? 'status-full' : 'status-vip'}">
+                                    ${availability['HERO']}
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="slot-status-label">Tình trạng</div>
-                        <div class="slot-status-text ${isFullHero ? 'status-full' : 'status-vip'}">
-                            ${availability['HERO']}
-                        </div>
-
-                        <div class="w-75 mt-auto">
+                        <div class="w-75 mx-auto mt-3">
                             <c:choose>
                                 <c:when test="${not empty currentUser && !isFullHero}">
-                                    <button class="btn btn-mu-action w-100 py-2 shadow-lg"
-                                            onclick="openRegisterModal('HERO', 'Banner VIP Center', false)">
-                                        THUÊ NGAY
-                                    </button>
+                                    <button class="btn btn-mu-action w-100 py-3 fs-5" onclick="openRegisterModal('HERO', 'Banner VIP Center', false)">THUÊ VỊ TRÍ VIP</button>
                                 </c:when>
                                 <c:when test="${not empty currentUser && isFullHero}">
-                                    <button class="btn btn-mu-waitlist w-100 py-2"
-                                            onclick="openRegisterModal('HERO', 'Banner VIP Center', true)">
-                                        <i class="bi bi-hourglass-split"></i> Đặt Chỗ VIP
+                                    <button class="btn btn-mu-waitlist w-100 py-2" onclick="openRegisterModal('HERO', 'Banner VIP Center', true)">
+                                        <i class="bi bi-hourglass-split"></i> ĐẶT CHỖ VIP
                                     </button>
-                                    <div class="mt-2 text-muted fst-italic small">Vị trí HOT đang full</div>
                                 </c:when>
-                                <c:otherwise>
-                                    <a href="/login" class="btn btn-mu-login w-100">Đăng nhập để thuê</a>
-                                </c:otherwise>
+                                <c:otherwise><a href="/login" class="btn btn-mu-login w-100">Đăng nhập</a></c:otherwise>
                             </c:choose>
                         </div>
                     </div>
 
-                    <div class="banner-slot flex-fill">
-                        <div class="slot-title">Banner Giữa (Nhỏ)</div>
-                        <div class="slot-info">
-                            <div><i class="bi bi-aspect-ratio me-1"></i> <span class="slot-size">1200 x 120 px</span></div>
-                            <div class="mt-1">Đã đặt: <span class="qty-badge">${qtyInfo['STD']}</span></div>
-                        </div>
+                    <div class="banner-slot flex-fill" style="min-height: auto;">
+                        <div class="d-flex align-items-center justify-content-between w-100 px-2">
+                            <div class="text-start">
+                                <div class="slot-title border-0 mb-0 text-start" style="font-size: 1.1rem">Banner Giữa (Nhỏ)</div>
+                                <div class="slot-size mb-1">1200 x 120 px</div>
+                                <div class="slot-info mb-0" style="font-size: 0.9rem;">
+                                    Đã đặt: <span class="qty-badge">${qtyInfo['STD']}</span>
+                                </div>
+                            </div>
 
-                        <div class="slot-status-label">Tình trạng</div>
-                        <div class="slot-status-text ${isFullStd ? 'status-full' : 'status-available'}">
-                            ${availability['STD']}
-                        </div>
-
-                        <div class="w-75 mt-auto">
-                            <c:choose>
-                                <c:when test="${not empty currentUser && !isFullStd}">
-                                    <button class="btn btn-mu-action w-100 py-2"
-                                            onclick="openRegisterModal('STD', 'Banner Giữa Nhỏ', false)">
-                                        Thuê Ngay
-                                    </button>
-                                </c:when>
-                                <c:when test="${not empty currentUser && isFullStd}">
-                                    <button class="btn btn-mu-waitlist w-100 py-2"
-                                            onclick="openRegisterModal('STD', 'Banner Giữa Nhỏ', true)">
-                                        <i class="bi bi-hourglass-split"></i> Đặt Chỗ Trước
-                                    </button>
-                                </c:when>
-                                <c:otherwise>
-                                    <a href="/login" class="btn btn-mu-login w-100">Đăng nhập để thuê</a>
-                                </c:otherwise>
-                            </c:choose>
+                            <div class="text-end">
+                                <div class="slot-status-text mb-1 ${isFullStd ? 'status-full' : 'status-available'}" style="font-size: 1rem">
+                                    ${availability['STD']}
+                                </div>
+                                <c:choose>
+                                    <c:when test="${not empty currentUser && !isFullStd}">
+                                        <button class="btn btn-mu-action btn-sm px-4" onclick="openRegisterModal('STD', 'Banner Giữa Nhỏ', false)">Thuê Ngay</button>
+                                    </c:when>
+                                    <c:when test="${not empty currentUser && isFullStd}">
+                                        <button class="btn btn-mu-waitlist btn-sm px-4" onclick="openRegisterModal('STD', 'Banner Giữa Nhỏ', true)">Đặt Chỗ</button>
+                                    </c:when>
+                                    <c:otherwise><a href="/login" class="btn btn-mu-login btn-sm px-3">Đăng nhập</a></c:otherwise>
+                                </c:choose>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-3">
-                <div class="banner-slot">
-                    <div class="slot-title">Banner Phải</div>
-                    <div class="slot-info">
-                        <div><i class="bi bi-aspect-ratio me-1"></i> <span class="slot-size">280 x 500 px</span></div>
-                        <div class="mt-1">Đã đặt: <span class="qty-badge">${qtyInfo['RIGHT_SIDEBAR']}</span></div>
+            <div class="col-md-3 d-flex align-items-center">
+                <div class="banner-slot w-100" style="height: auto;">
+                    <div>
+                        <div class="slot-title">Banner Phải</div>
+                        <div class="text-center px-2">
+                            <div class="slot-info">
+                                <i class="bi bi-aspect-ratio me-1"></i> <span class="slot-size">280 x 500 px</span>
+                            </div>
+                            <div class="slot-info">
+                                Đã đặt: <span class="qty-badge">${qtyInfo['RIGHT_SIDEBAR']}</span>
+                            </div>
+                            <div class="slot-status-label mt-3">Tình trạng</div>
+                            <div class="slot-status-text ${isFullRight ? 'status-full' : 'status-available'}">
+                                ${availability['RIGHT_SIDEBAR']}
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="slot-status-label">Tình trạng</div>
-                    <div class="slot-status-text ${isFullRight ? 'status-full' : 'status-available'}">
-                        ${availability['RIGHT_SIDEBAR']}
-                    </div>
-
-                    <div class="w-100 mt-auto">
+                    <div class="w-100 mt-4">
                         <c:choose>
                             <c:when test="${not empty currentUser && !isFullRight}">
-                                <button class="btn btn-mu-action w-100 py-2"
-                                        onclick="openRegisterModal('RIGHT_SIDEBAR', 'Banner Phải', false)">
-                                    Thuê Ngay
-                                </button>
+                                <button class="btn btn-mu-action w-100 py-2" onclick="openRegisterModal('RIGHT_SIDEBAR', 'Banner Phải', false)">Thuê Ngay</button>
                             </c:when>
                             <c:when test="${not empty currentUser && isFullRight}">
-                                <button class="btn btn-mu-waitlist w-100 py-2"
-                                        onclick="openRegisterModal('RIGHT_SIDEBAR', 'Banner Phải', true)">
-                                    <i class="bi bi-hourglass-split"></i> Đặt Chỗ Trước
+                                <button class="btn btn-mu-waitlist w-100 py-2" onclick="openRegisterModal('RIGHT_SIDEBAR', 'Banner Phải', true)">
+                                    <i class="bi bi-hourglass-split"></i> Đặt Chỗ
                                 </button>
-                                <div class="mt-2 text-muted fst-italic small" style="font-size: 0.75rem">Admin sẽ liên hệ khi trống</div>
+                                <div class="text-center mt-2 text-muted fst-italic" style="font-size: 0.75rem">Vào hàng chờ</div>
                             </c:when>
-                            <c:otherwise>
-                                <a href="/login" class="btn btn-mu-login w-100">Đăng nhập để thuê</a>
-                            </c:otherwise>
+                            <c:otherwise><a href="/login" class="btn btn-mu-login w-100">Đăng nhập</a></c:otherwise>
                         </c:choose>
                     </div>
                 </div>
             </div>
 
+        </div> <div class="marketing-section">
+        <h2 class="marketing-title">QUẢNG CÁO TẠI MUXUA.CO - CỘNG ĐỒNG MU LỚN NHẤT</h2>
+
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <ul class="marketing-list text-secondary fa-ul ms-4">
+                    <li><span class="fa-li"><i class="fa-solid fa-check text-success"></i></span>Thống kê có hơn <strong class="text-white">6.000 Admin Mu Online</strong> đã tin tưởng và sử dụng dịch vụ.</li>
+                    <li><span class="fa-li"><i class="fa-solid fa-check text-success"></i></span>Hơn <strong class="text-white">16.800 Game Mu Online</strong> đăng bài giới thiệu, tiếp cận hàng vạn game thủ.</li>
+                    <li><span class="fa-li"><i class="fa-solid fa-check text-success"></i></span>Giải pháp Marketing toàn diện: <strong class="text-white">Banner, VIP Ghim Bài & Facebook Ads.</strong></li>
+                </ul>
+
+                <div class="p-3 my-4 fst-italic text-center" style="background: rgba(0,0,0,0.5); border-left: 3px solid var(--mu-red);">
+                    "Ngay cả khi... Mu bạn mới không ai tới?<br>
+                    Ngay cả khi... Mu bạn cũ bị gamer phũ?<br>
+                    Ngay cả khi... Mu chà bá, cần bứt phá?"
+                </div>
+
+                <h4 class="marketing-subtitle text-warning">CÁC GÓI QUẢNG CÁO</h4>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-md-4">
+                        <div class="p-3 border border-secondary h-100 bg-black bg-opacity-25">
+                            <h6 class="text-white"><i class="fa-solid fa-1 me-2 text-danger"></i>TREO BANNER</h6>
+                            <p class="small text-secondary mb-0">Phủ sóng thương hiệu tại 4 vị trí chiến lược (VIP, Center, Sidebar). Hỗ trợ ảnh động, HTML5.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 border border-secondary h-100 bg-black bg-opacity-25">
+                            <h6 class="text-white"><i class="fa-solid fa-2 me-2 text-danger"></i>TREO VIP (GHIM)</h6>
+                            <p class="small text-secondary mb-0">Bài viết được Ghim lên TOP đầu trang chủ và các trang danh mục. Hiển thị "Đề xuất" tại bài của đối thủ.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 border border-secondary h-100 bg-black bg-opacity-25">
+                            <h6 class="text-white"><i class="fa-solid fa-3 me-2 text-danger"></i>FACEBOOK ADS</h6>
+                            <p class="small text-secondary mb-0">Chạy quảng cáo Retargeting (Tiếp thị lại) vào tệp khách hàng Pixel đã truy cập Muxua.co.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
+
     </div>
 </div>
 
@@ -392,7 +453,7 @@
         <div class="modal-content">
 
             <div class="modal-header modal-custom-header" id="modalHeaderBg">
-                <h5 class="modal-title fw-bold" id="modalTitle">ĐĂNG KÝ</h5>
+                <h5 class="modal-title fw-bold text-warning" id="modalTitle">ĐĂNG KÝ</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
@@ -409,7 +470,6 @@
                             <span class="input-group-text bg-dark border-secondary text-secondary"><i class="fa-solid fa-image"></i></span>
                             <input type="url" name="imageUrl" class="form-control" placeholder="https://imgur.com/..." required>
                         </div>
-                        <div class="form-text text-secondary fst-italic" style="font-size: 0.8rem">Khuyên dùng: Upload ảnh lên Imgur và lấy link trực tiếp.</div>
                     </div>
 
                     <div class="mb-4">
@@ -420,13 +480,8 @@
                         </div>
                     </div>
 
-                    <div class="alert alert-secondary bg-dark border-secondary text-secondary small d-flex align-items-center mb-4">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <div>Sau khi gửi, Admin sẽ kiểm duyệt nội dung và liên hệ qua thông tin tài khoản để thanh toán Coin.</div>
-                    </div>
-
                     <button type="submit" class="btn btn-mu-action w-100 py-2" id="btnSubmit">
-                        <i class="fa-solid fa-paper-plane me-2"></i> GỬI YÊU CẦU
+                        <i class="fa-solid fa-scroll me-2"></i> GỬI YÊU CẦU
                     </button>
                 </form>
             </div>
@@ -439,31 +494,23 @@
 <script>
     function openRegisterModal(code, name, isWaitlist) {
         document.getElementById('hiddenPosCode').value = code;
-
         var headerBg = document.getElementById('modalHeaderBg');
         var title = document.getElementById('modalTitle');
         var btnSubmit = document.getElementById('btnSubmit');
 
         if (isWaitlist) {
-            // Style cho Waitlist (Xanh tối)
-            headerBg.classList.remove('modal-custom-header');
-            headerBg.classList.add('waitlist');
-
+            headerBg.style.background = 'linear-gradient(90deg, #002244, #001122)';
             title.innerHTML = '<i class="bi bi-hourglass-split"></i> ĐẶT CHỖ TRƯỚC: ' + name;
-
+            title.className = "modal-title fw-bold text-info";
             btnSubmit.className = 'btn btn-mu-waitlist w-100 py-2';
             btnSubmit.innerHTML = 'XÁC NHẬN VÀO HÀNG CHỜ';
         } else {
-            // Style cho Thuê ngay (Đỏ MU)
-            headerBg.classList.remove('waitlist');
-            headerBg.classList.add('modal-custom-header');
-
+            headerBg.style.background = 'linear-gradient(90deg, #550000, #220000)';
             title.innerHTML = '<i class="fa-solid fa-bolt me-2"></i> THUÊ NGAY: ' + name;
-
+            title.className = "modal-title fw-bold text-warning";
             btnSubmit.className = 'btn btn-mu-action w-100 py-2';
             btnSubmit.innerHTML = 'GỬI ĐĂNG KÝ NGAY';
         }
-
         var myModal = new bootstrap.Modal(document.getElementById('registerModal'));
         myModal.show();
     }
