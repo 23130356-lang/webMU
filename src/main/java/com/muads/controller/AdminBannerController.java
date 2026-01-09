@@ -3,89 +3,75 @@ package com.muads.controller;
 import com.muads.entity.HomeBanner;
 import com.muads.entity.User;
 import com.muads.service.HomeBannerService;
-import com.muads.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Controller
-@RequestMapping("/admin/banners")
+@RequestMapping("/admin")
 public class AdminBannerController {
 
     @Autowired
     private HomeBannerService bannerService;
-    @Autowired
-    private UserService userService;
-    // 1. Danh sách Banner
-    @GetMapping("")
-    public String listBanners(Model model) {
-        model.addAttribute("banners", bannerService.getAllBanners());
-        return "admin/banner-list"; // File JSP danh sách
-    }
 
-    // 2. Form thêm mới
-    @GetMapping("/create")
-    public String createForm(Model model) {
-        model.addAttribute("banner", new HomeBanner());
-        model.addAttribute("pageTitle", "Thêm Banner Mới");
-        return "admin/banner-form"; // File JSP form
-    }
-
-    // 3. Form chỉnh sửa
-    @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable Long id, Model model) {
-        HomeBanner banner = bannerService.getBannerById(id);
-        if (banner == null) {
-            return "redirect:/admin/banners";
+    // 1. Hiển thị danh sách Banner
+    @GetMapping("/banners")
+    public String showBannerManager(Model model, HttpSession session) {
+        // Check quyền Admin
+        User user = (User) session.getAttribute("currentUser");
+        if (user == null || user.getRole() != User.Role.ADMIN) {
+            return "redirect:/login"; // Đá về login nếu không phải Admin
         }
-        model.addAttribute("banner", banner);
-        model.addAttribute("pageTitle", "Cập Nhật Banner (ID: " + id + ")");
-        return "admin/banner-form";
+
+        // Lấy danh sách
+        model.addAttribute("pendingList", bannerService.getPendingBanners());
+        model.addAttribute("activeList", bannerService.getActiveBanners());
+
+        return "admin/admin-banners";
     }
 
-    // 4. Lưu dữ liệu (Create & Update)
-    @PostMapping("/save")
-    public String saveBanner(@ModelAttribute("banner") HomeBanner banner, Principal principal) {
+    // 2. Xử lý Duyệt Banner
+    @PostMapping("/banner/approve")
+    public String approveBanner(
+            @RequestParam("id") Long id,
+            @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            HomeBanner banner = bannerService.findById(id);
+            if (banner != null) {
+                // Chuyển LocalDate (chọn từ lịch) sang LocalDateTime
+                banner.setStartDate(LocalDateTime.of(startDate, LocalTime.MIN));
+                banner.setEndDate(LocalDateTime.of(endDate, LocalTime.MAX));
+                banner.setActive(true); // Kích hoạt
 
-        // 1. Lấy thông tin User đang đăng nhập hiện tại
-        String currentUsername = principal.getName();
-        User currentUser = userService.findByUsername(currentUsername);
-        // Lưu ý: hàm findByUsername tùy thuộc vào bên UserService của bạn viết thế nào
-
-        if (banner.getId() != null) {
-            // === TRƯỜNG HỢP SỬA (UPDATE) ===
-            HomeBanner oldBanner = bannerService.getBannerById(banner.getId());
-            if (oldBanner != null) {
-                // Giữ lại ngày tạo cũ
-                banner.setCreatedAt(oldBanner.getCreatedAt());
-                // Giữ lại người đăng cũ (không đổi người đăng khi sửa)
-                banner.setUser(oldBanner.getUser());
+                bannerService.saveBanner(banner);
+                redirectAttributes.addFlashAttribute("successMessage", "Đã duyệt banner thành công!");
             }
-        } else {
-            // === TRƯỜNG HỢP THÊM MỚI (CREATE) ===
-            banner.setCreatedAt(java.time.LocalDateTime.now());
-            // Gán người đang đăng nhập là người tạo
-            banner.setUser(currentUser);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
         }
-
-        bannerService.saveBanner(banner);
         return "redirect:/admin/banners";
     }
 
-    // 5. Xóa banner
-    @GetMapping("/delete/{id}")
-    public String deleteBanner(@PathVariable Long id) {
-        bannerService.deleteBanner(id);
-        return "redirect:/admin/banners";
-    }
-
-    // 6. Duyệt nhanh (Bật/Tắt hiển thị)
-    @GetMapping("/toggle/{id}")
-    public String toggleStatus(@PathVariable Long id) {
-        bannerService.toggleStatus(id);
+    // 3. Xóa Banner
+    @GetMapping("/banner/delete/{id}")
+    public String deleteBanner(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            bannerService.deleteBanner(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã xóa banner.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi xóa: " + e.getMessage());
+        }
         return "redirect:/admin/banners";
     }
 }

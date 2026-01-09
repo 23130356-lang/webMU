@@ -32,9 +32,17 @@ public class HomeBanner {
     @ManyToOne
     @JoinColumn(name = "user_id") // Tên cột trong DB sẽ là user_id
     private User user;
+    @Column(name = "start_date")
+    private LocalDateTime startDate; // Ngày bắt đầu chạy
+
+    @Column(name = "end_date")
+    private LocalDateTime endDate;   // Ngày kết thúc (Start + 7 ngày)
     // Constructor, Getters, Setters
     public HomeBanner() {}
-
+    public LocalDateTime getStartDate() { return startDate; }
+    public void setStartDate(LocalDateTime startDate) { this.startDate = startDate; }
+    public LocalDateTime getEndDate() { return endDate; }
+    public void setEndDate(LocalDateTime endDate) { this.endDate = endDate; }
     // ... (Bạn tự generate Getter/Setter nhé để tiết kiệm dòng hiển thị) ...
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

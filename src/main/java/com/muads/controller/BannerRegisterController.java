@@ -2,8 +2,8 @@ package com.muads.controller;
 
 import com.muads.entity.HomeBanner;
 import com.muads.entity.User;
-import com.muads.repository.UserRepository;
 import com.muads.service.HomeBannerService;
+import jakarta.servlet.http.HttpSession; // Import Session
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.security.Principal; // Quan trọng: Để lấy thông tin đăng nhập
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,69 +22,81 @@ public class BannerRegisterController {
     @Autowired
     private HomeBannerService bannerService;
 
-    @Autowired
-    private UserRepository userRepository; // Inject thêm Repository User
+    // Cấu hình số lượng Slot tối đa
+    private final int LIMIT_HERO = 1;
+    private final int LIMIT_STD = 5;
+    private final int LIMIT_SIDEBAR = 3;
 
-    // --- HÀM 1: GET (Hiển thị trang Dashboard) ---
-    @GetMapping("/banner-register") // Có thể đổi thành /thue-quang-cao cho thân thiện SEO
-    public String showRegisterDashboard(Model model) {
-        // Giả lập dữ liệu thời gian trống
+    @GetMapping("/banner-register")
+    public String showRegisterDashboard(Model model, HttpSession session) {
+
+        // --- SỬA ĐỔI: Lấy User từ Session thay vì Principal ---
+        User currentUser = (User) session.getAttribute("currentUser");
+
+        if (currentUser != null) {
+            // Gửi thông tin user ra view để hiển thị nút
+            model.addAttribute("currentUser", currentUser);
+        }
+        // -----------------------------------------------------
+
+        // 2. Các logic đếm số lượng (Giữ nguyên)
+        long countHero = bannerService.countActiveBanners("HERO");
+        long countStd = bannerService.countActiveBanners("STD");
+        long countLeft = bannerService.countActiveBanners("LEFT_SIDEBAR");
+        long countRight = bannerService.countActiveBanners("RIGHT_SIDEBAR");
+
+        Map<String, String> qtyMap = new HashMap<>();
+        qtyMap.put("HERO", countHero + "/" + LIMIT_HERO);
+        qtyMap.put("STD", countStd + "/" + LIMIT_STD);
+        qtyMap.put("LEFT_SIDEBAR", countLeft + "/" + LIMIT_SIDEBAR);
+        qtyMap.put("RIGHT_SIDEBAR", countRight + "/" + LIMIT_SIDEBAR);
+        model.addAttribute("qtyInfo", qtyMap);
+
         Map<String, String> availability = new HashMap<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-        // Logic giả lập: Hero full đến tháng sau, còn lại trống
-        String nextMonth = LocalDateTime.now().plusDays(30).format(formatter);
-        String availableNow = "CÒN TRỐNG - ĐẶT NGAY";
-
-        availability.put("LEFT_SIDEBAR", availableNow);
-        availability.put("RIGHT_SIDEBAR", availableNow);
-        availability.put("HERO", nextMonth);
-        availability.put("STD", availableNow);
-
+        availability.put("HERO", countHero >= LIMIT_HERO ? "HẾT SLOT (Full)" : "CÒN TRỐNG");
+        availability.put("STD", countStd >= LIMIT_STD ? "HẾT SLOT (Full)" : "CÒN TRỐNG");
+        availability.put("LEFT_SIDEBAR", countLeft >= LIMIT_SIDEBAR ? "HẾT SLOT (Full)" : "CÒN TRỐNG");
+        availability.put("RIGHT_SIDEBAR", countRight >= LIMIT_SIDEBAR ? "HẾT SLOT (Full)" : "CÒN TRỐNG");
         model.addAttribute("availability", availability);
 
-        return "banner-register"; // Tên file JSP của bạn
+        model.addAttribute("isFullHero", countHero >= LIMIT_HERO);
+        model.addAttribute("isFullStd", countStd >= LIMIT_STD);
+        model.addAttribute("isFullLeft", countLeft >= LIMIT_SIDEBAR);
+        model.addAttribute("isFullRight", countRight >= LIMIT_SIDEBAR);
+
+        return "banner-register";
     }
 
-    // --- HÀM 2: POST (Xử lý Đăng ký Banner) ---
     @PostMapping("/banner-register")
     public String processRegister(
             @ModelAttribute HomeBanner banner,
-            Principal principal, // Thêm tham số này để lấy User hiện tại
+            HttpSession session, // <--- Dùng HttpSession ở đây
             RedirectAttributes redirectAttributes
     ) {
-        // 1. Kiểm tra đăng nhập (Bảo mật lớp Controller)
-        if (principal == null) {
-            // Nếu chưa đăng nhập, chuyển hướng về trang login
+        // 1. Kiểm tra User trong Session
+        User user = (User) session.getAttribute("currentUser");
+
+        if (user == null) {
+            // Nếu session null nghĩa là chưa đăng nhập hoặc hết phiên -> Về Login
             return "redirect:/login";
         }
 
         try {
-            // 2. Lấy thông tin User từ Database
-            String username = principal.getName(); // Lấy username từ session
-            User currentUser = userRepository.findByUsername(username);
+            // 2. Gán thông tin User từ Session vào Banner
+            banner.setUser(user);
 
-            if (currentUser == null) {
-                throw new Exception("Không tìm thấy thông tin người dùng.");
-            }
+            banner.setActive(false);
+            banner.setCreatedAt(LocalDateTime.now());
 
-            // 3. Thiết lập các thông số mặc định cho Banner
-            banner.setActive(false);          // Chờ duyệt
-            banner.setDisplayOrder(99);       // Xếp cuối cùng
-            banner.setCreatedAt(LocalDateTime.now()); // Thời gian tạo
-
-            // --- QUAN TRỌNG: Gán User vào Banner ---
-            banner.setUser(currentUser);
-            // ---------------------------------------
-
-            // 4. Lưu vào DB
+            // 3. Lưu vào DB
             bannerService.saveBanner(banner);
 
-            redirectAttributes.addFlashAttribute("successMessage", "Đăng ký thành công! Vui lòng chờ Admin xét duyệt.");
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Đăng ký thành công! Admin sẽ duyệt yêu cầu của bạn sớm nhất.");
 
         } catch (Exception e) {
-            e.printStackTrace(); // In lỗi ra console để debug nếu cần
-            redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
         }
 
         return "redirect:/banner-register";

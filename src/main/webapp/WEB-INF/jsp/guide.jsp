@@ -175,17 +175,17 @@
                     <h4 class="mt-0">Thông tin chuyển khoản:</h4>
                     <ul class="list-unstyled">
                         <li class="mb-2" style="color: #d1d1d1 !important;">
-                            🏦 <strong>Ngân hàng:</strong> MB BANK (Quân Đội)
+                            🏦 <strong>Ngân hàng:</strong> BIDV
                         </li>
 
                         <li class="mb-2">
                             💳
                             <strong style="color:#dcdcdc !important;">Số tài khoản:</strong>
-                            <span style="color:#ffd158 !important;">9999.8888.6666</span>
+                            <span style="color:#ffd158 !important;">052205001613</span>
                         </li>
 
                         <li class="mb-2" style="color:#c6c6c6 !important;">
-                            👤 <strong>Chủ tài khoản:</strong> NGUYEN VAN A
+                            👤 <strong>Chủ tài khoản:</strong> LE THANH TRUONG
                         </li>
                         <li>
                             📝
