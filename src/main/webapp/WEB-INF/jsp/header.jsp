@@ -371,8 +371,8 @@
                             <span class="mh-username">${sessionScope.currentUser.username}</span>
                         </div>
                         <ul class="mh-dropdown mh-user-dropdown">
-                            <li><a class="mh-dropdown-item" href="/user/profile"><i class="fa-solid fa-user me-2"></i> Hồ sơ</a></li>
-                            <li><a class="mh-dropdown-item" href="/user/my-servers"><i class="fa-solid fa-list me-2"></i> QL Server</a></li>
+                            <li><a class="mh-dropdown-item" href="/profile"><i class="fa-solid fa-user me-2"></i> Hồ sơ</a></li>
+                            <li><a class="mh-dropdown-item" href="/my-servers"><i class="fa-solid fa-list me-2"></i> QL Server</a></li>
                             <li style="border-top: 1px solid #333;"><a class="mh-dropdown-item" href="/logout" style="color: #ff5555;"><i class="fa-solid fa-power-off me-2"></i> Đăng xuất</a></li>
                         </ul>
                     </div>

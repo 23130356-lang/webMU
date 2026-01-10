@@ -1,6 +1,7 @@
 package com.muads.service;
 
 import com.muads.dto.UserLoginDTO;
+import com.muads.dto.UserProfileDTO;
 import com.muads.dto.UserRegisterDTO;
 import com.muads.entity.User;
 import com.muads.repository.UserRepository;
@@ -55,5 +56,39 @@ public class UserService {
     }
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+    public com.muads.dto.UserProfileDTO getUserProfile(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng!"));
+
+        // Map Entity sang DTO
+        return new com.muads.dto.UserProfileDTO(
+                user.getUsername(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getFullName(),
+                user.getCoin()
+        );
+    }
+    // Trong class UserService
+
+    public void updateUserProfile(Long userId, UserProfileDTO dto) {
+        // 1. Tìm user hiện tại trong DB
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại!"));
+
+        // 2. Kiểm tra logic thay đổi Email
+        // Nếu email mới KHÁC email cũ VÀ email mới đã có người dùng khác sử dụng -> Báo lỗi
+        if (!user.getEmail().equals(dto.getEmail()) && userRepository.existsByEmail(dto.getEmail())) {
+            throw new RuntimeException("Email này đã được sử dụng bởi tài khoản khác!");
+        }
+
+        // 3. Cập nhật thông tin
+        user.setFullName(dto.getFullName());
+        user.setEmail(dto.getEmail());
+        // user.setPhone(dto.getPhone()); // Nếu muốn cho sửa cả SĐT thì mở dòng này ra
+
+        // 4. Lưu xuống DB
+        userRepository.save(user);
     }
 }

@@ -205,6 +205,9 @@
             border: 1px solid;
             text-transform: uppercase;
         }
+        .text-muted {
+            color: #e4e4e4 !important;
+        }
     </style>
 </head>
 <body>

@@ -22,4 +22,5 @@ public interface HomeBannerRepository extends JpaRepository<HomeBanner, Long> {
     // active = false -> Danh sách chờ
     // active = true  -> Danh sách đang chạy
     List<HomeBanner> findByActive(boolean active);
+    List<HomeBanner> findByUserIdOrderByCreatedAtDesc(Long userId);
 }
