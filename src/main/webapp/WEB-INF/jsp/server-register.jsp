@@ -219,7 +219,7 @@
         /* 2. Làm sáng icon Lịch/Đồng hồ và giao diện chọn ngày */
         input[type="date"],
         input[type="time"] {
-            color-scheme: dark; /* Quan trọng: Báo cho trình duyệt hiển thị popup lịch màu tối chữ trắng */
+            color-scheme: #e8e8e8; /* Quan trọng: Báo cho trình duyệt hiển thị popup lịch màu tối chữ trắng */
             color: #fff !important; /* Chữ ngày tháng màu trắng */
         }
 
@@ -306,11 +306,13 @@
                                         <div class="schedule-title text-alpha"><i class="fa-solid fa-flask me-2"></i>Alpha Test</div>
                                         <div class="row g-2">
                                             <div class="col-7">
-                                                <label class="form-label small mb-1 text-muted">Ngày bắt đầu</label>
+                                                <label class="form-label small mb-1" style="color:#e3e3e3 !important;">
+                                                    Ngày bắt đầu
+                                                </label>
                                                 <input type="date" class="form-control" name="alphaDate">
                                             </div>
                                             <div class="col-5">
-                                                <label class="form-label small mb-1 text-muted">Giờ</label>
+                                                <label class="form-label small mb-1 text-muted"style="color:#e3e3e3 !important;">Giờ</label>
                                                 <input type="time" class="form-control" name="alphaTime">
                                             </div>
                                         </div>
@@ -322,11 +324,11 @@
                                         <div class="schedule-title text-beta"><i class="fa-solid fa-fire me-2"></i>Open Beta</div>
                                         <div class="row g-2">
                                             <div class="col-7">
-                                                <label class="form-label small mb-1 text-muted">Ngày Open</label>
+                                                <label class="form-label small mb-1 text-muted"style="color:#e3e3e3 !important;">Ngày Open</label>
                                                 <input type="date" class="form-control" name="betaDate" required>
                                             </div>
                                             <div class="col-5">
-                                                <label class="form-label small mb-1 text-muted">Giờ</label>
+                                                <label class="form-label small mb-1 text-muted"style="color:#e3e3e3 !important;">Giờ</label>
                                                 <input type="time" class="form-control" name="betaTime" required>
                                             </div>
                                         </div>
@@ -394,10 +396,17 @@
                                         <option value="SUPER_VIP" class="text-danger fw-bold">♛ Gói Super VIP - 10.000 Xu (Ghim Top)</option>
                                     </select>
                                 </div>
-                                <div class="small text-muted fst-italic">
-                                    <i class="fa-solid fa-circle-exclamation text-danger me-1"></i>
+                                <div
+                                        class="small fst-italic"
+                                        style="color:#dc3545 !important;"
+                                >
+                                    <i
+                                            class="fa-solid fa-circle-exclamation me-1"
+                                            style="color:#c58804 !important;"
+                                    ></i>
                                     Phí sẽ được trừ trực tiếp vào Coin của bạn khi Admin duyệt bài.
                                 </div>
+
                             </div>
                         </div>
 

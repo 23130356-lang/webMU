@@ -86,7 +86,7 @@
             );
 
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            height: 65%;
+            /* height: 65%; Xóa height cứng để flexbox tự chỉnh */
         }
 
         /* Hiệu ứng Hover: Lóe sáng vàng */
@@ -187,6 +187,61 @@
         }
         .btn-mu-login:hover { border-color: var(--mu-gold); color: var(--mu-gold); }
 
+        /* === VIP NAVIGATOR BOX (NEW) === */
+        .vip-nav-box {
+            display: block;
+            position: relative;
+            text-decoration: none;
+            background: linear-gradient(90deg, rgba(20,0,0,0.9) 0%, rgba(50,0,0,0.9) 50%, rgba(20,0,0,0.9) 100%);
+            border: 1px solid var(--mu-border);
+            border-top: 1px solid #7a5c00;
+            border-bottom: 1px solid #7a5c00;
+            padding: 15px 25px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+        }
+        .vip-nav-box:hover {
+            transform: translateY(-3px) scale(1.01);
+            border-color: var(--mu-gold);
+            box-shadow: 0 0 25px rgba(255, 204, 0, 0.2);
+            background: linear-gradient(90deg, #2b0505 0%, #4a0a0a 50%, #2b0505 100%);
+        }
+        .vip-nav-box::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -120%;
+            width: 60%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.4), transparent);
+            transform: skewX(-25deg);
+            transition: none;
+        }
+        .vip-nav-box:hover::after {
+            left: 120%;
+            transition: all 0.7s ease-in-out;
+        }
+        .vip-nav-title {
+            font-family: 'Cinzel', serif; font-weight: 900; font-size: 1.3rem;
+            color: var(--mu-gold); text-transform: uppercase; letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        .vip-nav-desc {
+            font-family: 'Rajdhani', sans-serif; color: #aaa; font-size: 0.95rem; margin-top: 2px;
+        }
+        .vip-nav-icon {
+            font-size: 1.8rem;
+            background: -webkit-linear-gradient(#fff, #ffcc00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 5px rgba(255, 204, 0, 0.5));
+        }
+        .vip-nav-arrow {
+            color: var(--mu-red); transition: margin-right 0.3s;
+        }
+        .vip-nav-box:hover .vip-nav-arrow {
+            margin-right: -5px; color: var(--mu-gold);
+        }
+
         /* === MARKETING SECTION === */
         .marketing-section {
             margin-top: 5rem;
@@ -195,7 +250,6 @@
             border: 1px solid var(--mu-gold-dark);
             position: relative;
         }
-        /* Góc trang trí cho Marketing Section */
         .marketing-section::after {
             content: ''; position: absolute; top: -1px; left: -1px; width: 30px; height: 30px;
             border-top: 3px solid var(--mu-gold); border-left: 3px solid var(--mu-gold);
@@ -204,34 +258,24 @@
             content: ''; position: absolute; bottom: -1px; right: -1px; width: 30px; height: 30px;
             border-bottom: 3px solid var(--mu-gold); border-right: 3px solid var(--mu-gold);
         }
-
         .marketing-title {
-            color: var(--mu-gold);
-            font-family: 'Cinzel', serif;
-            text-align: center;
-            font-weight: 700;
-            text-shadow: 0 0 10px rgba(184, 134, 11, 0.3);
-            margin-bottom: 2rem;
+            color: var(--mu-gold); font-family: 'Cinzel', serif; text-align: center;
+            font-weight: 700; text-shadow: 0 0 10px rgba(184, 134, 11, 0.3); margin-bottom: 2rem;
         }
         .marketing-subtitle {
-            font-family: 'Cinzel', serif;
-            border-left: 4px solid var(--mu-red);
-            padding-left: 15px;
-            margin-top: 30px;
-            margin-bottom: 15px;
+            font-family: 'Cinzel', serif; border-left: 4px solid var(--mu-red);
+            padding-left: 15px; margin-top: 30px; margin-bottom: 15px;
         }
         .marketing-list li { margin-bottom: 10px; font-size: 1.05rem; }
         .highlight-text { color: var(--mu-text-gold); font-weight: bold; }
 
         /* === MODAL === */
         .modal-content {
-            background: #0f0f0f;
-            border: 1px solid var(--mu-gold-dark);
+            background: #0f0f0f; border: 1px solid var(--mu-gold-dark);
             box-shadow: 0 0 50px rgba(0,0,0,0.9);
         }
         .modal-custom-header {
-            background: linear-gradient(90deg, #330000, #110000);
-            border-bottom: 1px solid #333;
+            background: linear-gradient(90deg, #330000, #110000); border-bottom: 1px solid #333;
         }
         .form-control {
             background: #1a1a1a; border: 1px solid #333; color: #eee;
@@ -267,7 +311,7 @@
         <div class="row g-4 align-items-stretch">
 
             <div class="col-md-3 d-flex align-items-center">
-                <div class="banner-slot w-100" style="height: auto;">
+                <div class="banner-slot w-100" style="height: 350px;">
                     <div>
                         <div class="slot-title">Banner Trái</div>
                         <div class="text-center px-2">
@@ -364,11 +408,33 @@
                             </div>
                         </div>
                     </div>
+
+                    <a href="/server/register" class="vip-nav-box">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="me-3">
+                                <i class="fa-solid fa-gem vip-nav-icon"></i>
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <div class="vip-nav-title">
+                                    ĐĂNG MU VIP TẠI ĐÂY
+                                    <span class="badge bg-danger text-white border border-warning ms-2" style="font-size: 0.6rem; vertical-align: middle;">HOT</span>
+                                </div>
+                                <div class="vip-nav-desc">
+                                    <i class="bi bi-stars text-warning me-1"></i> Tổng hợp các máy chủ Alpha Test & Open Beta đáng chơi nhất
+                                </div>
+                            </div>
+
+                            <div class="ms-3">
+                                <i class="fa-solid fa-chevron-right fa-lg vip-nav-arrow"></i>
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </div>
 
             <div class="col-md-3 d-flex align-items-center">
-                <div class="banner-slot w-100" style="height: auto;">
+                <div class="banner-slot w-100" style="height: 350px;">
                     <div>
                         <div class="slot-title">Banner Phải</div>
                         <div class="text-center px-2">
@@ -402,48 +468,50 @@
                 </div>
             </div>
 
-        </div> <div class="marketing-section">
-        <h2 class="marketing-title">QUẢNG CÁO TẠI MUXUA.CO - CỘNG ĐỒNG MU LỚN NHẤT</h2>
+        </div>
 
-        <div class="row">
-            <div class="col-lg-10 mx-auto">
-                <ul class="marketing-list text-secondary fa-ul ms-4">
-                    <li><span class="fa-li"><i class="fa-solid fa-check text-success"></i></span>Thống kê có hơn <strong class="text-white">6.000 Admin Mu Online</strong> đã tin tưởng và sử dụng dịch vụ.</li>
-                    <li><span class="fa-li"><i class="fa-solid fa-check text-success"></i></span>Hơn <strong class="text-white">16.800 Game Mu Online</strong> đăng bài giới thiệu, tiếp cận hàng vạn game thủ.</li>
-                    <li><span class="fa-li"><i class="fa-solid fa-check text-success"></i></span>Giải pháp Marketing toàn diện: <strong class="text-white">Banner, VIP Ghim Bài & Facebook Ads.</strong></li>
-                </ul>
+        <div class="marketing-section">
+            <h2 class="marketing-title">QUẢNG CÁO TẠI MUXUA.CO - CỘNG ĐỒNG MU LỚN NHẤT</h2>
 
-                <div class="p-3 my-4 fst-italic text-center" style="background: rgba(0,0,0,0.5); border-left: 3px solid var(--mu-red);">
-                    "Ngay cả khi... Mu bạn mới không ai tới?<br>
-                    Ngay cả khi... Mu bạn cũ bị gamer phũ?<br>
-                    Ngay cả khi... Mu chà bá, cần bứt phá?"
-                </div>
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+                    <ul class="marketing-list text-secondary fa-ul ms-4">
+                        <li><span class="fa-li"><i class="fa-solid fa-check text-success"></i></span>Thống kê có hơn <strong class="text-white">6.000 Admin Mu Online</strong> đã tin tưởng và sử dụng dịch vụ.</li>
+                        <li><span class="fa-li"><i class="fa-solid fa-check text-success"></i></span>Hơn <strong class="text-white">16.800 Game Mu Online</strong> đăng bài giới thiệu, tiếp cận hàng vạn game thủ.</li>
+                        <li><span class="fa-li"><i class="fa-solid fa-check text-success"></i></span>Giải pháp Marketing toàn diện: <strong class="text-white">Banner, VIP Ghim Bài & Facebook Ads.</strong></li>
+                    </ul>
 
-                <h4 class="marketing-subtitle text-warning">CÁC GÓI QUẢNG CÁO</h4>
-
-                <div class="row g-3 mt-2">
-                    <div class="col-md-4">
-                        <div class="p-3 border border-secondary h-100 bg-black bg-opacity-25">
-                            <h6 class="text-white"><i class="fa-solid fa-1 me-2 text-danger"></i>TREO BANNER</h6>
-                            <p class="small text-secondary mb-0">Phủ sóng thương hiệu tại 4 vị trí chiến lược (VIP, Center, Sidebar). Hỗ trợ ảnh động, HTML5.</p>
-                        </div>
+                    <div class="p-3 my-4 fst-italic text-center" style="background: rgba(0,0,0,0.5); border-left: 3px solid var(--mu-red);">
+                        "Ngay cả khi... Mu bạn mới không ai tới?<br>
+                        Ngay cả khi... Mu bạn cũ bị gamer phũ?<br>
+                        Ngay cả khi... Mu chà bá, cần bứt phá?"
                     </div>
-                    <div class="col-md-4">
-                        <div class="p-3 border border-secondary h-100 bg-black bg-opacity-25">
-                            <h6 class="text-white"><i class="fa-solid fa-2 me-2 text-danger"></i>TREO VIP (GHIM)</h6>
-                            <p class="small text-secondary mb-0">Bài viết được Ghim lên TOP đầu trang chủ và các trang danh mục. Hiển thị "Đề xuất" tại bài của đối thủ.</p>
+
+                    <h4 class="marketing-subtitle text-warning">CÁC GÓI QUẢNG CÁO</h4>
+
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-4">
+                            <div class="p-3 border border-secondary h-100 bg-black bg-opacity-25">
+                                <h6 class="text-white"><i class="fa-solid fa-1 me-2 text-danger"></i>TREO BANNER</h6>
+                                <p class="small text-secondary mb-0">Phủ sóng thương hiệu tại 4 vị trí chiến lược (VIP, Center, Sidebar). Hỗ trợ ảnh động, HTML5.</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="p-3 border border-secondary h-100 bg-black bg-opacity-25">
-                            <h6 class="text-white"><i class="fa-solid fa-3 me-2 text-danger"></i>FACEBOOK ADS</h6>
-                            <p class="small text-secondary mb-0">Chạy quảng cáo Retargeting (Tiếp thị lại) vào tệp khách hàng Pixel đã truy cập Muxua.co.</p>
+                        <div class="col-md-4">
+                            <div class="p-3 border border-secondary h-100 bg-black bg-opacity-25">
+                                <h6 class="text-white"><i class="fa-solid fa-2 me-2 text-danger"></i>TREO VIP (GHIM)</h6>
+                                <p class="small text-secondary mb-0">Bài viết được Ghim lên TOP đầu trang chủ và các trang danh mục. Hiển thị "Đề xuất" tại bài của đối thủ.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 border border-secondary h-100 bg-black bg-opacity-25">
+                                <h6 class="text-white"><i class="fa-solid fa-3 me-2 text-danger"></i>FACEBOOK ADS</h6>
+                                <p class="small text-secondary mb-0">Chạy quảng cáo Retargeting (Tiếp thị lại) vào tệp khách hàng Pixel đã truy cập Muxua.co.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
     </div>
 </div>
