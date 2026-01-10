@@ -22,7 +22,6 @@ public class ServerService {
     private ResetTypeRepository resetRepo;
     @Autowired
     private PointTypeRepository pointRepo;
-
     @Transactional
     public void registerServer(ServerRegisterDTO dto, User owner) {
 
@@ -94,5 +93,9 @@ public class ServerService {
     public List<Server> getApprovedServers() {
         // Gọi hàm vừa viết ở Repository
         return serverRepository.findByStatusOrderByCreatedAtDesc(Server.Status.APPROVED);
+    }
+    public Server getServerById(Long id) {
+        return serverRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy Server ID: " + id));
     }
 }

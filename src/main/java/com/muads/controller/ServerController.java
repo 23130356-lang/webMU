@@ -1,6 +1,7 @@
 package com.muads.controller;
 
 import com.muads.dto.ServerRegisterDTO;
+import com.muads.entity.Server;
 import com.muads.entity.User;
 import com.muads.repository.MuVersionRepository;
 import com.muads.repository.PointTypeRepository;
@@ -10,10 +11,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/server")
@@ -69,5 +67,17 @@ public class ServerController {
             e.printStackTrace();
             return "redirect:/server/register?error=true";
         }
+    }
+    @GetMapping("/detail/{id}")
+    public String showServerDetail(@PathVariable("id") Long id, Model model) {
+        Server server = serverService.getServerById(id);
+
+        // Kiểm tra null để tránh lỗi trang trắng
+        if(server == null) {
+            return "redirect:/";
+        }
+
+        model.addAttribute("server", server);
+        return "server-detail";
     }
 }
