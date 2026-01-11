@@ -37,7 +37,7 @@ public class BannerRegisterController {
 
     // Định nghĩa giới hạn Slot
     private final int LIMIT_HERO = 1;
-    private final int LIMIT_STD = 5;
+    private final int LIMIT_STD = 7;
     private final int LIMIT_SIDEBAR = 3;
 
     // Bảng giá

@@ -40,4 +40,5 @@ public class ServerRegisterDTO {
     private Integer expRate;
     private Integer dropRate;
     private String antiHack;
+
 }
