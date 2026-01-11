@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @SpringBootApplication // Chỉ cần dòng này, KHÔNG thêm @ComponentScan
+
 public class WebmuApplication {
     public static void main(String[] args) {
         SpringApplication.run(WebmuApplication.class, args);

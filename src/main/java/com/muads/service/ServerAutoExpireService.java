@@ -1,11 +1,11 @@
 package com.muads.service;
 
-import com.muads.entity.Server;
-import com.muads.repository.ServerRepository;
-import jakarta.transaction.Transactional;
+import com.muads.entity.HomeBanner;
+import com.muads.repository.HomeBannerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,25 +14,26 @@ import java.util.List;
 public class ServerAutoExpireService {
 
     @Autowired
-    private ServerRepository serverRepository;
+    private HomeBannerRepository homeBannerRepository;
 
-    // Chạy mỗi 1 tiếng (3600000 ms) hoặc 10 phút tùy bạn cấu hình
-    // initialDelay: Chờ 5 giây sau khi bật server mới bắt đầu quét lần đầu
-    @Scheduled(fixedRate = 3600000, initialDelay = 5000)
-    @Transactional
-    public void autoDisableExpiredServers() {
+    // Chạy mỗi 60 giây (60000ms) để kiểm tra
+    @Scheduled(fixedRate = 60000)
+    @Transactional // Đảm bảo tính toàn vẹn dữ liệu khi update DB
+    public void autoExpireBanners() {
         LocalDateTime now = LocalDateTime.now();
 
-        // Tìm các server đang BẬT nhưng đã quá hạn
-        List<Server> expiredServers = serverRepository.findByIsActiveTrueAndExpiredAtBefore(now);
+        // 1. Tìm các banner hết hạn (Active = true VÀ EndDate < Now)
+        List<HomeBanner> expiredBanners = homeBannerRepository.findByActiveTrueAndEndDateBefore(now);
 
-        if (!expiredServers.isEmpty()) {
-
-            for (Server s : expiredServers) {
-                s.setIsActive(false); // Tắt server
-                // s.setStatus(Server.Status.EXPIRED); // (Tuỳ chọn) Nếu muốn đổi trạng thái
+        if (!expiredBanners.isEmpty()) {
+            // 2. Duyệt qua và tắt chúng đi
+            for (HomeBanner banner : expiredBanners) {
+                banner.setActive(false);
+                System.out.println("Đã gỡ Banner ID: " + banner.getId() + " - Hết hạn lúc: " + banner.getEndDate());
             }
-            serverRepository.saveAll(expiredServers); // Lưu tất cả một lần
+
+            // 3. Lưu lại vào DB
+            homeBannerRepository.saveAll(expiredBanners);
         }
     }
 }

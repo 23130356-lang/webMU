@@ -4,6 +4,7 @@ import com.muads.entity.HomeBanner;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -27,5 +28,5 @@ public interface HomeBannerRepository extends JpaRepository<HomeBanner, Long> {
     // Hiển thị ra trang chủ (theo thứ tự hiển thị)
     // [MỚI] Tìm các banner đang chạy, sắp xếp theo ngày kết thúc TĂNG DẦN (thằng nào hết hạn trước lên đầu)
     List<HomeBanner> findByPositionCodeAndActiveTrueOrderByEndDateAsc(String positionCode);
-
+    List<HomeBanner> findByActiveTrueAndEndDateBefore(LocalDateTime now);
 }
