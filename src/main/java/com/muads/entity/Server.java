@@ -55,13 +55,13 @@ public class Server {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // --- [MỚI] THÊM 2 TRƯỜNG QUẢN LÝ THỜI GIAN ---
+    // --- QUẢN LÝ THỜI GIAN ---
     @Column(name = "approved_at")
     private LocalDateTime approvedAt; // Thời điểm Admin bấm nút duyệt
 
     @Column(name = "expired_at")
     private LocalDateTime expiredAt; // Thời điểm server sẽ tự động bị tắt
-    // ----------------------------------------------
+    // -------------------------
 
     @OneToOne(mappedBy = "server", cascade = CascadeType.ALL)
     private ServerSchedule schedule;
@@ -86,13 +86,13 @@ public class Server {
 
     @Getter
     public enum BannerPackage {
-        BASIC(0, "Cơ bản (Miễn phí)", 7),       // 7 Ngày
+        BASIC(0, "Cơ bản (Miễn phí)", 10),       // 10 Ngày
         VIP(5000, "VIP (5.000 Xu)", 10),           // 10 Ngày
-        SUPER_VIP(10000, "Super VIP (10.000 Xu)", 14); // 14 Ngày
+        SUPER_VIP(10000, "Super VIP (10.000 Xu)", 10); // 10 Ngày
 
         private final int price;
         private final String label;
-        private final int durationDays; // Thêm thuộc tính ngày
+        private final int durationDays;
 
         BannerPackage(int price, String label, int durationDays) {
             this.price = price;

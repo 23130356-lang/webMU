@@ -26,7 +26,6 @@
             background-color: var(--mu-bg);
             color: #ccc;
             font-family: 'Rajdhani', sans-serif;
-            /* Background tối huyền bí */
             background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)), url('https://toquoc.mediacdn.vn/280518851207290880/2022/6/7/-1654571912757628297204.jpg');
             background-size: cover;
             background-position: center;
@@ -44,7 +43,6 @@
             padding: 40px;
         }
 
-        /* Trang trí 4 góc (Góc vuông vàng) */
         .create-server-card::before, .create-server-card::after {
             content: ''; position: absolute; width: 15px; height: 15px;
             border: 2px solid var(--mu-gold); transition: 0.3s;
@@ -52,7 +50,6 @@
         .create-server-card::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
         .create-server-card::after { bottom: -2px; right: -2px; border-left: none; border-top: none; }
 
-        /* Tiêu đề trang */
         .page-title {
             font-family: 'Cinzel', serif;
             font-weight: 700;
@@ -84,7 +81,7 @@
         }
         .mu-section-title i { color: var(--mu-gold); margin-right: 10px; }
 
-        /* === 4. INPUT FIELDS (Đồng bộ Login/Register) === */
+        /* === 4. INPUT FIELDS === */
         .mu-form-group { margin-bottom: 20px; position: relative; }
 
         .mu-label {
@@ -107,7 +104,7 @@
             transition: all 0.3s;
         }
 
-        .mu-input { padding: 10px 15px 10px 40px; /* Padding trái cho icon */ }
+        .mu-input { padding: 10px 15px 10px 40px; }
         .mu-select { padding: 10px 15px; cursor: pointer; }
         .mu-textarea { padding: 15px; }
 
@@ -127,14 +124,10 @@
             transition: 0.3s;
         }
         .mu-input:focus ~ .mu-input-icon { color: var(--mu-gold); }
-
-        /* Fix Select Option Background */
         .mu-select option { background-color: #111; color: #fff; padding: 10px; }
-
-        /* Date Picker Customization */
-        input[type="date"], input[type="time"] {
-            color-scheme: dark;
-        }
+        input[type="date"], input[type="time"] { color-scheme: dark; }
+        /* Style riêng cho file input */
+        input[type="file"] { padding-left: 10px !important; }
 
         /* === 5. SCHEDULE BOX === */
         .schedule-box {
@@ -146,12 +139,7 @@
         }
         .schedule-box:hover { border-color: #555; background: rgba(0,0,0,0.4); }
 
-        .sch-title {
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            margin-bottom: 10px;
-            display: block;
-        }
+        .sch-title { font-family: 'Cinzel', serif; font-weight: 700; margin-bottom: 10px; display: block; }
         .text-alpha { color: #00d2ff; text-shadow: 0 0 5px rgba(0, 210, 255, 0.4); }
         .text-beta { color: #ff4444; text-shadow: 0 0 5px rgba(255, 68, 68, 0.4); }
 
@@ -192,6 +180,12 @@
             transform: translateY(-2px);
             color: #fff;
         }
+
+        /* === 8. RADIO CUSTOM === */
+        .form-check-input:checked {
+            background-color: var(--mu-gold);
+            border-color: var(--mu-gold);
+        }
     </style>
 </head>
 
@@ -204,7 +198,7 @@
         <div class="row justify-content-center">
             <div class="col-lg-10">
 
-                <form action="${pageContext.request.contextPath}/server/create" method="post" class="create-server-card">
+                <form action="${pageContext.request.contextPath}/server/create" method="post" enctype="multipart/form-data" class="create-server-card">
 
                     <h1 class="page-title">Khởi Tạo Máy Chủ</h1>
                     <p class="page-subtitle">Đăng ký chiến dịch quảng bá MU Online</p>
@@ -347,24 +341,94 @@
                         </div>
                     </div>
 
-                    <div class="vip-package-box mt-4 mb-4">
-                        <div class="vip-header">
-                            <i class="fa-solid fa-gem me-2"></i> Chọn Gói Quảng Cáo
-                        </div>
-
-                        <div class="mu-form-group mb-2">
-                            <select name="bannerPackage" id="bannerPackage" class="mu-select">
-                                <option value="BASIC" selected>Gói Cơ Bản - Miễn phí (Standard)</option>
-                                <option value="VIP" style="color: #ffd700;">★ Gói VIP - 5.000 Xu (Nổi bật)</option>
-                                <option value="SUPER_VIP" style="color: #ff4444;">♛ Gói Super VIP - 10.000 Xu (Ghim Top)</option>
-                            </select>
-                        </div>
-                        <div class="small fst-italic text-danger">
-                            <i class="fa-solid fa-circle-exclamation me-1 text-warning"></i>
-                            Phí sẽ được trừ trực tiếp vào Coin của bạn khi Admin duyệt bài.
-                        </div>
+                    <div class="mu-section-title mt-4">
+                        <i class="fa-solid fa-image"></i> 4. Banner Quảng Cáo
                     </div>
 
+                    <div class="row mb-3 ps-2">
+                        <div class="col-12 mb-3">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="uploadType" id="typeFile" value="file" checked onchange="toggleBannerInput()">
+                                <label class="form-check-label text-light fw-bold" for="typeFile">
+                                    <i class="fa-solid fa-upload me-1 text-warning"></i> Upload từ máy
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="uploadType" id="typeUrl" value="url" onchange="toggleBannerInput()">
+                                <label class="form-check-label text-light fw-bold" for="typeUrl">
+                                    <i class="fa-solid fa-link me-1 text-info"></i> Link ảnh Online
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-12" id="input-file-group">
+                            <div class="mu-form-group">
+                                <label class="mu-label">Chọn File Ảnh (JPG, PNG, GIF)</label>
+                                <input type="file" class="mu-input ps-2" name="bannerFile" accept="image/*" style="padding-left: 10px;">
+                                <div class="form-text text-secondary fst-italic mt-1">* Dung lượng tối đa 2MB.</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12" id="input-url-group" style="display: none;">
+                            <div class="mu-form-group">
+                                <label class="mu-label">Dán Đường Dẫn Ảnh</label>
+                                <input type="url" class="mu-input" name="bannerUrl" placeholder="https://imgur.com/example.jpg">
+                                <i class="fa-solid fa-link mu-input-icon"></i>
+                                <div class="form-text text-secondary fst-italic mt-1">* Hãy đảm bảo link ảnh công khai và hoạt động.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="vip-package-box mt-4 mb-4">
+                        <div class="vip-header"><i class="fa-solid fa-gem me-2"></i> Chọn Gói Quảng Cáo</div>
+
+                        <c:set var="maxSuperVip" value="30" />
+                        <c:set var="maxVip" value="8" />
+
+                        <c:set var="remSvip" value="${maxSuperVip - (usedSuperVip != null ? usedSuperVip : 0)}" />
+                        <c:set var="remVip" value="${maxVip - (usedVip != null ? usedVip : 0)}" />
+
+                        <div class="mb-2">
+                            <select name="bannerPackage" id="bannerPackage" class="mu-select">
+                                <option value="BASIC" selected>Gói Cơ Bản - Miễn phí (Vô hạn)</option>
+
+                                <c:choose>
+                                    <c:when test="${remVip > 0}">
+                                        <option value="VIP" style="color: #ffd700;">
+                                            ★ Gói VIP - 5.000 Xu (Còn ${remVip} slot)
+                                        </option>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <option value="VIP" disabled style="color: #666;">
+                                            ★ Gói VIP - Đã hết chỗ (Full 8/8)
+                                        </option>
+                                    </c:otherwise>
+                                </c:choose>
+
+                                <c:choose>
+                                    <c:when test="${remSvip > 0}">
+                                        <option value="SUPER_VIP" style="color: #ff4444; font-weight: bold;">
+                                            ♛ Gói Super VIP - 10.000 Xu (Còn ${remSvip} slot)
+                                        </option>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <option value="SUPER_VIP" disabled style="color: #666;">
+                                            ♛ Gói Super VIP - Đã hết chỗ (Full 30/30)
+                                        </option>
+                                    </c:otherwise>
+                                </c:choose>
+                            </select>
+                        </div>
+
+                        <c:if test="${remSvip <= 5 && remSvip > 0}">
+                            <div class="small fst-italic text-warning mt-1">
+                                <i class="fa-solid fa-fire me-1"></i> Gói Super VIP sắp hết chỗ, hãy đăng ký ngay!
+                            </div>
+                        </c:if>
+
+                        <div class="small fst-italic text-danger mt-1">
+                            <i class="fa-solid fa-circle-exclamation me-1"></i> Phí trừ trực tiếp vào Coin khi Admin duyệt.
+                        </div>
+                    </div>
                     <div class="mu-form-group">
                         <label class="mu-label">Nội dung bài viết</label>
                         <textarea class="mu-textarea" name="description" rows="6" placeholder="Mô tả chi tiết về server, tính năng, sự kiện..."></textarea>
@@ -376,7 +440,6 @@
                         </button>
                         <p class="text-secondary mt-3 small">Vui lòng kiểm tra kỹ thông tin trước khi gửi duyệt.</p>
                     </div>
-
                 </form>
 
             </div>
@@ -387,6 +450,26 @@
 <jsp:include page="footer.jsp" />
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function toggleBannerInput() {
+        const typeFile = document.getElementById('typeFile');
+        const fileGroup = document.getElementById('input-file-group');
+        const urlGroup = document.getElementById('input-url-group');
+
+        if (typeFile.checked) {
+            fileGroup.style.display = 'block';
+            urlGroup.style.display = 'none';
+            // Clear URL input nếu chuyển sang upload file để tránh gửi dữ liệu rác
+            document.querySelector('input[name="bannerUrl"]').value = '';
+        } else {
+            fileGroup.style.display = 'none';
+            urlGroup.style.display = 'block';
+            // Clear File input nếu chuyển sang link
+            document.querySelector('input[name="bannerFile"]').value = '';
+        }
+    }
+</script>
 
 </body>
 </html>
