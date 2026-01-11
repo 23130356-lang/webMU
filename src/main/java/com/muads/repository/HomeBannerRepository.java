@@ -23,4 +23,9 @@ public interface HomeBannerRepository extends JpaRepository<HomeBanner, Long> {
     // active = true  -> Danh sách đang chạy
     List<HomeBanner> findByActive(boolean active);
     List<HomeBanner> findByUserIdOrderByCreatedAtDesc(Long userId);
+    // Đếm số lượng
+    // Hiển thị ra trang chủ (theo thứ tự hiển thị)
+    // [MỚI] Tìm các banner đang chạy, sắp xếp theo ngày kết thúc TĂNG DẦN (thằng nào hết hạn trước lên đầu)
+    List<HomeBanner> findByPositionCodeAndActiveTrueOrderByEndDateAsc(String positionCode);
+
 }

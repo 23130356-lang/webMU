@@ -126,8 +126,8 @@
     #muxua-unique-header .mh-menu-link:hover i { color: #8b0000; }
 
     /* Highlight Ads Link */
-    #muxua-unique-header .mh-link-ads { color: #cfaa56 !important; }
-    #muxua-unique-header .mh-link-ads i { color: #cfaa56 !important; }
+    #muxua-unique-header .mh-link-ads { color: #ffd706 !important; }
+    #muxua-unique-header .mh-link-ads i { color: #ffd706 !important; }
 
     /* 5. DROPDOWN STYLE */
     #muxua-unique-header .mh-dropdown {
@@ -356,7 +356,7 @@
 
                 <li class="mh-menu-item">
                     <a href="/banner-register" class="mh-menu-link mh-link-ads">
-                        <i class="fa-solid fa-crown"></i> Quảng Cáo
+                        <i class="fa-solid fa-crown" style="font-size: 16px !important;"></i> Quảng Cáo
                     </a>
                 </li>
             </ul>

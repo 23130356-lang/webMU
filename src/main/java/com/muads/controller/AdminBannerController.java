@@ -1,19 +1,15 @@
 package com.muads.controller;
 
-import com.muads.entity.HomeBanner;
 import com.muads.entity.User;
 import com.muads.service.HomeBannerService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Controller
 @RequestMapping("/admin")
@@ -22,54 +18,40 @@ public class AdminBannerController {
     @Autowired
     private HomeBannerService bannerService;
 
-    // 1. Hiển thị danh sách Banner
+    // === 1. QUẢN LÝ BANNER (CHỈ CẦN XEM VÀ XÓA) ===
     @GetMapping("/banners")
     public String showBannerManager(Model model, HttpSession session) {
-        // Check quyền Admin
+        // 1. Kiểm tra quyền Admin
         User user = (User) session.getAttribute("currentUser");
-        if (user == null || user.getRole() != User.Role.ADMIN) {
-            return "redirect:/login"; // Đá về login nếu không phải Admin
+
+        // Lưu ý: Sửa logic check role tùy theo Enum hay String trong code của bạn
+        // Ví dụ: if (user == null || user.getRole() != User.Role.ADMIN)
+        if (user == null || !"ADMIN".equalsIgnoreCase(String.valueOf(user.getRole()))) {
+            return "redirect:/login";
         }
 
-        // Lấy danh sách
-        model.addAttribute("pendingList", bannerService.getPendingBanners());
+        // 2. Lấy danh sách để hiển thị
+        // - Danh sách đang chạy (Active) để kiểm tra nội dung
         model.addAttribute("activeList", bannerService.getActiveBanners());
+
+        // - Danh sách toàn bộ (nếu muốn xem cả lịch sử cũ)
+        model.addAttribute("allList", bannerService.getAllBanners());
 
         return "admin/admin-banners";
     }
 
-    // 2. Xử lý Duyệt Banner
-    @PostMapping("/banner/approve")
-    public String approveBanner(
-            @RequestParam("id") Long id,
-            @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-            @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-            RedirectAttributes redirectAttributes
-    ) {
-        try {
-            HomeBanner banner = bannerService.findById(id);
-            if (banner != null) {
-                // Chuyển LocalDate (chọn từ lịch) sang LocalDateTime
-                banner.setStartDate(LocalDateTime.of(startDate, LocalTime.MIN));
-                banner.setEndDate(LocalDateTime.of(endDate, LocalTime.MAX));
-                banner.setActive(true); // Kích hoạt
-
-                bannerService.saveBanner(banner);
-                redirectAttributes.addFlashAttribute("successMessage", "Đã duyệt banner thành công!");
-            }
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
-        }
-        return "redirect:/admin/banners";
-    }
-
-    // 3. Xóa Banner
+    // === 2. XÓA BANNER (NẾU VI PHẠM) ===
     @GetMapping("/banner/delete/{id}")
     public String deleteBanner(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
+            // Vì user đã trả tiền, nên nếu xóa admin có thể cần cân nhắc việc hoàn tiền thủ công
+            // hoặc quy định rõ trong điều khoản là "Vi phạm sẽ xóa không hoàn tiền".
+
             bannerService.deleteBanner(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Đã xóa banner.");
+            redirectAttributes.addFlashAttribute("successMessage", "Đã gỡ bỏ banner vi phạm thành công.");
+
         } catch (Exception e) {
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi xóa: " + e.getMessage());
         }
         return "redirect:/admin/banners";
