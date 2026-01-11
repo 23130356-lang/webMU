@@ -20,7 +20,6 @@ public class ServerController {
     @Autowired
     private ServerService serverService;
 
-    // Inject Repository để lấy dữ liệu đổ vào Dropdown
     @Autowired
     private MuVersionRepository versionRepo;
     @Autowired
@@ -30,37 +29,21 @@ public class ServerController {
 
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
-        // Đổ dữ liệu danh mục vào select-box
         model.addAttribute("versions", versionRepo.findAll());
         model.addAttribute("resetTypes", resetRepo.findAll());
         model.addAttribute("pointTypes", pointRepo.findAll());
-
-        // Gửi một DTO rỗng để form hứng dữ liệu
         model.addAttribute("serverDTO", new ServerRegisterDTO());
-
         return "server-register";
     }
 
     @PostMapping("/create")
     public String createServer(@ModelAttribute("serverDTO") ServerRegisterDTO serverDTO,
-                               HttpSession session) { // Thêm tham số Session
-
-// --- ĐOẠN DEBUG (BẮT BUỘC THÊM VÀO ĐỂ KIỂM TRA) ---
-        System.out.println("================ DEBUG START ================");
-        System.out.println("Tên Server: " + serverDTO.getServerName());
-        System.out.println("Ngày Alpha (DTO): " + serverDTO.getAlphaDate()); // Xem có null không?
-        System.out.println("Giờ Alpha (DTO): " + serverDTO.getAlphaTime());   // Xem có null không?
-        System.out.println("Ngày Beta (DTO): " + serverDTO.getBetaDate());
-        System.out.println("================ DEBUG END ==================");
-        // --------------------------------------------------
-        // 1. Kiểm tra xem đã login chưa
+                               HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) {
-            return "redirect:/login"; // Chưa login thì đá về trang login
+            return "redirect:/login";
         }
-
         try {
-            // 2. Truyền cả User vào service
             serverService.registerServer(serverDTO, currentUser);
             return "redirect:/server/register?success=true";
         } catch (Exception e) {
@@ -68,15 +51,13 @@ public class ServerController {
             return "redirect:/server/register?error=true";
         }
     }
+
     @GetMapping("/detail/{id}")
     public String showServerDetail(@PathVariable("id") Long id, Model model) {
         Server server = serverService.getServerById(id);
-
-        // Kiểm tra null để tránh lỗi trang trắng
         if(server == null) {
             return "redirect:/";
         }
-
         model.addAttribute("server", server);
         return "server-detail";
     }

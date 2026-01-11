@@ -528,15 +528,42 @@
             <div class="modal-body p-4">
                 <c:url var="postUrl" value="/banner-register"/>
 
-                <form action="${postUrl}" method="post">
+                <form action="${postUrl}" method="post" enctype="multipart/form-data" id="bannerForm">
                     <sec:csrfInput />
                     <input type="hidden" name="positionCode" id="hiddenPosCode">
 
                     <div class="mb-3">
-                        <label class="form-label text-secondary small text-uppercase fw-bold">Link Ảnh Banner (URL)</label>
+                        <label class="form-label text-secondary small text-uppercase fw-bold">Chọn nguồn ảnh</label>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="uploadType" id="optUpload" value="file" checked onchange="toggleImageInput()">
+                                <label class="form-check-label text-white" for="optUpload">
+                                    <i class="fa-solid fa-cloud-arrow-up me-1"></i> Tải ảnh lên
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="uploadType" id="optLink" value="url" onchange="toggleImageInput()">
+                                <label class="form-check-label text-white" for="optLink">
+                                    <i class="fa-solid fa-link me-1"></i> Dùng Link ảnh
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3" id="groupFile">
+                        <label class="form-label text-secondary small text-uppercase fw-bold">Chọn file (Ảnh/Gif)</label>
                         <div class="input-group">
-                            <span class="input-group-text bg-dark border-secondary text-secondary"><i class="fa-solid fa-image"></i></span>
-                            <input type="url" name="imageUrl" class="form-control" placeholder="https://imgur.com/..." required>
+                            <span class="input-group-text bg-dark border-secondary text-secondary"><i class="fa-solid fa-file-image"></i></span>
+                            <input type="file" name="imageFile" id="inputImageFile" class="form-control" accept="image/png, image/jpeg, image/gif" required>
+                        </div>
+                        <div class="form-text text-muted small">Hỗ trợ: JPG, PNG, GIF (Tối đa 5MB)</div>
+                    </div>
+
+                    <div class="mb-3 d-none" id="groupUrl">
+                        <label class="form-label text-secondary small text-uppercase fw-bold">Dán Link Ảnh</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-secondary"><i class="fa-solid fa-globe"></i></span>
+                            <input type="url" name="imageUrl" id="inputImageUrl" class="form-control" placeholder="https://imgur.com/example.gif">
                         </div>
                     </div>
 
@@ -558,7 +585,35 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleImageInput() {
+        const isUpload = document.getElementById('optUpload').checked;
+        const groupFile = document.getElementById('groupFile');
+        const groupUrl = document.getElementById('groupUrl');
+        const inputFile = document.getElementById('inputImageFile');
+        const inputUrl = document.getElementById('inputImageUrl');
 
+        if (isUpload) {
+            // Hiện File, Ẩn URL
+            groupFile.classList.remove('d-none');
+            groupUrl.classList.add('d-none');
+
+            // Set required cho File, bỏ required cho URL (tránh lỗi form)
+            inputFile.setAttribute('required', '');
+            inputUrl.removeAttribute('required');
+            inputUrl.value = ''; // Xóa value url cũ nếu có
+        } else {
+            // Hiện URL, Ẩn File
+            groupFile.classList.add('d-none');
+            groupUrl.classList.remove('d-none');
+
+            // Set required cho URL, bỏ required cho File
+            inputUrl.setAttribute('required', '');
+            inputFile.removeAttribute('required');
+            inputFile.value = ''; // Reset file đã chọn
+        }
+    }
+</script>
 <script>
     function openRegisterModal(code, name, isWaitlist) {
         document.getElementById('hiddenPosCode').value = code;

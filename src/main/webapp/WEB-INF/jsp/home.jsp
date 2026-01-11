@@ -65,7 +65,8 @@
         }
 
         .real-ad-img {
-            width: 100%; height: 100%; object-fit: cover; display: block;
+            width: 100%; height: 100%; display: block;
+            object-fit: fill;
             opacity: 0.9; transition: 0.3s;
         }
         .mu-item-frame:hover .real-ad-img { opacity: 1; scale: 1.02; }
@@ -242,7 +243,7 @@
                                 <div class="carousel-item ${status.first ? 'active' : ''}" data-bs-interval="3000">
                                     <a href="${banner.targetUrl}" target="_blank">
                                         <img src="${banner.imageUrl}" class="d-block w-100" alt="Hero Banner"
-                                             style="height: 400px; object-fit: cover;">
+                                             style="height: 400px; object-fit: fill;">
                                     </a>
                                 </div>
                             </c:forEach>

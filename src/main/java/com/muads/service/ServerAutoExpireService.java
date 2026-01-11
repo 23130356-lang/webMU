@@ -27,15 +27,11 @@ public class ServerAutoExpireService {
         List<Server> expiredServers = serverRepository.findByIsActiveTrueAndExpiredAtBefore(now);
 
         if (!expiredServers.isEmpty()) {
-            System.out.println("--- [AUTO] Tìm thấy " + expiredServers.size() + " server hết hạn ---");
 
             for (Server s : expiredServers) {
                 s.setIsActive(false); // Tắt server
                 // s.setStatus(Server.Status.EXPIRED); // (Tuỳ chọn) Nếu muốn đổi trạng thái
-
-                System.out.println("-> Đã tắt server: " + s.getServerName() + " (Hết hạn lúc: " + s.getExpiredAt() + ")");
             }
-
             serverRepository.saveAll(expiredServers); // Lưu tất cả một lần
         }
     }
