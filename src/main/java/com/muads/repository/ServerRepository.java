@@ -15,46 +15,46 @@ import java.util.List;
 @Repository
 public interface ServerRepository extends JpaRepository<Server, Long> {
 
+    // 1. Các hàm tìm kiếm cơ bản
     List<Server> findByIsActiveTrue();
 
+    // [QUAN TRỌNG] Hàm bạn đang bị thiếu báo lỗi đây:
+    List<Server> findByStatus(Status status);
+
+    // [QUAN TRỌNG] Hàm sắp xếp theo thời gian (dùng cho Service):
+    List<Server> findByStatusOrderByCreatedAtDesc(Status status);
+
+    // 2. Các hàm phân trang (Paging)
     Page<Server> findByStatusAndIsActiveTrue(Status status, Pageable pageable);
 
     Page<Server> findByStatusInAndIsActiveTrue(List<Status> statuses, Pageable pageable);
 
+    // 3. Tìm kiếm theo tên
     List<Server> findByServerNameContainingIgnoreCaseAndIsActiveTrue(String keyword);
-
-    List<Server> findByUserId(Long userId);
-
-    long countByStatus(Status status);
-
-    @Query("SELECT s FROM Server s WHERE s.isActive = true AND s.status = 'ACTIVE' ORDER BY s.createdAt DESC")
-    List<Server> findLatestActiveServers(Pageable pageable);
-
     boolean existsByServerName(String serverName);
 
-    List<Server> findByStatus(Status status);
+    // 4. Tìm theo User
+    List<Server> findByUserId(Long userId);
 
-    List<Server> findByStatusOrderByCreatedAtDesc(Status status);
+    // 5. Đếm số lượng
+    long countByStatus(Status status);
 
-    // --- [MỚI] TÌM SERVER HẾT HẠN ---
-    List<Server> findByIsActiveTrueAndExpiredAtBefore(LocalDateTime now);
-
-    // --- [MỚI] ĐẾM SLOT ĐANG CHẠY ---
+    // 6. Logic đếm Slot cho chức năng Đăng ký/Gia hạn
     long countByBannerPackageAndStatusAndIsActiveTrue(BannerPackage bannerPackage, Status status);
 
-    // --- QUERY HIỂN THỊ ---
-    @Query("SELECT s FROM Server s WHERE s.status = 'APPROVED' AND s.isActive = true " +
-            "AND s.bannerPackage = 'SUPER_VIP' " +
-            "ORDER BY s.approvedAt DESC")
+    // 7. Tìm server hết hạn (để CronJob quét tắt server)
+    List<Server> findByIsActiveTrueAndExpiredAtBefore(LocalDateTime now);
+
+    // 8. Các Query Custom hiển thị ra trang chủ (Home)
+    @Query("SELECT s FROM Server s WHERE s.isActive = true AND s.status = 'APPROVED' ORDER BY s.createdAt DESC")
+    List<Server> findLatestActiveServers(Pageable pageable);
+
+    @Query("SELECT s FROM Server s WHERE s.status = 'APPROVED' AND s.isActive = true AND s.bannerPackage = 'SUPER_VIP' ORDER BY s.approvedAt DESC")
     List<Server> findSuperVipServers();
 
-    @Query("SELECT s FROM Server s WHERE s.status = 'APPROVED' AND s.isActive = true " +
-            "AND s.bannerPackage = 'VIP' " +
-            "ORDER BY s.approvedAt DESC")
+    @Query("SELECT s FROM Server s WHERE s.status = 'APPROVED' AND s.isActive = true AND s.bannerPackage = 'VIP' ORDER BY s.approvedAt DESC")
     List<Server> findVipServers();
 
-    @Query("SELECT s FROM Server s WHERE s.status = 'APPROVED' AND s.isActive = true " +
-            "AND s.bannerPackage = 'BASIC' " +
-            "ORDER BY s.approvedAt DESC")
+    @Query("SELECT s FROM Server s WHERE s.status = 'APPROVED' AND s.isActive = true AND s.bannerPackage = 'BASIC' ORDER BY s.approvedAt DESC")
     List<Server> findNormalServers();
 }

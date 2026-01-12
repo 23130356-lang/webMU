@@ -42,7 +42,7 @@
         .server-thumb {
             width: 100%;
             height: 100px;
-            object-fit: cover;
+            object-fit: fill;
             border-bottom: 1px solid #333;
         }
         .status-badge {
@@ -120,7 +120,9 @@
                                         <a href="/manage/servers/edit/${sv.id}" class="btn btn-outline-light btn-sm w-50" style="border-color: #555;">
                                             <i class="fa-solid fa-pen-nib"></i> Sửa
                                         </a>
-                                        <a href="#" class="btn btn-outline-warning btn-sm w-50 text-gold border-warning">
+                                        <a href="/manage/servers/renew/${sv.id}"
+                                           class="btn btn-outline-warning btn-sm w-50 text-gold border-warning"
+                                           onclick="return confirm('Gia hạn gói ${sv.bannerPackage.label}?\nGiá: ${sv.bannerPackage.price} Xu / 10 Ngày\nBạn có chắc chắn muốn tiếp tục?');">
                                             <i class="fa-solid fa-cart-arrow-down"></i> Gia Hạn
                                         </a>
                                     </div>

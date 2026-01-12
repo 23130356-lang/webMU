@@ -4,6 +4,7 @@ import com.muads.entity.Server;
 import com.muads.entity.ServerEditRequest;
 import com.muads.entity.User;
 import com.muads.service.UserManageService;
+import com.muads.service.UserService; // Cần import UserService để làm mới session
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,6 +19,9 @@ public class UserManageController {
     @Autowired
     private UserManageService userManageService;
 
+    @Autowired
+    private UserService userService; // Dùng để lấy lại thông tin User mới nhất (số dư coin)
+
     // === 1. QUẢN LÝ SERVER ===
 
     @GetMapping("/servers")
@@ -25,8 +29,15 @@ public class UserManageController {
         User user = (User) session.getAttribute("currentUser");
         if (user == null) return "redirect:/login";
 
+        // CẬP NHẬT SESSION: Lấy user mới nhất từ DB để hiển thị đúng số dư Coin hiện tại
+        // (Tránh trường hợp vừa trừ tiền xong nhưng session vẫn lưu số cũ)
+        User freshUser = userService.findById(user.getId());
+        if (freshUser != null) {
+            session.setAttribute("currentUser", freshUser);
+        }
+
         model.addAttribute("servers", userManageService.getMyServers(user.getId()));
-        return "manage/my-servers"; // File JSP bên dưới
+        return "manage/my-servers"; // File JSP danh sách
     }
 
     @GetMapping("/servers/edit/{id}")
@@ -54,10 +65,39 @@ public class UserManageController {
 
         try {
             userManageService.submitEditRequest(serverId, user.getId(), requestData);
-            redirect.addFlashAttribute("successMessage", "Đã gửi yêu cầu thành công! Vui lòng chờ Admin duyệt.");
+            redirect.addFlashAttribute("successMessage", "Đã gửi yêu cầu chỉnh sửa! Admin sẽ duyệt sớm nhất.");
         } catch (Exception e) {
-            redirect.addFlashAttribute("errorMessage", e.getMessage());
+            redirect.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
         }
+        return "redirect:/manage/servers";
+    }
+
+    // === [MỚI] CHỨC NĂNG GIA HẠN SERVER ===
+    @GetMapping("/servers/renew/{id}")
+    public String renewServer(@PathVariable("id") Long serverId,
+                              HttpSession session,
+                              RedirectAttributes redirect) {
+        User user = (User) session.getAttribute("currentUser");
+        if (user == null) return "redirect:/login";
+
+        try {
+            // 1. Gọi Service xử lý logic gia hạn (Trừ tiền + Cộng ngày/Check slot)
+            userManageService.renewServer(serverId, user.getId());
+
+            // 2. Cập nhật lại Session ngay lập tức để hiển thị số Coin mới trên Header
+            User freshUser = userService.findById(user.getId());
+            session.setAttribute("currentUser", freshUser);
+
+            redirect.addFlashAttribute("successMessage", "Gia hạn thành công! Server đã được cộng thêm ngày.");
+        } catch (RuntimeException e) {
+            // Lỗi nghiệp vụ (Không đủ tiền, hết slot, không phải chủ sở hữu...)
+            redirect.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            // Lỗi hệ thống khác
+            e.printStackTrace();
+            redirect.addFlashAttribute("errorMessage", "Lỗi hệ thống: " + e.getMessage());
+        }
+
         return "redirect:/manage/servers";
     }
 

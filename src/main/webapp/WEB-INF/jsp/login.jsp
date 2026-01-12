@@ -25,7 +25,6 @@
             background-color: var(--mu-bg);
             color: #ccc;
             font-family: 'Rajdhani', sans-serif;
-            /* Ảnh nền mờ phía sau (tùy chọn) */
             background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://toquoc.mediacdn.vn/280518851207290880/2022/6/7/-1654571912757628297204.jpg');
             background-size: cover;
             background-position: center;
@@ -52,7 +51,6 @@
             position: relative;
         }
 
-        /* Trang trí góc card */
         .login-card::before, .login-card::after {
             content: ''; position: absolute; width: 10px; height: 10px;
             border: 2px solid var(--mu-gold); transition: 0.3s;
@@ -78,14 +76,13 @@
             margin-bottom: 30px;
         }
 
-        /* Custom Input Fields */
         .mu-form-group { margin-bottom: 20px; position: relative; }
 
         .mu-input {
             width: 100%;
             background: rgba(255,255,255,0.05);
             border: 1px solid #333;
-            padding: 12px 15px 12px 45px; /* Padding trái chừa chỗ cho icon */
+            padding: 12px 15px 12px 45px;
             color: #fff;
             font-family: 'Rajdhani', sans-serif;
             font-size: 1.1rem;
@@ -111,7 +108,6 @@
 
         .mu-input:focus + .mu-input-icon { color: var(--mu-gold); }
 
-        /* Custom Checkbox */
         .form-check-input {
             background-color: #222;
             border-color: #444;
@@ -121,7 +117,6 @@
             border-color: var(--mu-red);
         }
 
-        /* Submit Button */
         .btn-mu-submit {
             width: 100%;
             background: linear-gradient(180deg, #b91c1c 0%, #7f1d1d 100%);
@@ -143,7 +138,6 @@
             transform: translateY(-1px);
         }
 
-        /* Links */
         .mu-link { color: #888; text-decoration: none; font-size: 0.95rem; transition: 0.3s; }
         .mu-link:hover { color: var(--mu-gold); }
         .divider { border-top: 1px solid #222; margin: 25px 0; }
@@ -161,13 +155,19 @@
             <h2 class="login-title">Thành Viên</h2>
             <p class="login-subtitle">Đăng nhập để quản lý Server & Quảng cáo</p>
 
-            <c:if test="${not empty error}">
+            <c:if test="${not empty errorMessage}">
                 <div class="alert alert-danger py-2" role="alert" style="background: rgba(220,53,69,0.1); border: 1px solid #dc3545; color: #ff6b6b; font-size: 0.9rem;">
-                    <i class="fa-solid fa-circle-exclamation me-2"></i> ${error}
+                    <i class="fa-solid fa-circle-exclamation me-2"></i> ${errorMessage}
                 </div>
             </c:if>
 
-            <form action="/login" method="post">
+            <c:if test="${param.registerSuccess}">
+                <div class="alert alert-success py-2" role="alert" style="background: rgba(25,135,84,0.1); border: 1px solid #198754; color: #75b798; font-size: 0.9rem;">
+                    <i class="fa-solid fa-check-circle me-2"></i> Đăng ký thành công! Vui lòng đăng nhập.
+                </div>
+            </c:if>
+
+            <form action="${pageContext.request.contextPath}/login" method="post">
 
                 <div class="mu-form-group">
                     <input type="text" class="mu-input" name="username" placeholder="Tên tài khoản" required autofocus>
@@ -186,7 +186,7 @@
                             Ghi nhớ
                         </label>
                     </div>
-                    <a href="/forgot-password" class="mu-link">Quên mật khẩu?</a>
+                    <a href="#" class="mu-link">Quên mật khẩu?</a>
                 </div>
 
                 <button type="submit" class="btn btn-mu-submit">
@@ -198,7 +198,7 @@
 
             <div class="text-center">
                 <span class="text-secondary">Chưa có tài khoản?</span>
-                <a href="/register" class="mu-link text-warning fw-bold ms-2">Đăng Ký Mới</a>
+                <a href="${pageContext.request.contextPath}/register" class="mu-link text-warning fw-bold ms-2">Đăng Ký Mới</a>
             </div>
         </div>
     </div>

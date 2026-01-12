@@ -30,9 +30,9 @@ public class UserService {
         user.setUsername(dto.getUsername());
         user.setPassword(dto.getPassword()); // Lưu ý: Nên mã hóa password ở đây nếu có Spring Security
         user.setEmail(dto.getEmail());
-        user.setCoin(0);
+        user.setCoin(0); // Mặc định 0 coin
         user.setRole(User.Role.USER);
-
+        user.setPhone(dto.getPhone());
 
         // 3. Lưu xuống DB
         return userRepository.save(user);
@@ -46,7 +46,6 @@ public class UserService {
         User user = userRepository.findByUsername(dto.getUsername());
 
         // 2. Kiểm tra password
-        // (Nếu sau này dùng BCryptPasswordEncoder thì dùng passwordEncoder.matches())
         if (user == null || !user.getPassword().equals(dto.getPassword())) {
             throw new RuntimeException("Sai tên đăng nhập hoặc mật khẩu!");
         }
@@ -54,15 +53,24 @@ public class UserService {
         // 3. Trả về user nếu đúng
         return user;
     }
+
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
-    public com.muads.dto.UserProfileDTO getUserProfile(Long userId) {
+
+    // --- [MỚI BỔ SUNG] Hàm tìm User theo ID (Dùng cho Controller để refresh session) ---
+    public User findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với ID: " + id));
+    }
+    // -----------------------------------------------------------------------------------
+
+    public UserProfileDTO getUserProfile(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng!"));
 
         // Map Entity sang DTO
-        return new com.muads.dto.UserProfileDTO(
+        return new UserProfileDTO(
                 user.getUsername(),
                 user.getEmail(),
                 user.getPhone(),
@@ -70,7 +78,6 @@ public class UserService {
                 user.getCoin()
         );
     }
-    // Trong class UserService
 
     public void updateUserProfile(Long userId, UserProfileDTO dto) {
         // 1. Tìm user hiện tại trong DB
@@ -84,7 +91,7 @@ public class UserService {
         }
 
         // 3. Cập nhật thông tin
-        user.setFullName(dto.getFullName());
+//        user.setFullName(dto.getFullName());
         user.setEmail(dto.getEmail());
         // user.setPhone(dto.getPhone()); // Nếu muốn cho sửa cả SĐT thì mở dòng này ra
 
