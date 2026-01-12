@@ -2,6 +2,8 @@ package com.muads.controller;
 
 import com.muads.entity.HomeBanner;
 import com.muads.entity.User;
+import com.muads.repository.MuVersionRepository; // <-- Import mới
+import com.muads.repository.ResetTypeRepository; // <-- Import mới
 import com.muads.repository.UserRepository;
 import com.muads.service.HomeBannerService;
 import jakarta.servlet.http.HttpSession;
@@ -28,7 +30,11 @@ public class BannerRegisterController {
 
     @Autowired
     private HomeBannerService bannerService;
+    @Autowired
+    private MuVersionRepository versionRepo;
 
+    @Autowired
+    private ResetTypeRepository resetRepo;
     @Autowired
     private UserRepository userRepository;
 
@@ -52,6 +58,8 @@ public class BannerRegisterController {
 
     @GetMapping("/banner-register")
     public String showRegisterDashboard(Model model, HttpSession session) {
+        model.addAttribute("menuVersions", versionRepo.findAll());
+        model.addAttribute("menuTypes", resetRepo.findAll());
         // 1. Cập nhật thông tin User (Số dư mới nhất)
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser != null) {
