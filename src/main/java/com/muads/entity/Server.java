@@ -40,7 +40,7 @@ public class Server {
     private String bannerImage;
 
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    private Boolean isActive = false;
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.PENDING;
@@ -72,7 +72,7 @@ public class Server {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        if (isActive == null) isActive = true;
+        if (isActive == null) isActive = false;
     }
 
     @PreUpdate

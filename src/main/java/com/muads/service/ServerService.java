@@ -63,6 +63,7 @@ public class ServerService {
         server.setFanpageUrl(dto.getFanpageUrl());
         server.setDescription(dto.getDescription());
         server.setStatus(Server.Status.PENDING);
+        server.setIsActive(false); // [THÊM DÒNG NÀY]: Đảm bảo server mới tạo chưa được kích hoạt
         server.setUser(owner);
 
         // --- 2. XỬ LÝ ẢNH BANNER (ĐÃ THAY ĐỔI) ---

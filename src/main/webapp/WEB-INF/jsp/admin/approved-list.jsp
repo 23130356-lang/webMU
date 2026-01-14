@@ -43,9 +43,9 @@
                                 </td>
                                 <td>
                                     <c:choose>
-                                        <c:when test="${s.bannerPackage == 'SUPER_VIP'}"><span class="badge bg-danger">SUPER VIP (14d)</span></c:when>
+                                        <c:when test="${s.bannerPackage == 'SUPER_VIP'}"><span class="badge bg-danger">SUPER VIP (10d)</span></c:when>
                                         <c:when test="${s.bannerPackage == 'VIP'}"><span class="badge bg-warning text-dark">VIP (10d)</span></c:when>
-                                        <c:otherwise><span class="badge bg-secondary">Cơ bản (7d)</span></c:otherwise>
+                                        <c:otherwise><span class="badge bg-secondary">Cơ bản (10d)</span></c:otherwise>
                                     </c:choose>
                                 </td>
 

@@ -106,8 +106,7 @@ public class HomeController {
             // == TRƯỜNG HỢP MẶC ĐỊNH (TRANG CHỦ) ==
             // Nếu không search, lấy toàn bộ server (sau đó lọc theo gói banner ở dưới)
             // Hoặc dùng các hàm findSuperVip riêng lẻ nếu muốn tối ưu query
-            searchResults = serverRepository.findAll();
-            // Lưu ý: Nếu findAll() quá nặng, bạn có thể quay lại cách gọi 3 hàm riêng như code cũ.
+            searchResults = serverRepository.findByStatusOrderByCreatedAtDesc(Server.Status.APPROVED);            // Lưu ý: Nếu findAll() quá nặng, bạn có thể quay lại cách gọi 3 hàm riêng như code cũ.
             // Ở đây tôi dùng findAll() rồi filter stream cho code gọn gàng đồng bộ với logic search.
         }
 
