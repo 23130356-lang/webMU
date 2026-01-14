@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -57,4 +58,17 @@ public interface ServerRepository extends JpaRepository<Server, Long> {
 
     @Query("SELECT s FROM Server s WHERE s.status = 'APPROVED' AND s.isActive = true AND s.bannerPackage = 'BASIC' ORDER BY s.approvedAt DESC")
     List<Server> findNormalServers();
+    @Query("SELECT s FROM Server s " +
+            "JOIN s.serverStat ss " +
+            "WHERE s.isActive = true " +
+            "AND s.status = 'APPROVED' " +
+            "AND (:resetId IS NULL OR ss.resetType.id = :resetId) " +
+            "AND (:versionIds IS NULL OR ss.muVersion.id IN :versionIds) " +
+            "ORDER BY " +
+            "CASE WHEN s.bannerPackage = 'SUPER_VIP' THEN 1 " +
+            "WHEN s.bannerPackage = 'VIP' THEN 2 " +
+            "ELSE 3 END ASC, " +
+            "s.approvedAt DESC")
+    List<Server> searchServers(@Param("resetId") Integer resetId,
+                               @Param("versionIds") List<Integer> versionIds);
 }

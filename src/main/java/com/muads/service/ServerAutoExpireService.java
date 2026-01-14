@@ -22,7 +22,7 @@ public class ServerAutoExpireService {
     private ServerRepository serverRepository;
 
     // Chạy mỗi 60 giây để kiểm tra
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 6000)
     @Transactional
     public void autoExpireEverything() {
         LocalDateTime now = LocalDateTime.now();

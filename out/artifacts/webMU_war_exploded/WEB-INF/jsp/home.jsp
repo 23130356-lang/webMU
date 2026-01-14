@@ -88,38 +88,6 @@
         }
         .section-title { font-family: 'Cinzel', serif; font-weight: 700; color: var(--mu-gold); font-size: 1.1rem; margin: 0; }
 
-        /* CSS CHO FORM TÌM KIẾM MỚI */
-        .filter-bar {
-            padding: 10px 15px;
-            background: rgba(0,0,0,0.5);
-            border-bottom: 1px solid #333;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .mu-select {
-            background-color: #000;
-            color: #ccc;
-            border: 1px solid #444;
-            font-size: 0.85rem;
-            padding: 5px 10px;
-            font-family: 'Rajdhani', sans-serif;
-        }
-        .mu-select:focus {
-            outline: none; border-color: var(--mu-gold); box-shadow: 0 0 5px rgba(207, 170, 86, 0.5);
-        }
-        .btn-filter {
-            background: var(--mu-red); color: white; border: none; font-size: 0.85rem; font-weight: bold;
-            padding: 6px 15px; transition: 0.2s;
-        }
-        .btn-filter:hover { background: #ff0000; }
-        .btn-reset-filter {
-            background: #333; color: #ccc; border: 1px solid #555; font-size: 0.85rem;
-            padding: 6px 12px;
-        }
-        .btn-reset-filter:hover { background: #555; color: white; }
-
-
         .srv-header {
             display: flex; background: linear-gradient(180deg, #1f0a0a 0%, #0a0505 100%);
             border-top: 1px solid var(--mu-gold-dark); border-bottom: 1px solid var(--mu-gold-dark);
@@ -147,16 +115,22 @@
 
 
         /* =========================================
-           1. SUPER VIP STYLE
+           1. SUPER VIP STYLE (Viền rực cháy TOÀN BỘ ROW)
            ========================================= */
         .svip-wrapper {
             position: relative;
-            margin-bottom: 14px;
+            margin-bottom: 14px; /* Khoảng cách giữa các server */
             border-radius: 6px;
-            padding: 4px;
-            overflow: hidden;
-            animation: pulseRed 1s infinite alternate;
+            padding: 4px; /* Độ dày của viền lửa */
+            overflow: hidden; /* Cắt phần thừa của tia sáng xoay */
+            animation: pulseRed 1s infinite alternate; /* Hiệu ứng nhấp nháy bóng đỏ */
             background: #000;
+        }
+
+        /* Lớp tia sáng xoay tròn phía sau */
+        .svip-wrapper {
+            position: relative;
+            overflow: hidden;
         }
 
         .svip-wrapper::before,
@@ -184,12 +158,30 @@
             z-index: 1;
         }
 
-        .svip-wrapper::before { animation-delay: 0s; }
-        .svip-wrapper::after { animation-delay: -1.25s; }
+        /* TIA GỐC */
+        .svip-wrapper::before {
+            animation-delay: 0s;
+        }
 
+        /* TIA ĐỐI DIỆN 180° */
+        .svip-wrapper::after {
+            animation-delay: -1.25s; /* 2.5s / 2 */
+        }
+
+        @keyframes spinBorder {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+
+        /* Lớp nội dung bên trong (Đè lên tia sáng) */
         .svip-content {
             position: relative; z-index: 2;
-            background: linear-gradient(90deg, #250000 0%, #150000 100%);
+            background: linear-gradient(90deg, #250000 0%, #150000 100%); /* Nền đỏ đen tối */
             border-radius: 4px;
             width: 100%; height: 100%;
         }
@@ -200,19 +192,18 @@
             font-weight: 700;
             text-shadow: 0 0 10px #f7ff00;
             font-family: 'Cinzel', serif;
-        }
-        .btn-view-svip { background: linear-gradient(180deg, #cc0000 0%, #660000 100%); border: 1px solid #ff3333; color: #fff; padding: 4px 15px; font-size: 0.75rem; }
+        }        .btn-view-svip { background: linear-gradient(180deg, #cc0000 0%, #660000 100%); border: 1px solid #ff3333; color: #fff; padding: 4px 15px; font-size: 0.75rem; }
         .btn-view-svip:hover { box-shadow: 0 0 15px red; color: #fff; transform: scale(1.05); }
 
 
         /* =========================================
-           2. VIP STYLE
+           2. VIP STYLE (Viền vàng chạy nhẹ TOÀN BỘ ROW)
            ========================================= */
         .vip-wrapper {
             position: relative;
             margin-bottom: 10px;
             border-radius: 4px;
-            padding: 2px;
+            padding: 2px; /* Độ dày viền vàng */
             background: linear-gradient(110deg, #333 30%, #cfaa56 45%, #fff 50%, #cfaa56 55%, #333 70%);
             background-size: 200% 100%;
             animation: shimmerGold 2.5s linear infinite;
@@ -328,46 +319,17 @@
             </c:choose>
         </c:forEach>
 
-        <div class="server-section" id="result-list">
+        <div class="server-section">
             <div class="section-header">
                 <div class="d-flex align-items-center">
                     <i class="fa-solid fa-dragon text-danger me-2 fs-5"></i>
-                    <h3 class="section-title">
-                        <c:choose>
-                            <c:when test="${isSearching}">KẾT QUẢ TÌM KIẾM</c:when>
-                            <c:otherwise>DANH SÁCH SERVER VIP</c:otherwise>
-                        </c:choose>
-                    </h3>
+                    <h3 class="section-title">DANH SÁCH SERVER VIP</h3>
                 </div>
                 <div class="small text-secondary fst-italic">
                     <i class="fa-solid fa-clock me-1"></i> <fmt:formatDate value="<%=new java.util.Date()%>" pattern="dd/MM/yyyy"/>
                 </div>
             </div>
 
-            <form action="/" method="GET" class="filter-bar">
-                <div class="flex-grow-1">
-                    <select name="group" class="form-select form-select-sm mu-select">
-                        <option value="">-- Chọn Phiên Bản --</option>
-                        <option value="1-5" ${selectedGroup == '1-5' ? 'selected' : ''}>Season 1 - 5 (Cổ điển)</option>
-                        <option value="6" ${selectedGroup == '6' ? 'selected' : ''}>Season 6 (6.0 - 6.15)</option>
-                        <option value="7+" ${selectedGroup == '7+' ? 'selected' : ''}>Season 7 trở lên (Mới)</option>
-                    </select>
-                </div>
-                <div class="flex-grow-1">
-                    <select name="reset" class="form-select form-select-sm mu-select">
-                        <option value="">-- Chọn Kiểu Reset --</option>
-                        <c:if test="${not empty menuTypes}">
-                            <c:forEach var="rt" items="${menuTypes}">
-                                <option value="${rt.id}" ${selectedReset == rt.id ? 'selected' : ''}>${rt.resetName}</option>
-                            </c:forEach>
-                        </c:if>
-                    </select>
-                </div>
-                <button type="submit" class="btn-filter"><i class="fa-solid fa-filter me-1"></i> LỌC</button>
-                <c:if test="${isSearching}">
-                    <a href="/" class="btn-reset-filter"><i class="fa-solid fa-rotate-left"></i></a>
-                </c:if>
-            </form>
             <div class="srv-header">
                 <div class="hdr-left">Thông tin Server</div>
                 <div class="hdr-right">
@@ -378,47 +340,47 @@
                 </div>
             </div>
 
-            <div style="padding: 15px;">
+            <div style="padding: 15px;"> <c:forEach var="sv" items="${superVips}">
+                <div class="svip-wrapper">
+                    <div class="svip-content">
+                        <div class="srv-row-inner">
+                            <div class="col-left-identity">
 
-                <c:forEach var="sv" items="${superVips}">
-                    <div class="svip-wrapper">
-                        <div class="svip-content">
-                            <div class="srv-row-inner">
-                                <div class="col-left-identity">
-                                    <div class="d-flex align-items-center mb-1">
-                                        <span class="badge badge-svip me-2">HOT</span>
-                                        <a href="/server/detail/${sv.id}" class="name-super-vip">${sv.serverName}</a>
-                                    </div>
-                                    <div style="font-size: 0.8rem; color: #ddd; line-height: 1.2;">
-                                        <img src="https://cdn.pixabay.com/animation/2025/11/03/21/48/21-48-26-427_512.gif" style="width: 20px; margin-right: 5px;" alt="icon">
-                                            ${sv.muName}</div>
-                                    <div class="text-warning fst-italic mt-1 text-truncate" style="font-size: 0.75rem;">
-                                        "${sv.slogan}"
-                                    </div>
+                                <div class="d-flex align-items-center mb-1">
+
+                                    <span class="badge badge-svip me-2">HOT</span>
+                                    <a href="/server/detail/${sv.id}" class="name-super-vip">${sv.serverName}</a>
                                 </div>
+                                <div style="font-size: 0.8rem; color: #ddd; line-height: 1.2;">
+                                    <img src="https://cdn.pixabay.com/animation/2025/11/03/21/48/21-48-26-427_512.gif" style="width: 20px; margin-right: 5px;" alt="icon">
+                                ${sv.muName}</div>
+                                <div class="text-warning fst-italic mt-1 text-truncate" style="font-size: 0.75rem;">
+                                    "${sv.slogan}"
+                                </div>
+                            </div>
 
-                                <div class="col-right-wrapper">
-                                    <div class="stats-line">
-                                        <div class="stat-box"><span class="badge-ver text-warning">${sv.serverStat.muVersion.versionName}</span></div>
-                                        <div class="stat-box text-light fw-bold">${sv.serverStat.resetType.resetName}</div>
-                                        <div class="stat-box text-danger fw-bold" style="font-size: 1rem;">${sv.schedule.betaDate}</div>
-                                        <div class="stat-box"><a href="/server/detail/${sv.id}" class="btn-view btn-view-svip">XEM NGAY</a></div>
-                                    </div>
-                                    <div class="banner-line">
-                                        <c:choose>
-                                            <c:when test="${not empty sv.bannerImage}">
-                                                <img src="${sv.bannerImage}" class="inner-banner-img" alt="${sv.serverName}">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <img src="https://via.placeholder.com/600x60/550000/FFFFFF?text=MU+ONLINE+VIP" class="inner-banner-img">
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </div>
+                            <div class="col-right-wrapper">
+                                <div class="stats-line">
+                                    <div class="stat-box"><span class="badge-ver text-warning">${sv.serverStat.muVersion.versionName}</span></div>
+                                    <div class="stat-box text-light fw-bold">${sv.serverStat.resetType.resetName}</div>
+                                    <div class="stat-box text-danger fw-bold" style="font-size: 1rem;">${sv.schedule.betaDate}</div>
+                                    <div class="stat-box"><a href="/server/detail/${sv.id}" class="btn-view btn-view-svip">XEM NGAY</a></div>
+                                </div>
+                                <div class="banner-line">
+                                    <c:choose>
+                                        <c:when test="${not empty sv.bannerImage}">
+                                            <img src="${sv.bannerImage}" class="inner-banner-img" alt="${sv.serverName}">
+                                        </c:when>
+                                        <c:otherwise>
+                                            <img src="https://via.placeholder.com/600x60/550000/FFFFFF?text=MU+ONLINE+VIP" class="inner-banner-img">
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </c:forEach>
+                </div>
+            </c:forEach>
 
                 <c:forEach var="sv" items="${vips}">
                     <div class="vip-wrapper">
@@ -479,20 +441,11 @@
 
                 <c:if test="${empty superVips && empty vips && empty normals}">
                     <div class="text-center text-muted py-5 fst-italic">
-                        <c:choose>
-                            <c:when test="${isSearching}">
-                                Không tìm thấy Server nào khớp với tiêu chí tìm kiếm.<br>
-                                <a href="/" class="text-warning mt-2 d-inline-block">Quay lại trang chủ</a>
-                            </c:when>
-                            <c:otherwise>
-                                Hiện chưa có server nào ra mắt hôm nay.
-                            </c:otherwise>
-                        </c:choose>
+                        Hiện chưa có server nào ra mắt hôm nay.
                     </div>
                 </c:if>
 
-            </div>
-        </div>
+            </div> </div>
     </main>
 
     <aside class="sidebar">
