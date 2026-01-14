@@ -115,7 +115,7 @@
                 <h5 class="footer-title">DANH MỤC</h5>
                 <ul class="footer-links">
                     <li><a href="/"><i class="fa-solid fa-chevron-right"></i> Trang Chủ</a></li>
-                    <li><a href="/server/new"><i class="fa-solid fa-chevron-right"></i> Server Mới Ra</a></li>
+                    <li><a href="/?versionId=1#result-listw"><i class="fa-solid fa-chevron-right"></i> Server Mới Ra</a></li>
                     <li><a href="/banner-register"><i class="fa-solid fa-chevron-right"></i> Thuê Quảng Cáo</a></li>
                     <li><a href="/login"><i class="fa-solid fa-chevron-right"></i> Đăng Nhập Admin</a></li>
                 </ul>

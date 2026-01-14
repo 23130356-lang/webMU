@@ -234,7 +234,7 @@
                     <div class="text-end text-muted fst-italic small">MU COIN</div>
 
                     <div class="mt-3">
-                        <a href="/guide#section-payment" class="btn btn-gold w-100 py-2">
+                        <a href="${pageContext.request.contextPath}/huong-dan#section-payment" class="btn btn-gold w-100 py-2">
                             <i class="fa-solid fa-cart-plus me-2"></i> NẠP XU NGAY
                         </a>
                     </div>

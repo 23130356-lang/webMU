@@ -451,7 +451,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
+    // 1. Script xử lý ẩn hiện Upload / URL ảnh
     function toggleBannerInput() {
         const typeFile = document.getElementById('typeFile');
         const fileGroup = document.getElementById('input-file-group');
@@ -461,14 +464,54 @@
             fileGroup.style.display = 'block';
             urlGroup.style.display = 'none';
             // Clear URL input nếu chuyển sang upload file để tránh gửi dữ liệu rác
-            document.querySelector('input[name="bannerUrl"]').value = '';
+            const urlInput = document.querySelector('input[name="bannerUrl"]');
+            if (urlInput) urlInput.value = '';
         } else {
             fileGroup.style.display = 'none';
             urlGroup.style.display = 'block';
             // Clear File input nếu chuyển sang link
-            document.querySelector('input[name="bannerFile"]').value = '';
+            const fileInput = document.querySelector('input[name="bannerFile"]');
+            if (fileInput) fileInput.value = '';
         }
     }
+
+    // 2. Script kiểm tra URL để hiển thị thông báo
+    document.addEventListener("DOMContentLoaded", function() {
+        // Lấy tham số 'status' từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');
+
+        if (status === 'success') {
+            Swal.fire({
+                title: '<span style="color: #cfaa56; font-family: Cinzel, serif;">ĐĂNG KÝ THÀNH CÔNG!</span>',
+                html: '<span style="color: #ccc;">Bài viết của bạn đã được gửi lên hệ thống.<br>Vui lòng chờ Admin phê duyệt trong ít phút.</span>',
+                icon: 'success',
+                background: 'rgba(15, 15, 15, 0.95)', // Màu nền tối MU
+
+                confirmButtonText: 'ĐÃ HIỂU',
+                confirmButtonColor: '#8b0000', // Màu đỏ nút
+                buttonsStyling: true,
+                customClass: {
+                    popup: 'border border-warning' // Viền vàng cho popup
+                }
+            }).then((result) => {
+                // Sau khi bấm OK, xóa tham số trên URL để F5 không bị hiện lại
+                if (result.isConfirmed || result.isDismissed) {
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            });
+        }
+
+        if (status === 'error') {
+            Swal.fire({
+                icon: 'error',
+                title: '<span style="color: #dc3545;">CÓ LỖI XẢY RA!</span>',
+                html: '<span style="color: #ccc;">Đăng ký thất bại. Vui lòng kiểm tra lại thông tin hoặc liên hệ Admin.</span>',
+                background: '#1a1a1a',
+                confirmButtonColor: '#444'
+            });
+        }
+    });
 </script>
 
 </body>

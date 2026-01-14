@@ -44,13 +44,14 @@
         /* === 2. SIDEBAR STYLES === */
         .guide-sidebar {
             position: sticky;
-            top: 20px;
+            top: 100px;
             background: rgba(10, 10, 10, 0.9);
             border: 1px solid var(--mu-border);
             border-top: 3px solid var(--mu-red);
             border-radius: 4px;
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            z-index: 10;
         }
 
         .sidebar-header {
@@ -97,6 +98,7 @@
             margin-bottom: 30px;
             position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            scroll-margin-top: 110px;
         }
 
         /* Decorative Corners */
@@ -137,7 +139,7 @@
             color: var(--mu-gold);
             font-family: 'Cinzel', serif;
             padding: 15px;
-            text-align: center;
+            text-align: left;
             border-bottom: 2px solid var(--mu-red);
         }
         .table-custom td {
@@ -358,7 +360,9 @@
                         </div>
                         <div class="col-md-5 text-center mt-3 mt-md-0">
                             <div style="background: white; padding: 10px; display: inline-block; border-radius: 4px;">
-                                <img src="qr.png" alt="QR Code" width="140">
+                                <img src="${pageContext.request.contextPath}/uploads/qr.png"
+                                     alt="QR Code"
+                                     width="180">
                             </div>
                             <p class="small text-muted mt-2">Quét QR để chuyển khoản nhanh</p>
                         </div>
@@ -369,7 +373,7 @@
             <div id="section-faq" class="content-section">
                 <h2 class="section-header"><i class="fa-solid fa-circle-question"></i> 5. Câu hỏi thường gặp (FAQ)</h2>
 
-                <div class="accordion" id="accordionFAQ">
+                <div class="accordion mu-accordion" id="accordionFAQ">
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
@@ -382,6 +386,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
@@ -394,6 +399,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
@@ -403,6 +409,80 @@
                         <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
                             <div class="accordion-body">
                                 Gói Super VIP cam kết hiển thị trong TOP 5 vị trí đầu tiên của trang chủ. Thứ tự giữa các server Super VIP sẽ được sắp xếp ngẫu nhiên (Random) sau mỗi lần tải lại trang để đảm bảo công bằng cho tất cả khách hàng.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                Quảng cáo có tác dụng với những phiên bản Mu season mấy?
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                            <div class="accordion-body">
+                                <p>Thống kê của chúng tôi chỉ ra rằng đã có rất nhiều phiên bản Mu từng quảng cáo tại đây, bao gồm các phiên bản <strong>Season 2 rất cũ</strong> cho đến phiên bản <strong>Season 15, 16 mới nhất</strong>.</p>
+                                <p class="mb-0">Do đó, việc bạn chọn phiên bản nào thì website vẫn đáp ứng được do số lượng gamer tìm kiếm Mu mới ra hàng ngày tại Mumoira.tv rất đông.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                Server Mu Online mới làm, chưa có thương hiệu thì quảng cáo có hiệu quả không?
+                            </button>
+                        </h2>
+                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                            <div class="accordion-body">
+                                <p>Các server Mu Online quảng cáo tại đây đa số đến từ các thương hiệu mới. Thực tế gamer rất thích trải nghiệm liên tục các server Mu mới (khái niệm "nhảy server"), do đó việc bạn mới bắt đầu làm game sẽ rất thích hợp để quảng cáo tại đây.</p>
+                                <div class="alert alert-warning bg-transparent border-warning text-warning p-2 mt-2">
+                                    <i class="fa-solid fa-lightbulb me-2"></i><strong>Gợi ý:</strong> Bạn nên đăng bài giới thiệu về server tại mục <em>đăng bài miễn phí</em> trước. Hãy giới thiệu thật rõ ràng, chi tiết những yếu tố hay và lôi cuốn. Bài viết càng hay thì càng được nhiều gamer quan tâm và muốn ghé chơi thử.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                                Tôi có thể yêu cầu xem thống kê chất lượng quảng cáo không?
+                            </button>
+                        </h2>
+                        <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                            <div class="accordion-body">
+                                Hoàn toàn có thể. Quảng cáo của bạn sẽ được đo đạc tự động bằng công cụ <strong>bitly.com</strong> để đảm bảo tính khách quan và chính xác. Khi bạn cần xem kết quả, chúng tôi sẽ xuất báo cáo để gửi cho bạn.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7">
+                                Thời gian treo Banner/VIP quảng cáo tối thiểu là bao lâu?
+                            </button>
+                        </h2>
+                        <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                            <div class="accordion-body">
+                                <p>Thời gian tối thiểu là <strong>1 tháng</strong>. Lưu ý: Nếu tất cả vị trí quảng cáo đã đầy, bạn cần phải đợi cho đến khi có vị trí trống.</p>
+                                <p class="mb-0 text-white-50"><em>Lời khuyên: Bạn nên tính toán thời gian Open Game để liên hệ đặt chỗ sớm nhất có thể.</em></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq8">
+                                Tôi cần liên hệ ai để tiến hành treo quảng cáo?
+                            </button>
+                        </h2>
+                        <div id="faq8" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+                            <div class="accordion-body">
+                                <p>Hệ thống treo Banner, VIP Vàng cũng như nạp Coin của <strong>Mumoira.tv</strong> là hoàn toàn tự động 100%.</p>
+                                <ul>
+                                    <li>Ở phần trên cùng của trang này có thể hiện số slot đã treo và thời gian trống nếu đang Full chỗ.</li>
+                                    <li>Bạn chỉ cần <strong>Đăng nhập</strong> vào website để có thể đăng bài miễn phí và thuê vị trí quảng cáo ngay lập tức.</li>
+                                </ul>
                             </div>
                         </div>
                     </div>

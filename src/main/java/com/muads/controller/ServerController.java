@@ -42,7 +42,6 @@ public class ServerController {
     @Autowired
     private PointTypeRepository pointRepo;
 
-    // [MỚI] Inject đường dẫn từ file properties giống BannerRegisterController
     @Value("${muads.upload.path}")
     private String uploadDir;
 
@@ -79,7 +78,7 @@ public class ServerController {
         }
 
         try {
-            // [LOGIC MỚI] Xử lý file ảnh ngay tại Controller (giống BannerController)
+            // Xử lý file ảnh
             MultipartFile file = serverDTO.getBannerFile();
             String finalImageUrl = null;
 
@@ -92,20 +91,20 @@ public class ServerController {
                 finalImageUrl = serverDTO.getBannerUrl();
             }
 
-            // Gán đường dẫn ảnh đã xử lý ngược lại vào DTO để Service chỉ việc lưu
-            // (Lưu ý: Bạn có thể gán vào field bannerUrl của DTO để tái sử dụng)
             serverDTO.setBannerUrl(finalImageUrl);
 
             // Gọi Service để lưu dữ liệu xuống DB
             serverService.registerServer(serverDTO, currentUser);
 
-            redirectAttributes.addFlashAttribute("successMessage", "Đăng ký Server thành công! Vui lòng chờ duyệt.");
-            return "redirect:/server/register";
+            // [SỬA ĐOẠN NÀY] Thay vì addFlashAttribute message, ta redirect kèm param status=success
+            // Để bên JSP bắt được param này và hiện SweetAlert2
+            return "redirect:/server/register?status=success";
 
         } catch (Exception e) {
             e.printStackTrace();
+            // Giữ lại flash message để debug nếu cần, nhưng cũng thêm param error
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
-            return "redirect:/server/register";
+            return "redirect:/server/register?status=error";
         }
     }
 
@@ -119,10 +118,8 @@ public class ServerController {
         return "server-detail";
     }
 
-    // [HÀM MỚI] Hàm lưu file giống hệt bên BannerRegisterController
     private String saveFileAndGetUrl(MultipartFile file) throws IOException {
         String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
-        // Thêm UUID để tránh trùng tên file
         String fileName = UUID.randomUUID().toString() + "_" + originalFilename;
 
         Path uploadPath = Paths.get(uploadDir);
@@ -133,7 +130,6 @@ public class ServerController {
         Path filePath = uploadPath.resolve(fileName);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        // Trả về đường dẫn web (VD: /uploads/ten-anh.jpg)
         return "/uploads/" + fileName;
     }
 }

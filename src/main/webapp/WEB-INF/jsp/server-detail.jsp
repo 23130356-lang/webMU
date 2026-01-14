@@ -17,7 +17,7 @@
 
     <style>
         :root {
-            /* Palette màu MU Sang trọng (Giữ nguyên từ code mẫu của bạn) */
+            /* Palette màu MU Sang trọng */
             --mu-bg: #050505;
             --mu-panel-bg: rgba(15, 10, 10, 0.9);
             --mu-gold: #ffcc00;
@@ -49,16 +49,17 @@
             -webkit-text-fill-color: transparent;
             text-shadow: 0 0 30px rgba(255, 204, 0, 0.3);
             margin-bottom: 0;
+            font-size: 3.0rem; /* Tăng size lên một chút vì giờ nó nằm ngoài thoáng hơn */
+            line-height: 1.2;
+
         }
         .server-mu-name {
             font-family: 'Cinzel', serif;
             letter-spacing: 3px;
             color: #888;
             font-size: 1rem;
-            border-bottom: 1px solid #333;
             display: inline-block;
-            padding-bottom: 5px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         /* === LAYOUT CONTAINERS === */
@@ -68,7 +69,6 @@
             padding: 20px;
             height: 100%;
             backdrop-filter: blur(5px);
-            /* Cắt vát 4 góc */
             clip-path: polygon(
                     15px 0, 100% 0,
                     100% calc(100% - 15px), calc(100% - 15px) 100%,
@@ -77,6 +77,21 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
+        }
+
+        /* === BANNER STYLE === */
+        /* Sửa banner để nó bo góc nhẹ hoặc style khác biệt vì nằm ngoài khung */
+        .server-banner-container {
+            width: 100%;
+            border: 1px solid #444; /* Viền nhẹ cho ảnh */
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        .server-banner-img {
+            width: 100%;
+            height: auto;
+            max-height: 250px; /* Giới hạn chiều cao để không đẩy layout quá xa */
+            object-fit: cover;
+            display: block;
         }
 
         /* === SCHEDULE BOXES === */
@@ -91,7 +106,7 @@
             border: 1px solid #333;
             padding: 15px;
             text-align: center;
-            border-radius: 4px; /* Nhẹ nhàng hơn clip-path cho box con */
+            border-radius: 4px;
             transition: 0.3s;
         }
         .schedule-title {
@@ -150,13 +165,12 @@
             border: 1px solid #333;
             padding: 15px;
             overflow-y: auto;
-            max-height: 400px; /* Giới hạn chiều cao để không vỡ layout */
+            max-height: 400px;
             color: #ccc;
             font-size: 0.95rem;
             line-height: 1.6;
             white-space: pre-wrap;
         }
-        /* Custom Scrollbar */
         .desc-container::-webkit-scrollbar { width: 6px; }
         .desc-container::-webkit-scrollbar-track { background: #111; }
         .desc-container::-webkit-scrollbar-thumb { background: #444; }
@@ -201,9 +215,11 @@
         .status-badge {
             font-family: 'Cinzel', serif;
             font-size: 0.8rem;
-            padding: 5px 10px;
+            padding: 4px 10px;
             border: 1px solid;
             text-transform: uppercase;
+            display: inline-block;
+            margin-right: 5px;
         }
         .text-muted {
             color: #e4e4e4 !important;
@@ -216,21 +232,32 @@
 
 <div class="container pt-5 pb-5">
 
-    <div class="text-center server-header mb-4">
-        <h1>${server.serverName}</h1>
-        <div class="server-mu-name">${server.muName}</div>
-
-        <div class="d-flex justify-content-center gap-2">
-            <c:if test="${server.bannerPackage == 'VIP' || server.bannerPackage == 'SUPER_VIP'}">
+    <div class="row align-items-center mb-4">
+        <div class="col-lg-4">
+            <div class="server-header text-center">
+                <h1>${server.serverName}</h1>
+                <div class="server-mu-name">${server.muName}</div>
+                <div>
+                    <c:if test="${server.bannerPackage == 'VIP' || server.bannerPackage == 'SUPER_VIP'}">
                 <span class="status-badge" style="color: var(--mu-gold); border-color: var(--mu-gold);">
                     <i class="fa-solid fa-crown me-1"></i> VIP SERVER
                 </span>
-            </c:if>
-            <span class="status-badge" style="color: #aaa; border-color: #555;">
+                    </c:if>
+                    <span class="status-badge" style="color: #aaa; border-color: #555;">
                 <i class="fa-solid fa-tag me-1"></i> ${server.slogan}
             </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <c:if test="${not empty server.bannerImage}">
+                <div class="server-banner-container">
+                    <img src="${server.bannerImage}" alt="${server.serverName}" class="server-banner-img">
+                </div>
+            </c:if>
         </div>
     </div>
+
 
     <div class="row g-4">
 
@@ -288,7 +315,6 @@
 
         <div class="col-lg-8">
             <div class="detail-panel">
-
                 <div class="schedule-row">
                     <div class="schedule-item sch-alpha">
                         <div class="schedule-title">Alpha Test</div>
@@ -336,6 +362,7 @@
     </div>
 
 </div>
+<jsp:include page="footer.jsp" />
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
