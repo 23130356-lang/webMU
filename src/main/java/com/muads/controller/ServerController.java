@@ -8,6 +8,7 @@ import com.muads.repository.PointTypeRepository;
 import com.muads.repository.ResetTypeRepository;
 import com.muads.repository.ServerRepository;
 import com.muads.service.ServerService;
+import com.muads.util.SlugUtils;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,30 +30,80 @@ import java.util.UUID;
 @RequestMapping("/server")
 public class ServerController {
 
-    @Autowired
-    private ServerService serverService;
-
-    @Autowired
-    private ServerRepository serverRepository;
-
-    @Autowired
-    private MuVersionRepository versionRepo;
-    @Autowired
-    private ResetTypeRepository resetRepo;
-    @Autowired
-    private PointTypeRepository pointRepo;
+    @Autowired private ServerService serverService;
+    @Autowired private ServerRepository serverRepository;
+    @Autowired private MuVersionRepository versionRepo;
+    @Autowired private ResetTypeRepository resetRepo;
+    @Autowired private PointTypeRepository pointRepo;
 
     @Value("${muads.upload.path}")
     private String uploadDir;
 
+    // ============================================================
+    // DỮ LIỆU DÙNG CHUNG (MENU)
+    // Cách tối ưu: Dùng @ModelAttribute để tự động có trong mọi view của Controller này
+    // ============================================================
+    @ModelAttribute
+    public void addGlobalAttributes(Model model) {
+        // Hàm này sẽ chạy trước mọi RequestMapping trong Controller này
+        // Đảm bảo menu luôn có dữ liệu mà không cần copy paste nhiều lần
+        model.addAttribute("menuVersions", versionRepo.findAll());
+        model.addAttribute("menuTypes", resetRepo.findAll());
+    }
+
+    // ============================================================
+    // 1. URL CHÍNH (CHUẨN SEO)
+    // ============================================================
+    @GetMapping("/{slug}-{id}")
+    public String showServerDetailSeo(
+            @PathVariable("slug") String slug,
+            @PathVariable("id") Long id,
+            Model model) {
+
+        Server server = serverService.getServerById(id);
+        if (server == null) {
+            return "redirect:/";
+        }
+
+        String correctSlug = SlugUtils.toSlug(server.getServerName());
+        if (!slug.equals(correctSlug)) {
+            return "redirect:/server/" + correctSlug + "-" + id;
+        }
+
+        model.addAttribute("server", server);
+
+        // [ĐÃ CÓ SẴN DO @ModelAttribute Ở TRÊN]
+        // model.addAttribute("menuVersions", versionRepo.findAll());
+        // model.addAttribute("menuTypes", resetRepo.findAll());
+
+        return "server-detail";
+    }
+
+    // ============================================================
+    // 2. URL CŨ (REDIRECT)
+    // ============================================================
+    @GetMapping("/detail/{id}")
+    public String showServerDetailLegacy(@PathVariable("id") Long id) {
+        Server server = serverService.getServerById(id);
+        if (server == null) return "redirect:/";
+        String slug = SlugUtils.toSlug(server.getServerName());
+        return "redirect:/server/" + slug + "-" + id;
+    }
+
+    // ============================================================
+    // 3. ĐĂNG KÝ SERVER
+    // ============================================================
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
+        // Các biến dùng cho Dropdown trong Form đăng ký
         model.addAttribute("versions", versionRepo.findAll());
         model.addAttribute("resetTypes", resetRepo.findAll());
         model.addAttribute("pointTypes", pointRepo.findAll());
+
+        // [ĐÃ CÓ SẴN menuVersions, menuTypes DO @ModelAttribute Ở TRÊN CHO HEADER]
+
         model.addAttribute("serverDTO", new ServerRegisterDTO());
 
-        // Đếm slot đang sử dụng
         long usedSuperVip = serverRepository.countByBannerPackageAndStatusAndIsActiveTrue(
                 Server.BannerPackage.SUPER_VIP, Server.Status.APPROVED
         );
@@ -78,44 +129,25 @@ public class ServerController {
         }
 
         try {
-            // Xử lý file ảnh
             MultipartFile file = serverDTO.getBannerFile();
             String finalImageUrl = null;
 
-            // 1. Nếu có upload file -> Lưu file và lấy đường dẫn
             if (file != null && !file.isEmpty()) {
                 finalImageUrl = saveFileAndGetUrl(file);
-            }
-            // 2. Nếu không upload mà điền link ảnh -> Lấy link
-            else if (serverDTO.getBannerUrl() != null && !serverDTO.getBannerUrl().isBlank()) {
+            } else if (serverDTO.getBannerUrl() != null && !serverDTO.getBannerUrl().isBlank()) {
                 finalImageUrl = serverDTO.getBannerUrl();
             }
 
             serverDTO.setBannerUrl(finalImageUrl);
-
-            // Gọi Service để lưu dữ liệu xuống DB
             serverService.registerServer(serverDTO, currentUser);
 
-            // [SỬA ĐOẠN NÀY] Thay vì addFlashAttribute message, ta redirect kèm param status=success
-            // Để bên JSP bắt được param này và hiện SweetAlert2
             return "redirect:/server/register?status=success";
 
         } catch (Exception e) {
             e.printStackTrace();
-            // Giữ lại flash message để debug nếu cần, nhưng cũng thêm param error
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
             return "redirect:/server/register?status=error";
         }
-    }
-
-    @GetMapping("/detail/{id}")
-    public String showServerDetail(@PathVariable("id") Long id, Model model) {
-        Server server = serverService.getServerById(id);
-        if (server == null) {
-            return "redirect:/";
-        }
-        model.addAttribute("server", server);
-        return "server-detail";
     }
 
     private String saveFileAndGetUrl(MultipartFile file) throws IOException {

@@ -50,21 +50,21 @@ public class Server {
     @Column(name = "banner_package")
     private BannerPackage bannerPackage = BannerPackage.BASIC;
 
-    // --- THỜI GIAN HỆ THỐNG ---
+    // --- THỜI GIAN ---
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // --- QUẢN LÝ THỜI GIAN HIỂN THỊ ---
     @Column(name = "approved_at")
-    private LocalDateTime approvedAt; // Thời điểm Admin bấm nút duyệt
+    private LocalDateTime approvedAt;
 
     @Column(name = "expired_at")
-    private LocalDateTime expiredAt; // Thời điểm server sẽ tự động bị tắt (EXPIRED)
-    // -------------------------
+    private LocalDateTime expiredAt;
 
+    // --- LIÊN KẾT BẢNG KHÁC ---
+    // ServerStat chứa thông tin ResetType và MuVersion
     @OneToOne(mappedBy = "server", cascade = CascadeType.ALL)
     private ServerSchedule schedule;
 
@@ -83,20 +83,15 @@ public class Server {
         updatedAt = LocalDateTime.now();
     }
 
-    // --- 1. ENUM STATUS (Đã thêm EXPIRED) ---
     public enum Status {
-        PENDING,  // Chờ duyệt
-        APPROVED, // Đang hoạt động
-        REJECTED, // Từ chối
-        EXPIRED   // Hết hạn
+        PENDING, APPROVED, REJECTED, EXPIRED
     }
 
-    // --- 2. ENUM BANNER PACKAGE (Đã cập nhật ngày) ---
     @Getter
     public enum BannerPackage {
-        BASIC(0, "Cơ bản (Miễn phí)", 7),       // 10 Ngày
-        VIP(100, "VIP (100 Xu)", 10),           // 10 Ngày
-        SUPER_VIP(200, "Super VIP (2000 Xu)", 14); // 14 Ngày
+        BASIC(0, "Cơ bản (Miễn phí)", 7),
+        VIP(100, "VIP (100 Xu)", 10),
+        SUPER_VIP(200, "Super VIP (2000 Xu)", 14);
 
         private final int price;
         private final String label;

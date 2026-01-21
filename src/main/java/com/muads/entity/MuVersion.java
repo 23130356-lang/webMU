@@ -1,7 +1,7 @@
 package com.muads.entity;
 import jakarta.persistence.*;
 import lombok.Data; // Nếu bạn dùng Lombok, không thì generate getter/setter
-
+import com.muads.util.SlugUtils;
 @Entity
 @Table(name = "mu_versions")
 @Data
@@ -13,4 +13,7 @@ public class MuVersion {
 
     @Column(name = "version_name", nullable = false)
     private String versionName;
+    public String getSlug() {
+        return SlugUtils.toSlug(this.versionName);
+    }
 }

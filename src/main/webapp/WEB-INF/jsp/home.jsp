@@ -7,7 +7,20 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>MU Mới Ra - Cộng Đồng MU Online Lớn Nhất VN</title>
+    <title>${not empty pageTitle ? pageTitle : 'Mu Mới Ra | Munoria Portal'}</title>
+    <meta name="description" content="${not empty metaDescription ? metaDescription : 'Cổng game Mu Online, Mu Mobile mới ra mắt.'}">
+    <meta name="keywords" content="mu moi ra, mu online, mu private, game mu, mu ss6, mu reset, mu non reset">
+
+    <c:if test="${not empty canonicalUrl}">
+        <link rel="canonical" href="${canonicalUrl}" />
+    </c:if>
+
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="${not empty pageTitle ? pageTitle : 'Mu Mới Ra'}" />
+    <meta property="og:description" content="${not empty metaDescription ? metaDescription : '...'}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${not empty canonicalUrl ? canonicalUrl : 'https://munoria.mobile/'}" />
+    <meta property="og:image" content="https://munoria.mobile/images/thumbnail-share.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -32,7 +45,7 @@
             background-attachment: fixed;
             font-family: 'Rajdhani', sans-serif;
             color: var(--mu-text);
-            min-width: 1400px;
+            min-width: 1400px; /* Giữ layout chuẩn web game */
             overflow-x: auto;
             margin: 0;
         }
@@ -61,192 +74,60 @@
         .ads-text { font-family: 'Cinzel', serif; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; }
 
         /* === ANIMATIONS === */
-        @keyframes spinBorder {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-        @keyframes shimmerGold {
-            0% { background-position: -150% 0; }
-            100% { background-position: 150% 0; }
-        }
-        @keyframes pulseRed {
-            0% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.3); }
-            50% { box-shadow: 0 0 25px rgba(255, 0, 0, 0.7); }
-            100% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.3); }
-        }
+        @keyframes spinBorder { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+        @keyframes shimmerGold { 0% { background-position: -150% 0; } 100% { background-position: 150% 0; } }
+        @keyframes pulseRed { 0% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.3); } 50% { box-shadow: 0 0 25px rgba(255, 0, 0, 0.7); } 100% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.3); } }
 
         /* === SERVER SECTION === */
-        .server-section {
-            background: var(--mu-panel-bg);
-            border: 1px solid var(--mu-border);
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
-            margin-bottom: 15px; width: 100%;
-        }
-        .section-header {
-            background: linear-gradient(90deg, #330000 0%, #1a0505 100%); border-bottom: 1px solid var(--mu-red);
-            padding: 10px 20px; display: flex; align-items: center; justify-content: space-between;
-        }
+        .server-section { background: var(--mu-panel-bg); border: 1px solid var(--mu-border); box-shadow: 0 0 30px rgba(0,0,0,0.8); margin-bottom: 15px; width: 100%; }
+        .section-header { background: linear-gradient(90deg, #330000 0%, #1a0505 100%); border-bottom: 1px solid var(--mu-red); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
         .section-title { font-family: 'Cinzel', serif; font-weight: 700; color: var(--mu-gold); font-size: 1.1rem; margin: 0; }
 
-        /* CSS CHO FORM TÌM KIẾM MỚI */
-        .filter-bar {
-            padding: 10px 15px;
-            background: rgba(0,0,0,0.5);
-            border-bottom: 1px solid #333;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .mu-select {
-            background-color: #000;
-            color: #ccc;
-            border: 1px solid #444;
-            font-size: 0.85rem;
-            padding: 5px 10px;
-            font-family: 'Rajdhani', sans-serif;
-        }
-        .mu-select:focus {
-            outline: none; border-color: var(--mu-gold); box-shadow: 0 0 5px rgba(207, 170, 86, 0.5);
-        }
-        .btn-filter {
-            background: var(--mu-red); color: white; border: none; font-size: 0.85rem; font-weight: bold;
-            padding: 6px 15px; transition: 0.2s;
-        }
-        .btn-filter:hover { background: #ff0000; }
-        .btn-reset-filter {
-            background: #333; color: #ccc; border: 1px solid #555; font-size: 0.85rem;
-            padding: 6px 12px;
-        }
+        /* CSS FILTER BAR */
+        .filter-bar { padding: 10px 15px; background: rgba(0,0,0,0.5); border-bottom: 1px solid #333; display: flex; gap: 10px; align-items: center; }
+        .mu-select { background-color: #000; color: #ccc; border: 1px solid #444; font-size: 0.85rem; padding: 5px 10px; font-family: 'Rajdhani', sans-serif; cursor: pointer; }
+        .mu-select:focus { outline: none; border-color: var(--mu-gold); box-shadow: 0 0 5px rgba(207, 170, 86, 0.5); }
+        .btn-filter { background: var(--mu-red); color: white; border: none; font-size: 0.85rem; font-weight: bold; padding: 6px 15px; transition: 0.2s; }
+        .btn-filter:hover { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
+        .btn-reset-filter { background: #333; color: #ccc; border: 1px solid #555; font-size: 0.85rem; padding: 6px 12px; }
         .btn-reset-filter:hover { background: #555; color: white; }
 
-
-        .srv-header {
-            display: flex; background: linear-gradient(180deg, #1f0a0a 0%, #0a0505 100%);
-            border-top: 1px solid var(--mu-gold-dark); border-bottom: 1px solid var(--mu-gold-dark);
-            padding: 12px 0; font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--mu-gold);
-            text-transform: uppercase; font-weight: 800; z-index: 5; position: relative;
-        }
+        .srv-header { display: flex; background: linear-gradient(180deg, #1f0a0a 0%, #0a0505 100%); border-top: 1px solid var(--mu-gold-dark); border-bottom: 1px solid var(--mu-gold-dark); padding: 12px 0; font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--mu-gold); text-transform: uppercase; font-weight: 800; z-index: 5; position: relative; }
         .hdr-left { width: 30%; padding-left: 20px; }
         .hdr-right { width: 70%; display: flex; justify-content: space-between; padding-right: 15px; text-align: center; }
         .hdr-item { flex: 1; }
 
-        /* === CẤU TRÚC ROW MỚI (CHUNG) === */
-        .srv-row-inner {
-            display: flex; align-items: center; padding: 12px 0; position: relative; z-index: 2;
-            width: 100%; height: 100%;
-        }
-
+        /* === ROW STYLES === */
+        .srv-row-inner { display: flex; align-items: center; padding: 12px 0; position: relative; z-index: 2; width: 100%; height: 100%; }
         .col-left-identity { width: 30%; padding-left: 20px; padding-right: 10px; display: flex; flex-direction: column; justify-content: center; }
         .col-right-wrapper { width: 70%; display: flex; flex-direction: column; padding: 0 15px; justify-content: center; gap: 8px; }
         .stats-line { display: flex; justify-content: space-between; align-items: center; width: 100%; text-align: center; }
         .stat-box { flex: 1; font-size: 0.9rem; }
+        .banner-line { width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 5px; }
+        .inner-banner-img { width: 100%; height: 60px; object-fit: fill; border-radius: 2px; border: 1px solid #333; }
 
-        .banner-line { width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 5px;}
-        /* Ảnh banner bên trong không cần viền nữa, chỉ bo góc nhẹ */
-        .inner-banner-img { width: 100%; height: 60px; object-fit: cover; border-radius: 2px; border: 1px solid #333; }
-
-
-        /* =========================================
-           1. SUPER VIP STYLE
-           ========================================= */
-        .svip-wrapper {
-            position: relative;
-            margin-bottom: 14px;
-            border-radius: 6px;
-            padding: 4px;
-            overflow: hidden;
-            animation: pulseRed 1s infinite alternate;
-            background: #000;
-        }
-
-        .svip-wrapper::before,
-        .svip-wrapper::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 300%;
-            height: 1000%;
-            background: conic-gradient(
-                    transparent 0deg,
-                    transparent 140deg,
-                    #da0000 160deg,
-                    #ff7300 170deg,
-                    #ffff00 175deg,
-                    #ffffff 180deg,
-                    #ffff00 185deg,
-                    #ff7300 190deg,
-                    #da0000 200deg,
-                    transparent 220deg
-            );
-            transform: translate(-50%, -50%);
-            animation: spinBorder 2.5s linear infinite;
-            z-index: 1;
-        }
-
-        .svip-wrapper::before { animation-delay: 0s; }
+        /* SVIP, VIP, NORMAL styles (giữ nguyên như cũ) */
+        .svip-wrapper { position: relative; margin-bottom: 14px; border-radius: 6px; padding: 4px; overflow: hidden; animation: pulseRed 1s infinite alternate; background: #000; }
+        .svip-wrapper::before, .svip-wrapper::after { content: ''; position: absolute; top: 50%; left: 50%; width: 300%; height: 1000%; background: conic-gradient(transparent 0deg, transparent 140deg, #da0000 160deg, #ff7300 170deg, #ffff00 175deg, #ffffff 180deg, #ffff00 185deg, #ff7300 190deg, #da0000 200deg, transparent 220deg); transform: translate(-50%, -50%); animation: spinBorder 2.5s linear infinite; z-index: 1; }
         .svip-wrapper::after { animation-delay: -1.25s; }
-
-        .svip-content {
-            position: relative; z-index: 2;
-            background: linear-gradient(90deg, #250000 0%, #150000 100%);
-            border-radius: 4px;
-            width: 100%; height: 100%;
-        }
-
-        .name-super-vip {
-            color: rgb(212 253 13);
-            font-size: 1.25rem;
-            font-weight: 700;
-            text-shadow: 0 0 10px #f7ff00;
-            font-family: 'Cinzel', serif;
-        }
+        .svip-content { position: relative; z-index: 2; background: linear-gradient(90deg, #250000 0%, #150000 100%); border-radius: 4px; width: 100%; height: 100%; }
+        .name-super-vip { color: rgb(212 253 13); font-size: 1.25rem; font-weight: 700; text-shadow: 0 0 10px #f7ff00; font-family: 'Cinzel', serif; }
         .btn-view-svip { background: linear-gradient(180deg, #cc0000 0%, #660000 100%); border: 1px solid #ff3333; color: #fff; padding: 4px 15px; font-size: 0.75rem; }
         .btn-view-svip:hover { box-shadow: 0 0 15px red; color: #fff; transform: scale(1.05); }
 
-
-        /* =========================================
-           2. VIP STYLE
-           ========================================= */
-        .vip-wrapper {
-            position: relative;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            padding: 2px;
-            background: linear-gradient(110deg, #333 30%, #cfaa56 45%, #fff 50%, #cfaa56 55%, #333 70%);
-            background-size: 200% 100%;
-            animation: shimmerGold 2.5s linear infinite;
-            box-shadow: 0 0 5px rgba(207, 170, 86, 0.2);
-        }
-
-        .vip-content {
-            position: relative; z-index: 2;
-            background: linear-gradient(90deg, #1a1a1a 0%, #0c0c0c 100%);
-            border-radius: 3px;
-        }
-
+        .vip-wrapper { position: relative; margin-bottom: 10px; border-radius: 4px; padding: 2px; background: linear-gradient(110deg, #333 30%, #cfaa56 45%, #fff 50%, #cfaa56 55%, #333 70%); background-size: 200% 100%; animation: shimmerGold 2.5s linear infinite; box-shadow: 0 0 5px rgba(207, 170, 86, 0.2); }
+        .vip-content { position: relative; z-index: 2; background: linear-gradient(90deg, #1a1a1a 0%, #0c0c0c 100%); border-radius: 3px; }
         .name-vip { color: var(--mu-gold); font-size: 1.1rem; font-weight: 700; font-family: 'Cinzel', serif; }
         .btn-view { border: 1px solid var(--mu-gold-dark); color: var(--mu-gold); padding: 4px 12px; font-size: 0.75rem; font-family: 'Cinzel', serif; }
         .btn-view:hover { background: var(--mu-gold); color: #000; }
         .vip-content .inner-banner-img { height: 50px; border-color: #444; }
 
-
-        /* =========================================
-           3. NORMAL STYLE
-           ========================================= */
-        .normal-wrapper {
-            border-bottom: 1px solid #222;
-            transition: 0.2s;
-        }
+        .normal-wrapper { border-bottom: 1px solid #222; transition: 0.2s; }
         .normal-wrapper:hover { background-color: rgba(255, 255, 255, 0.02); }
         .name-normal { color: #ccc; font-weight: 600; font-size: 0.95rem; }
-
-        /* Badges */
         .badge-ver { background: #222; border: 1px solid #444; color: #aaa; padding: 2px 6px; font-size: 0.7rem; }
         .badge-svip { background: #d00; color: #fff; font-size: 0.7rem; padding: 1px 5px; font-weight: bold; border-radius: 2px; }
-
     </style>
-
 </head>
 <body>
 
@@ -334,7 +215,9 @@
                     <i class="fa-solid fa-dragon text-danger me-2 fs-5"></i>
                     <h3 class="section-title">
                         <c:choose>
-                            <c:when test="${isSearching}">KẾT QUẢ TÌM KIẾM</c:when>
+                            <c:when test="${isSearching}">
+                                ${not empty filterDisplay ? filterDisplay : 'KẾT QUẢ TÌM KIẾM'}
+                            </c:when>
                             <c:otherwise>DANH SÁCH SERVER VIP</c:otherwise>
                         </c:choose>
                     </h3>
@@ -346,28 +229,38 @@
 
             <form action="/" method="GET" class="filter-bar">
                 <div class="flex-grow-1">
-                    <select name="group" class="form-select form-select-sm mu-select">
-                        <option value="">-- Chọn Phiên Bản --</option>
-                        <option value="1-5" ${selectedGroup == '1-5' ? 'selected' : ''}>Season 1 - 5 (Cổ điển)</option>
-                        <option value="6" ${selectedGroup == '6' ? 'selected' : ''}>Season 6 (6.0 - 6.15)</option>
-                        <option value="7+" ${selectedGroup == '7+' ? 'selected' : ''}>Season 7 trở lên (Mới)</option>
-                    </select>
-                </div>
-                <div class="flex-grow-1">
-                    <select name="reset" class="form-select form-select-sm mu-select">
-                        <option value="">-- Chọn Kiểu Reset --</option>
-                        <c:if test="${not empty menuTypes}">
-                            <c:forEach var="rt" items="${menuTypes}">
-                                <option value="${rt.id}" ${selectedReset == rt.id ? 'selected' : ''}>${rt.resetName}</option>
+                    <select name="versionId" class="form-select form-select-sm mu-select">
+                        <option value="">-- Tất cả phiên bản --</option>
+                        <c:if test="${not empty menuVersions}">
+                            <c:forEach var="ver" items="${menuVersions}">
+                                <option value="${ver.id}" ${ver.id == selectedVersion ? 'selected' : ''}>
+                                        ${ver.versionName}
+                                </option>
                             </c:forEach>
                         </c:if>
                     </select>
                 </div>
-                <button type="submit" class="btn-filter"><i class="fa-solid fa-filter me-1"></i> LỌC</button>
+
+                <div class="flex-grow-1">
+                    <select name="reset" class="form-select form-select-sm mu-select">
+                        <option value="">-- Tất cả kiểu Reset --</option>
+                        <c:if test="${not empty menuTypes}">
+                            <c:forEach var="rt" items="${menuTypes}">
+                                <option value="${rt.id}" ${rt.id == selectedReset ? 'selected' : ''}>
+                                        ${rt.resetName}
+                                </option>
+                            </c:forEach>
+                        </c:if>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-filter"><i class="fa-solid fa-filter me-1"></i> LỌC NGAY</button>
+
                 <c:if test="${isSearching}">
-                    <a href="/" class="btn-reset-filter"><i class="fa-solid fa-rotate-left"></i></a>
+                    <a href="/" class="btn-reset-filter" title="Xóa lọc"><i class="fa-solid fa-rotate-left"></i></a>
                 </c:if>
             </form>
+
             <div class="srv-header">
                 <div class="hdr-left">Thông tin Server</div>
                 <div class="hdr-right">
@@ -479,10 +372,11 @@
 
                 <c:if test="${empty superVips && empty vips && empty normals}">
                     <div class="text-center text-muted py-5 fst-italic">
+                        <i class="fa-solid fa-search fa-2x mb-3 text-secondary"></i><br>
                         <c:choose>
                             <c:when test="${isSearching}">
                                 Không tìm thấy Server nào khớp với tiêu chí tìm kiếm.<br>
-                                <a href="/" class="text-warning mt-2 d-inline-block">Quay lại trang chủ</a>
+                                <a href="/" class="text-warning mt-2 d-inline-block">Xóa bộ lọc & Quay lại</a>
                             </c:when>
                             <c:otherwise>
                                 Hiện chưa có server nào ra mắt hôm nay.
@@ -517,6 +411,7 @@
     </aside>
 
 </div>
+
 <jsp:include page="footer.jsp"/>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

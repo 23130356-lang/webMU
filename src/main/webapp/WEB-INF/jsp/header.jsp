@@ -185,7 +185,7 @@
                         <c:if test="${not empty menuVersions}">
                             <c:forEach var="ver" items="${menuVersions}">
                                 <li>
-                                    <a class="mh-dropdown-item" href="/?versionId=${ver.id}#result-list">
+                                    <a class="mh-dropdown-item" href="/mu/${ver.slug}#result-list">
                                             ${ver.versionName}
                                     </a>
                                 </li>
@@ -202,7 +202,7 @@
                         <c:if test="${not empty menuTypes}">
                             <c:forEach var="type" items="${menuTypes}">
                                 <li>
-                                    <a class="mh-dropdown-item" href="/?reset=${type.id}#result-list">
+                                    <a class="mh-dropdown-item" href="/mu/${type.slug}#result-list">
                                             ${type.resetName}
                                     </a>
                                 </li>

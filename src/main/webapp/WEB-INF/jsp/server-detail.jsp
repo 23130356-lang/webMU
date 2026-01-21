@@ -1,33 +1,105 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+
+<%--
+    ========================================================
+    SEO LOGIC: XỬ LÝ DỮ LIỆU TRƯỚC KHI RENDER
+    ========================================================
+--%>
+<%-- 1. Tạo Slug giả lập từ Server Name (Nếu Controller chưa truyền sang) --%>
+<c:set var="rawName" value="${fn:toLowerCase(server.serverName)}" />
+<c:set var="slug" value="${fn:replace(fn:replace(rawName, ' ', '-'), 'đ', 'd')}" />
+<c:set var="finalUrl" value="https://munoria.mobile/server/${slug}-${server.id}" />
+
+<%-- 2. Tạo Meta Description tự động: Chứa keyword quan trọng --%>
+<c:set var="metaDesc" value="Mu Online ${server.serverName}. Phiên bản ${server.serverStat.muVersion.versionName} miễn phí. Alpha Test: ${server.schedule.alphaDate}. Open Beta: ${server.schedule.betaDate}. Reset: ${server.serverStat.resetType.resetName}. Đăng ký ngay!" />
 
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>${server.serverName} | Munoria.mobile Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <%-- === SEO META TAGS === --%>
+    <title>${server.serverName} - Mu Mới Ra Hôm Nay | Munoria Portal</title>
+    <meta name="description" content="${metaDesc}">
+    <meta name="keywords" content="mu moi ra, mu online, ${server.serverName}, mu private, game mu, mu mobile, mu pc, ${slug}">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="${server.muName}">
+
+    <%-- Canonical URL: Định danh link gốc cho Google --%>
+    <link rel="canonical" href="${finalUrl}" />
+
+    <%-- === OPEN GRAPH (FACEBOOK/ZALO SHARE) === --%>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Mu ${server.serverName} - Ra Mắt Máy Chủ Mới" />
+    <meta property="og:description" content="${metaDesc}" />
+    <meta property="og:url" content="${finalUrl}" />
+    <meta property="og:site_name" content="Munoria Mobile" />
+    <c:if test="${not empty server.bannerImage}">
+        <meta property="og:image" content="https://munoria.mobile${server.bannerImage}" />
+        <meta property="og:image:alt" content="Banner Mu ${server.serverName}" />
+    </c:if>
+
+    <%-- === STRUCTURED DATA (JSON-LD) === --%>
+    <%-- 1. Schema BreadcrumbList (Đường dẫn) --%>
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [{
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Trang Chủ",
+            "item": "https://munoria.mobile/"
+          },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Danh Sách Server",
+            "item": "https://munoria.mobile/#result-list"
+          },{
+            "@type": "ListItem",
+            "position": 3,
+            "name": "${server.serverName}"
+      }]
+    }
+    </script>
+
+    <%-- 2. Schema VideoGame (Khai báo Game) --%>
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "VideoGame",
+          "name": "Mu Online: ${server.serverName}",
+      "description": "${metaDesc}",
+      "genre": ["MMORPG", "Fantasy"],
+      "playMode": "MultiPlayer",
+      "applicationCategory": "Game",
+      "operatingSystem": "Windows, Android, iOS",
+      "datePublished": "${server.schedule.betaDate}",
+      "author": {
+        "@type": "Organization",
+        "name": "${server.muName}"
+      }
+    }
+    </script>
+
+    <%-- === RESOURCES === --%>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 
+    <%-- === CUSTOM CSS (Giữ nguyên giao diện đẹp của bạn) === --%>
     <style>
         :root {
-            /* Palette màu MU Sang trọng */
             --mu-bg: #050505;
             --mu-panel-bg: rgba(15, 10, 10, 0.9);
             --mu-gold: #ffcc00;
             --mu-gold-dark: #b8860b;
-            --mu-text-gold: #deb887;
             --mu-red: #ff0000;
-            --mu-red-dark: #550000;
             --mu-border: #3d2b1f;
-            --mu-glow-gold: 0 0 20px rgba(255, 204, 0, 0.3);
-            --mu-glow-red: 0 0 25px rgba(255, 0, 0, 0.5);
         }
 
         body {
@@ -39,7 +111,13 @@
             min-height: 100vh;
         }
 
-        /* === TYPOGRAPHY === */
+        /* BREADCRUMB STYLE */
+        .breadcrumb-item a { color: #888; transition: 0.3s; }
+        .breadcrumb-item a:hover { color: var(--mu-gold); }
+        .breadcrumb-item.active { color: var(--mu-gold); font-weight: 600; }
+        .breadcrumb-item+.breadcrumb-item::before { color: #444; }
+
+        /* HEADER & TYPOGRAPHY */
         .server-header h1 {
             font-family: 'Cinzel', serif;
             font-weight: 900;
@@ -48,219 +126,177 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 0 0 30px rgba(255, 204, 0, 0.3);
-            margin-bottom: 0;
-            font-size: 3.0rem; /* Tăng size lên một chút vì giờ nó nằm ngoài thoáng hơn */
+            margin-bottom: 5px;
+            font-size: 2.8rem;
             line-height: 1.2;
-
         }
         .server-mu-name {
             font-family: 'Cinzel', serif;
             letter-spacing: 3px;
             color: #888;
-            font-size: 1rem;
+            font-size: 1.1rem;
             display: inline-block;
             margin-bottom: 10px;
+            text-transform: uppercase;
         }
 
-        /* === LAYOUT CONTAINERS === */
+        /* LAYOUT PANELS */
         .detail-panel {
             background: var(--mu-panel-bg);
             border: 1px solid var(--mu-border);
             padding: 20px;
-            height: 100%;
+
+            /* --- SỬA ĐỔI QUAN TRỌNG TẠI ĐÂY --- */
+            height: fit-content; /* Chỉ cao bằng nội dung bên trong, không dãn full */
+            min-height: auto;    /* Hủy bỏ chiều cao tối thiểu nếu có */
+            /* ---------------------------------- */
+
             backdrop-filter: blur(5px);
-            clip-path: polygon(
-                    15px 0, 100% 0,
-                    100% calc(100% - 15px), calc(100% - 15px) 100%,
-                    0 100%, 0 15px
-            );
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
         }
 
-        /* === BANNER STYLE === */
-        /* Sửa banner để nó bo góc nhẹ hoặc style khác biệt vì nằm ngoài khung */
+        /* BANNER */
         .server-banner-container {
             width: 100%;
-            border: 1px solid #444; /* Viền nhẹ cho ảnh */
+            border: 1px solid #444;
             box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
         }
         .server-banner-img {
-            width: 100%;
-            height: auto;
-            max-height: 250px; /* Giới hạn chiều cao để không đẩy layout quá xa */
-            object-fit: cover;
-            display: block;
+            width: 100%; height: auto; max-height: 280px; object-fit: cover; display: block;
+            transition: transform 0.5s;
         }
+        .server-banner-container:hover .server-banner-img { transform: scale(1.02); }
 
-        /* === SCHEDULE BOXES === */
-        .schedule-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
+        /* SCHEDULE BOXES */
+        .schedule-row { display: flex; gap: 15px; margin-bottom: 20px; }
         .schedule-item {
-            flex: 1;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid #333;
-            padding: 15px;
-            text-align: center;
-            border-radius: 4px;
-            transition: 0.3s;
+            flex: 1; background: rgba(0,0,0,0.4); border: 1px solid #333;
+            padding: 15px; text-align: center; border-radius: 4px; transition: 0.3s;
         }
         .schedule-title {
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            margin-bottom: 5px;
+            font-family: 'Cinzel', serif; font-weight: 700; text-transform: uppercase;
+            font-size: 0.9rem; margin-bottom: 5px;
         }
-        .schedule-time {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #fff;
-        }
-        .schedule-date {
-            font-size: 1.5rem;
-            color: #aaa;
-        }
+        .schedule-time { font-family: 'Rajdhani', sans-serif; font-size: 1.4rem; font-weight: 700; color: #fff; }
+        .schedule-date { font-size: 1.2rem; color: #aaa; }
 
-        /* Alpha Style */
         .sch-alpha { border-color: #004466; }
         .sch-alpha .schedule-title { color: #00d2ff; }
-        .sch-alpha:hover { box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); border-color: #00d2ff; }
+        .sch-alpha:hover { box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
 
-        /* Beta Style */
         .sch-beta { border-color: #660000; background: linear-gradient(180deg, rgba(40,0,0,0.5) 0%, rgba(10,0,0,0.5) 100%); }
         .sch-beta .schedule-title { color: #ff3333; }
-        .sch-beta .schedule-time { text-shadow: 0 0 10px rgba(255, 51, 51, 0.5); }
-        .sch-beta:hover { box-shadow: var(--mu-glow-red); border-color: var(--mu-red); }
+        .sch-beta:hover { box-shadow: 0 0 25px rgba(255, 0, 0, 0.4); border-color: var(--mu-red); }
 
-        /* === INFO GRID (SPECS) === */
-        .spec-list {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+        /* SPECS & INFO */
+        .spec-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .spec-item {
-            background: rgba(255, 255, 255, 0.03);
-            border-left: 3px solid #333;
-            padding: 8px 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: rgba(255, 255, 255, 0.03); border-left: 3px solid #333;
+            padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;
         }
         .spec-item:hover { background: rgba(255, 204, 0, 0.05); border-left-color: var(--mu-gold); }
         .spec-label { font-size: 0.85rem; text-transform: uppercase; color: #888; }
         .spec-value { font-weight: 700; color: #e0e0e0; font-size: 1.1rem; }
         .spec-highlight { color: var(--mu-gold); }
 
-        /* === DESCRIPTION BOX === */
-        .desc-container {
-            flex-grow: 1;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid #333;
-            padding: 15px;
-            overflow-y: auto;
-            max-height: 400px;
-            color: #ccc;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            white-space: pre-wrap;
-        }
-        .desc-container::-webkit-scrollbar { width: 6px; }
-        .desc-container::-webkit-scrollbar-track { background: #111; }
-        .desc-container::-webkit-scrollbar-thumb { background: #444; }
-        .desc-container::-webkit-scrollbar-thumb:hover { background: var(--mu-gold); }
-
-        /* === BUTTONS === */
+        /* BUTTONS */
         .btn-mu-main {
             background: linear-gradient(90deg, #550000 0%, #8b0000 100%);
-            color: #fff;
-            border: 1px solid #a00000;
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            width: 100%;
-            padding: 12px;
+            color: #fff; border: 1px solid #a00000;
+            font-family: 'Cinzel', serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            width: 100%; padding: 12px;
             clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-            transition: all 0.3s;
-            text-decoration: none;
-            display: block;
-            text-align: center;
-            margin-bottom: 10px;
+            transition: all 0.3s; text-decoration: none; display: block; text-align: center; margin-bottom: 10px;
         }
         .btn-mu-main:hover {
             background: linear-gradient(90deg, #8b0000 0%, #ff0000 100%);
-            color: #fff;
-            box-shadow: 0 0 15px rgba(255,0,0,0.6);
-            border-color: #ff3333;
+            color: #fff; box-shadow: 0 0 15px rgba(255,0,0,0.6); border-color: #ff3333;
         }
-
         .btn-mu-sub {
             background: linear-gradient(90deg, #b8860b 0%, #daa520 100%);
-            color: #000;
-            border: 1px solid #ffd700;
+            color: #000; border: 1px solid #ffd700;
         }
         .btn-mu-sub:hover {
-            background: linear-gradient(90deg, #daa520 0%, #ffd700 100%);
+            background: linear-gradient(90deg, #daa520 0%, #ffd700 100%); color: #000;
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-            color: #000;
+        }
+        .status-badge {
+            font-family: 'Cinzel', serif; font-size: 0.8rem; padding: 4px 10px;
+            border: 1px solid; text-transform: uppercase; display: inline-block; margin-right: 5px;
         }
 
-        .status-badge {
-            font-family: 'Cinzel', serif;
-            font-size: 0.8rem;
-            padding: 4px 10px;
-            border: 1px solid;
-            text-transform: uppercase;
-            display: inline-block;
-            margin-right: 5px;
+        /* DESCRIPTION CONTENT */
+        .desc-container {
+            flex-grow: 1; background: rgba(0,0,0,0.3); border: 1px solid #333;
+            padding: 15px; overflow-y: auto; max-height: 500px;
+            color: #ccc; font-size: 0.95rem; line-height: 1.7; white-space: pre-wrap;
         }
-        .text-muted {
-            color: #e4e4e4 !important;
-        }
+        .desc-container h2, .desc-container h3 { color: var(--mu-gold); font-family: 'Cinzel', serif; margin-top: 15px; font-size: 1.3rem; }
+        .desc-container ul { list-style: square; padding-left: 20px; }
+        .desc-container img { max-width: 100%; height: auto; display: block; margin: 10px auto; border: 1px solid #444; }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: #444; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--mu-gold); }
     </style>
 </head>
 <body>
 
+<%-- HEADER INCLUDE --%>
 <jsp:include page="header.jsp" />
 
-<div class="container pt-5 pb-5">
+<div class="container pt-4 pb-5">
 
+    <%-- SEO: BREADCRUMB (Điều hướng) --%>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none"><i class="fa-solid fa-house"></i> Trang Chủ</a></li>
+            <li class="breadcrumb-item"><a href="/#result-list" class="text-decoration-none">Danh Sách Server</a></li>
+            <li class="breadcrumb-item active text-warning" aria-current="page">${server.serverName}</li>
+        </ol>
+    </nav>
+
+    <%-- TITLE SECTION --%>
     <div class="row align-items-center mb-4">
-        <div class="col-lg-4">
-            <div class="server-header text-center">
+        <div class="col-lg-4 text-center text-lg-start">
+            <div class="server-header">
+                <%-- SEO: H1 cho Tên Server --%>
                 <h1>${server.serverName}</h1>
                 <div class="server-mu-name">${server.muName}</div>
                 <div>
                     <c:if test="${server.bannerPackage == 'VIP' || server.bannerPackage == 'SUPER_VIP'}">
-                <span class="status-badge" style="color: var(--mu-gold); border-color: var(--mu-gold);">
-                    <i class="fa-solid fa-crown me-1"></i> VIP SERVER
-                </span>
+                        <span class="status-badge" style="color: var(--mu-gold); border-color: var(--mu-gold);">
+                            <i class="fa-solid fa-crown me-1"></i> VIP SERVER
+                        </span>
                     </c:if>
                     <span class="status-badge" style="color: #aaa; border-color: #555;">
-                <i class="fa-solid fa-tag me-1"></i> ${server.slogan}
-            </span>
+                        <i class="fa-solid fa-tag me-1"></i> ${server.slogan}
+                    </span>
                 </div>
             </div>
         </div>
+
+        <%-- BANNER SECTION --%>
         <div class="col-lg-8">
             <c:if test="${not empty server.bannerImage}">
                 <div class="server-banner-container">
-                    <img src="${server.bannerImage}" alt="${server.serverName}" class="server-banner-img">
+                        <%-- SEO: Alt text chứa từ khóa --%>
+                    <img src="${server.bannerImage}" alt="Mu Online ${server.serverName} - ${server.muName}" class="server-banner-img">
                 </div>
             </c:if>
         </div>
     </div>
 
 
-    <div class="row g-4">
-
+        <div class="row g-4 align-items-start">        <%-- LEFT COLUMN: THÔNG SỐ KỸ THUẬT --%>
         <div class="col-lg-4">
             <div class="detail-panel">
                 <div style="font-family: 'Cinzel', serif; color: var(--mu-gold); margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px;">
@@ -273,11 +309,11 @@
                         <span class="spec-value text-white">${server.serverStat.muVersion.versionName}</span>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-label">Exp</span>
+                        <span class="spec-label">Exp Rate</span>
                         <span class="spec-value spec-highlight">x${server.serverStat.expRate}</span>
                     </div>
                     <div class="spec-item">
-                        <span class="spec-label">Drop</span>
+                        <span class="spec-label">Drop Rate</span>
                         <span class="spec-value">${server.serverStat.dropRate}%</span>
                     </div>
                     <div class="spec-item">
@@ -289,42 +325,51 @@
                 <div class="spec-item mb-2">
                     <span class="spec-label">Reset Type</span>
                     <span class="spec-value">
-                        <c:out value="${server.serverStat.resetType.resetName}" default="Thường" />
+                        <c:out value="${server.serverStat.resetType.resetName}" default="Reset" />
                     </span>
                 </div>
                 <div class="spec-item mb-4">
-                    <span class="spec-label">Point Type</span>
+                    <span class="spec-label">Point / Level</span>
                     <span class="spec-value">
-                        <c:out value="${server.serverStat.pointType.pointName}" default="Thường" />
+                        <c:out value="${server.serverStat.pointType.pointName}" default="5/7" />
                     </span>
                 </div>
 
+                <%-- CALL TO ACTION BUTTONS --%>
                 <div class="mt-auto">
-                    <a href="${server.websiteUrl}" target="_blank" class="btn-mu-main btn-mu-sub">
-                        <i class="fa-solid fa-globe me-2"></i> Trang Chủ
-                    </a>
-                    <a href="${server.fanpageUrl}" target="_blank" class="btn-mu-main">
-                        <i class="fa-brands fa-facebook me-2"></i> Fanpage
-                    </a>
+                    <c:if test="${not empty server.websiteUrl}">
+                        <a href="${server.websiteUrl}" target="_blank" rel="nofollow" class="btn-mu-main btn-mu-sub">
+                            <i class="fa-solid fa-globe me-2"></i> Trang Chủ Game
+                        </a>
+                    </c:if>
+
+                    <c:if test="${not empty server.fanpageUrl}">
+                        <a href="${server.fanpageUrl}" target="_blank" rel="nofollow" class="btn-mu-main">
+                            <i class="fa-brands fa-facebook me-2"></i> Fanpage
+                        </a>
+                    </c:if>
+
                     <a href="/" class="btn btn-sm btn-outline-secondary w-100 mt-2 border-0">
-                        <i class="fa-solid fa-arrow-left me-1"></i> Quay lại
+                        <i class="fa-solid fa-arrow-left me-1"></i> Quay lại danh sách
                     </a>
                 </div>
             </div>
         </div>
 
+        <%-- RIGHT COLUMN: LỊCH TRÌNH & MÔ TẢ --%>
         <div class="col-lg-8">
             <div class="detail-panel">
+                <%-- SCHEDULE --%>
                 <div class="schedule-row">
                     <div class="schedule-item sch-alpha">
                         <div class="schedule-title">Alpha Test</div>
                         <c:choose>
                             <c:when test="${not empty server.schedule.alphaDate}">
                                 <div class="schedule-time">${server.schedule.alphaTime}</div>
-                                <div class="schedule-date">
+                                <time class="schedule-date" datetime="${server.schedule.alphaDate}">
                                     <fmt:parseDate value="${server.schedule.alphaDate}" pattern="yyyy-MM-dd" var="pAlpha" type="date"/>
                                     <fmt:formatDate value="${pAlpha}" pattern="dd/MM/yyyy"/>
-                                </div>
+                                </time>
                             </c:when>
                             <c:otherwise>
                                 <div class="schedule-date text-muted mt-2">Chưa cập nhật</div>
@@ -337,10 +382,10 @@
                         <c:choose>
                             <c:when test="${not empty server.schedule.betaDate}">
                                 <div class="schedule-time">${server.schedule.betaTime}</div>
-                                <div class="schedule-date">
+                                <time class="schedule-date" datetime="${server.schedule.betaDate}">
                                     <fmt:parseDate value="${server.schedule.betaDate}" pattern="yyyy-MM-dd" var="pBeta" type="date"/>
                                     <fmt:formatDate value="${pBeta}" pattern="dd/MM/yyyy"/>
-                                </div>
+                                </time>
                             </c:when>
                             <c:otherwise>
                                 <div class="schedule-time" style="font-size: 1.2rem; margin-top: 5px;">Coming Soon</div>
@@ -349,11 +394,13 @@
                     </div>
                 </div>
 
+                <%-- DESCRIPTION --%>
                 <div style="font-family: 'Cinzel', serif; color: #fff; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px;">
-                    <i class="fa-solid fa-scroll me-2 text-warning"></i> Giới Thiệu
+                    <i class="fa-solid fa-scroll me-2 text-warning"></i> Giới Thiệu Server
                 </div>
 
                 <div class="desc-container">
+                    <%-- Hiển thị HTML an toàn nhưng giữ định dạng --%>
                     <c:out value="${server.description}" escapeXml="false"/>
                 </div>
 
@@ -362,6 +409,8 @@
     </div>
 
 </div>
+
+<%-- FOOTER INCLUDE --%>
 <jsp:include page="footer.jsp" />
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -1,4 +1,5 @@
 package com.muads.entity;
+import com.muads.util.SlugUtils;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -13,4 +14,7 @@ public class ResetType {
 
     @Column(name = "reset_name", nullable = false)
     private String resetName;
+    public String getSlug() {
+        return SlugUtils.toSlug(this.resetName);
+    }
 }

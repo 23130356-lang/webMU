@@ -16,41 +16,25 @@ import java.util.List;
 @Repository
 public interface ServerRepository extends JpaRepository<Server, Long> {
 
-    // ==========================================
-    // PHẦN 1: CÁC HÀM CŨ (GIỮ NGUYÊN)
-    // ==========================================
-
-    // 1. Các hàm tìm kiếm cơ bản
+    // --- CÁC HÀM CƠ BẢN ---
     List<Server> findByIsActiveTrue();
-
-    // Tìm theo Status
     List<Server> findByStatus(Status status);
-
-    // Sắp xếp theo thời gian (dùng cho Service admin/dashboard)
     List<Server> findByStatusOrderByCreatedAtDesc(Status status);
 
-    // 2. Các hàm phân trang (Paging)
     Page<Server> findByStatusAndIsActiveTrue(Status status, Pageable pageable);
-
     Page<Server> findByStatusInAndIsActiveTrue(List<Status> statuses, Pageable pageable);
 
-    // 3. Tìm kiếm theo tên
     List<Server> findByServerNameContainingIgnoreCaseAndIsActiveTrue(String keyword);
     boolean existsByServerName(String serverName);
-
-    // 4. Tìm theo User
     List<Server> findByUserId(Long userId);
 
-    // 5. Đếm số lượng
     long countByStatus(Status status);
-
-    // 6. Logic đếm Slot cho chức năng Đăng ký/Gia hạn
     long countByBannerPackageAndStatusAndIsActiveTrue(BannerPackage bannerPackage, Status status);
-
-    // 7. Tìm server hết hạn (Hàm cũ của bạn - có thể giữ lại hoặc dùng hàm mới bên dưới)
     List<Server> findByIsActiveTrueAndExpiredAtBefore(LocalDateTime now);
+    List<Server> findByStatusAndExpiredAtBefore(Status status, LocalDateTime now);
 
-    // 8. Các Query Custom hiển thị ra trang chủ (Home)
+    // --- QUERY HIỂN THỊ TRANG CHỦ ---
+
     @Query("SELECT s FROM Server s WHERE s.isActive = true AND s.status = 'APPROVED' ORDER BY s.createdAt DESC")
     List<Server> findLatestActiveServers(Pageable pageable);
 
@@ -63,6 +47,8 @@ public interface ServerRepository extends JpaRepository<Server, Long> {
     @Query("SELECT s FROM Server s WHERE s.status = 'APPROVED' AND s.isActive = true AND s.bannerPackage = 'BASIC' ORDER BY s.approvedAt DESC")
     List<Server> findNormalServers();
 
+    // --- QUERY TÌM KIẾM CHÍNH (QUAN TRỌNG) ---
+    // Lưu ý: versionIds ở đây là List<Integer> để hỗ trợ tìm kiếm nhiều phiên bản cùng lúc
     @Query("SELECT s FROM Server s " +
             "JOIN s.serverStat ss " +
             "WHERE s.isActive = true " +
@@ -76,8 +62,4 @@ public interface ServerRepository extends JpaRepository<Server, Long> {
             "s.approvedAt DESC")
     List<Server> searchServers(@Param("resetId") Integer resetId,
                                @Param("versionIds") List<Integer> versionIds);
-
-
-
-    List<Server> findByStatusAndExpiredAtBefore(Status status, LocalDateTime now);
 }

@@ -32,7 +32,6 @@ public class BannerRegisterController {
     private HomeBannerService bannerService;
     @Autowired
     private MuVersionRepository versionRepo;
-
     @Autowired
     private ResetTypeRepository resetRepo;
     @Autowired
