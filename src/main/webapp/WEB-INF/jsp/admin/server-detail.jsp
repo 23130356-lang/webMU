@@ -105,51 +105,60 @@
                     </div>
                 </div>
 
-               <div class="card-footer bg-white p-4">
-    <div class="d-flex justify-content-end gap-2">
+              <div class="card-footer bg-white p-4">
+    <div class="d-flex justify-content-between align-items-center">
 
-        <c:choose>
+        <form action="/admin/server/delete/${sv.id}" method="post"
+              onsubmit="return confirm('CẢNH BÁO NGUY HIỂM:\n\nServer này và toàn bộ dữ liệu liên quan sẽ bị XÓA VĨNH VIỄN khỏi cơ sở dữ liệu.\n\nBạn có chắc chắn muốn tiếp tục?');">
+            <button type="submit" class="btn btn-outline-danger">
+                <i class="bi bi-trash-fill"></i> Xóa Server
+            </button>
+        </form>
 
-            <%-- TRƯỜNG HỢP 1: CHỜ DUYỆT (Hiện nút thao tác) --%>
-            <c:when test="${sv.status == 'PENDING'}">
+        <div class="d-flex gap-2">
+            <c:choose>
+                <%-- TRƯỜNG HỢP 1: CHỜ DUYỆT --%>
+                <c:when test="${sv.status == 'PENDING'}">
+                    <form action="/admin/reject/${sv.id}" method="post" onsubmit="return confirm('Bạn chắc chắn muốn từ chối server này?');">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-x-circle"></i> Từ chối
+                        </button>
+                    </form>
 
-                <form action="/admin/reject/${sv.id}" method="post" onsubmit="return confirm('Bạn chắc chắn muốn từ chối server này?');">
-                    <button type="submit" class="btn btn-danger">
-                        <i class="bi bi-x-circle"></i> Từ chối
-                    </button>
-                </form>
+                    <form action="/admin/approve/${sv.id}" method="post" onsubmit="return confirm('Xác nhận duyệt và trừ tiền thành viên?');">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Duyệt ngay
+                        </button>
+                    </form>
+                </c:when>
 
-                <form action="/admin/approve/${sv.id}" method="post" onsubmit="return confirm('Xác nhận duyệt và trừ tiền thành viên?');">
-                    <button type="submit" class="btn btn-success">
-                        <i class="bi bi-check-circle"></i> Duyệt ngay
-                    </button>
-                </form>
+                <%-- TRƯỜNG HỢP 2: ĐÃ DUYỆT --%>
+                <c:when test="${sv.status == 'APPROVED'}">
+                    <div class="text-success fw-bold d-flex align-items-center me-3">
+                        <i class="bi bi-check-circle-fill me-2"></i> Đang hoạt động
+                    </div>
+                    <a href="/admin/approved" class="btn btn-secondary">Quay lại DS</a>
+                </c:when>
 
-            </c:when>
+                <%-- TRƯỜNG HỢP 3: ĐÃ TỪ CHỐI --%>
+                <c:when test="${sv.status == 'REJECTED'}">
+                    <div class="text-danger fw-bold d-flex align-items-center me-3">
+                        <i class="bi bi-x-circle-fill me-2"></i> Đã từ chối
+                    </div>
+                    <a href="/admin/pending" class="btn btn-secondary">Quay lại DS</a>
+                </c:when>
 
-            <%-- TRƯỜNG HỢP 2: ĐÃ DUYỆT (Chỉ hiện thông báo, ẩn nút) --%>
-            <c:when test="${sv.status == 'APPROVED'}">
-                <div class="alert alert-success m-0 py-2 px-4 d-flex align-items-center">
-                    <i class="bi bi-check-circle-fill me-2"></i>
-                    <strong>Đã duyệt</strong>
-                    <span class="ms-2 small">(Ngày hết hạn: ${sv.expiredAt.toLocalDate()})</span>
-                </div>
-                <a href="/admin/approved" class="btn btn-secondary">Quay lại</a>
-            </c:when>
-
-            <%-- TRƯỜNG HỢP 3: ĐÃ TỪ CHỐI --%>
-            <c:when test="${sv.status == 'REJECTED'}">
-                <div class="alert alert-danger m-0 py-2 px-4">
-                    <i class="bi bi-x-circle-fill me-2"></i> Đã từ chối
-                </div>
-                <a href="/admin/pending" class="btn btn-secondary">Quay lại</a>
-            </c:when>
-
-        </c:choose>
-
+                <%-- TRƯỜNG HỢP 4: HẾT HẠN (EXPIRED) --%>
+                <c:when test="${sv.status == 'EXPIRED'}">
+                    <div class="text-muted fw-bold d-flex align-items-center me-3">
+                        <i class="bi bi-clock-history me-2"></i> Đã hết hạn
+                    </div>
+                    <a href="/admin/approved" class="btn btn-secondary">Quay lại DS</a>
+                </c:when>
+            </c:choose>
+        </div>
     </div>
 </div>
-            </div>
         </div>
     </div>
 </div>

@@ -14,7 +14,7 @@
         font-family: 'Rajdhani', sans-serif;
         display: block;
         width: 100%;
-        background: #050505;
+        background: #180303;
         border-bottom: 1px solid #3d2b1f;
         box-sizing: border-box;
         position: sticky;

@@ -4,6 +4,7 @@ import com.muads.entity.Server;
 import com.muads.entity.User;
 import com.muads.repository.ServerRepository;
 import com.muads.repository.UserRepository;
+import com.muads.service.ServerService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,6 +21,9 @@ public class AdminController {
 
     @Autowired
     private ServerRepository serverRepository;
+    @Autowired
+
+    private ServerService serverService;
 
     @Autowired
     private UserRepository userRepository;
@@ -121,5 +125,22 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("successMessage", "Đã từ chối server.");
         }
         return "redirect:/admin/pending";
+    }
+    @PostMapping("/server/delete/{id}")
+    public String deleteServer(@PathVariable Long id,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+        // 1. Check quyền Admin
+        if (!isAdmin(session)) return "redirect:/login";
+
+        try {
+            serverService.deleteServer(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã xóa server vĩnh viễn!");
+            return "redirect:/admin/pending"; // Hoặc về /admin/approved tùy ý
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi xóa: " + e.getMessage());
+            return "redirect:/admin/server/" + id;
+        }
     }
 }

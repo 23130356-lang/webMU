@@ -78,14 +78,6 @@ public interface ServerRepository extends JpaRepository<Server, Long> {
                                @Param("versionIds") List<Integer> versionIds);
 
 
-    // ==========================================
-    // PHẦN 2: BỔ SUNG THÊM (CHO LOGIC EXPIRED)
-    // ==========================================
 
-    /**
-     * Hàm này dùng cho ServerService.autoExpireServers()
-     * Mục đích: Tìm chính xác các server đang ở trạng thái 'status' (ví dụ APPROVED)
-     * mà thời gian 'expiredAt' nhỏ hơn thời gian hiện tại 'now'.
-     */
     List<Server> findByStatusAndExpiredAtBefore(Status status, LocalDateTime now);
 }

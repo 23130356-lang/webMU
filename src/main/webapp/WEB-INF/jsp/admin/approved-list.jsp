@@ -69,11 +69,20 @@
                                         <c:otherwise><span class="badge bg-secondary">Đã tắt</span></c:otherwise>
                                     </c:choose>
                                 </td>
-                                <td class="text-center">
-                                    <a href="/admin/server/${s.id}" class="btn btn-outline-primary btn-sm">
-                                        <i class="bi bi-pencil-square"></i> Chi tiết
+                               <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="/admin/server/${s.id}" class="btn btn-outline-primary btn-sm" title="Xem chi tiết">
+                                        <i class="bi bi-pencil-square"></i>
                                     </a>
-                                </td>
+
+                                    <form action="/admin/server/delete/${s.id}" method="post"
+                                          onsubmit="return confirm('Xóa vĩnh viễn server ${s.serverName}?');">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Xóa vĩnh viễn">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
                             </tr>
                         </c:forEach>
                         </tbody>

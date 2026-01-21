@@ -957,6 +957,8 @@
         </div>
     </div>
 </div>
+<jsp:include page="footer.jsp" />
+
 <script>
     // Hàm chạy đếm ngược
     function startCountdowns() {

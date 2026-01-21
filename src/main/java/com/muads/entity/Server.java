@@ -94,9 +94,9 @@ public class Server {
     // --- 2. ENUM BANNER PACKAGE (Đã cập nhật ngày) ---
     @Getter
     public enum BannerPackage {
-        BASIC(0, "Cơ bản (Miễn phí)", 10),       // 10 Ngày
-        VIP(5000, "VIP (5.000 Xu)", 10),           // 10 Ngày
-        SUPER_VIP(10000, "Super VIP (10.000 Xu)", 14); // 14 Ngày
+        BASIC(0, "Cơ bản (Miễn phí)", 7),       // 10 Ngày
+        VIP(100, "VIP (100 Xu)", 10),           // 10 Ngày
+        SUPER_VIP(200, "Super VIP (2000 Xu)", 14); // 14 Ngày
 
         private final int price;
         private final String label;

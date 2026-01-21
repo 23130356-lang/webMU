@@ -45,15 +45,37 @@ public class HomeController {
         model.addAttribute("bannersStd", banners.get("STD"));
 
         // --- 2. LOGIC GROUP VERSION ---
+        // --- 2. LOGIC GROUP VERSION (3 GROUP) ---
         if (versionId != null && versionId > 0) {
+
             Optional<MuVersion> verOpt = versionRepo.findById(versionId);
+
             if (verOpt.isPresent()) {
-                String verName = verOpt.get().getVersionName().toLowerCase();
-                if (matchesSeason(verName, 1, 5)) groupVer = "1-5";
-                else if (verName.contains("season 6") || verName.contains("ss6")) groupVer = "6";
-                else if (matchesSeasonAbove(verName, 7)) groupVer = "7+";
+                String verName = verOpt.get().getVersionName();
+
+                switch (verName) {
+                    case "SEASON 0-1":
+                    case "SEASON 2":
+                    case "SEASON 3-5":
+                        groupVer = "1-5";
+                        break;
+
+                    case "SEASON 6":
+                        groupVer = "6x";
+                        break;
+
+                    case "SEASON 7-15":
+                    case "SEASON 16-20":
+                    case "SEASON 21":
+                        groupVer = "7+";
+                        break;
+
+                    default:
+                        groupVer = null;
+                }
             }
         }
+
 
         // --- 3. LẤY DỮ LIỆU THÔ (RAW DATA) ---
         boolean isSearching = (groupVer != null && !groupVer.isEmpty())

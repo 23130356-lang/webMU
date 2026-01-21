@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -155,5 +159,23 @@ public class ServerService {
     public Server getServerById(Long id) {
         return serverRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy Server ID: " + id));
+    }
+    @Transactional
+    public void deleteServer(Long serverId) {
+        Server server = getServerById(serverId);
+
+        // 1. Xóa ảnh Banner vật lý (nếu có) để giải phóng dung lượng
+        if (server.getBannerImage() != null && !server.getBannerImage().isEmpty()) {
+            try {
+
+                Path imagePath = Paths.get("src/main/webapp/uploads").resolve(server.getBannerImage());
+
+                Files.deleteIfExists(imagePath);
+            } catch (IOException e) {
+                System.err.println("Lỗi xóa ảnh (có thể bỏ qua nếu chỉ muốn xóa DB): " + e.getMessage());
+            }
+        }
+
+        serverRepository.delete(server);
     }
 }

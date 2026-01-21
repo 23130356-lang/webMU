@@ -1,7 +1,6 @@
 package com.muads.controller;
 
 import com.muads.entity.Server;
-import com.muads.entity.ServerEditRequest;
 import com.muads.entity.User;
 import com.muads.service.UserManageService;
 import com.muads.service.UserService; // Cần import UserService để làm mới session
@@ -55,22 +54,7 @@ public class UserManageController {
         }
     }
 
-    @PostMapping("/servers/edit")
-    public String processEdit(@RequestParam Long serverId,
-                              @ModelAttribute ServerEditRequest requestData,
-                              HttpSession session,
-                              RedirectAttributes redirect) {
-        User user = (User) session.getAttribute("currentUser");
-        if (user == null) return "redirect:/login";
 
-        try {
-            userManageService.submitEditRequest(serverId, user.getId(), requestData);
-            redirect.addFlashAttribute("successMessage", "Đã gửi yêu cầu chỉnh sửa! Admin sẽ duyệt sớm nhất.");
-        } catch (Exception e) {
-            redirect.addFlashAttribute("errorMessage", "Lỗi: " + e.getMessage());
-        }
-        return "redirect:/manage/servers";
-    }
 
     // === [MỚI] CHỨC NĂNG GIA HẠN SERVER ===
     @GetMapping("/servers/renew/{id}")

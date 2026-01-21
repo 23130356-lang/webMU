@@ -14,7 +14,6 @@ public class UserManageService {
 
     @Autowired private ServerRepository serverRepository;
     @Autowired private HomeBannerRepository homeBannerRepository;
-    @Autowired private ServerEditRequestRepository editRequestRepository;
     @Autowired private UserRepository userRepository; // Cần thêm cái này để trừ tiền User
 
     // --- CẤU HÌNH GIỚI HẠN SLOT (Số lượng tối đa đang chạy cùng lúc) ---
@@ -43,18 +42,6 @@ public class UserManageService {
         return server;
     }
 
-    // 4. Submit yêu cầu sửa
-    @Transactional
-    public void submitEditRequest(Long serverId, Long userId, ServerEditRequest requestData) {
-        Server server = getServerForEdit(serverId, userId);
-        if (editRequestRepository.existsByServerIdAndStatus(serverId, ServerEditRequest.RequestStatus.PENDING)) {
-            throw new RuntimeException("Server này đang có yêu cầu chờ duyệt. Vui lòng đợi Admin xử lý!");
-        }
-        requestData.setServer(server);
-        requestData.setStatus(ServerEditRequest.RequestStatus.PENDING);
-        requestData.setCreatedAt(LocalDateTime.now());
-        editRequestRepository.save(requestData);
-    }
 
     // 5. CHỨC NĂNG GIA HẠN SERVER (MỚI)
     @Transactional
