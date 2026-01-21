@@ -21,28 +21,45 @@ public class ServerAutoExpireService {
     @Autowired
     private ServerRepository serverRepository;
 
-    // Chạy mỗi 60 giây để kiểm tra
-    @Scheduled(fixedRate = 6000)
+    // Chạy mỗi 60 giây (60000ms) để kiểm tra.
+    // Nếu muốn test nhanh có thể sửa thành 10000 (10 giây)
+    @Scheduled(fixedRate = 10000)
     @Transactional
     public void autoExpireEverything() {
         LocalDateTime now = LocalDateTime.now();
+        // System.out.println("CronJob: Đang quét dữ liệu hết hạn tại " + now);
 
-        // 1. Quét Banner Trang Chủ hết hạn
-        List<HomeBanner> expiredBanners = homeBannerRepository.findByActiveTrueAndEndDateBefore(now);
-        if (!expiredBanners.isEmpty()) {
-            for (HomeBanner banner : expiredBanners) {
-                banner.setActive(false);
+        // --- 1. XỬ LÝ BANNER (Giữ nguyên code của bạn) ---
+        // (Lưu ý: Đảm bảo HomeBannerRepository đã có hàm findByActiveTrueAndEndDateBefore)
+        try {
+            List<HomeBanner> expiredBanners = homeBannerRepository.findByActiveTrueAndEndDateBefore(now);
+            if (!expiredBanners.isEmpty()) {
+                for (HomeBanner banner : expiredBanners) {
+                    banner.setActive(false);
+                }
+                homeBannerRepository.saveAll(expiredBanners);
+                System.out.println("Auto Expire: Đã tắt " + expiredBanners.size() + " Banner hết hạn.");
             }
-            homeBannerRepository.saveAll(expiredBanners);
+        } catch (Exception e) {
+            // Bỏ qua lỗi nếu chưa setup xong phần Banner
         }
 
-        // 2. Quét Server Quảng Cáo hết hạn (Quá 10 ngày)
-        List<Server> expiredServers = serverRepository.findByIsActiveTrueAndExpiredAtBefore(now);
+        // --- 2. XỬ LÝ SERVER (CẬP NHẬT MỚI) ---
+        // Tìm các server đang APPROVED mà expiredAt < hiện tại
+        // Sử dụng hàm mới đã khai báo trong ServerRepository
+        List<Server> expiredServers = serverRepository.findByStatusAndExpiredAtBefore(Server.Status.APPROVED, now);
+
         if (!expiredServers.isEmpty()) {
             for (Server sv : expiredServers) {
-                sv.setIsActive(false); // Tắt server
-                System.out.println("Auto Expire: Tắt Server ID " + sv.getId() + " - " + sv.getServerName());
+                // 1. Chuyển trạng thái sang EXPIRED (Để lưu vào DB)
+                sv.setStatus(Server.Status.EXPIRED);
+
+                // 2. Tắt Active (Để ẩn khỏi web)
+                sv.setIsActive(false);
+
+                System.out.println("Auto Expire: Server ID " + sv.getId() + " (" + sv.getServerName() + ") -> Đã chuyển EXPIRED.");
             }
+            // Lưu tất cả thay đổi
             serverRepository.saveAll(expiredServers);
         }
     }

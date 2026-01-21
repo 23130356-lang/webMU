@@ -16,13 +16,17 @@ import java.util.List;
 @Repository
 public interface ServerRepository extends JpaRepository<Server, Long> {
 
+    // ==========================================
+    // PHẦN 1: CÁC HÀM CŨ (GIỮ NGUYÊN)
+    // ==========================================
+
     // 1. Các hàm tìm kiếm cơ bản
     List<Server> findByIsActiveTrue();
 
-    // [QUAN TRỌNG] Hàm bạn đang bị thiếu báo lỗi đây:
+    // Tìm theo Status
     List<Server> findByStatus(Status status);
 
-    // [QUAN TRỌNG] Hàm sắp xếp theo thời gian (dùng cho Service):
+    // Sắp xếp theo thời gian (dùng cho Service admin/dashboard)
     List<Server> findByStatusOrderByCreatedAtDesc(Status status);
 
     // 2. Các hàm phân trang (Paging)
@@ -43,7 +47,7 @@ public interface ServerRepository extends JpaRepository<Server, Long> {
     // 6. Logic đếm Slot cho chức năng Đăng ký/Gia hạn
     long countByBannerPackageAndStatusAndIsActiveTrue(BannerPackage bannerPackage, Status status);
 
-    // 7. Tìm server hết hạn (để CronJob quét tắt server)
+    // 7. Tìm server hết hạn (Hàm cũ của bạn - có thể giữ lại hoặc dùng hàm mới bên dưới)
     List<Server> findByIsActiveTrueAndExpiredAtBefore(LocalDateTime now);
 
     // 8. Các Query Custom hiển thị ra trang chủ (Home)
@@ -58,6 +62,7 @@ public interface ServerRepository extends JpaRepository<Server, Long> {
 
     @Query("SELECT s FROM Server s WHERE s.status = 'APPROVED' AND s.isActive = true AND s.bannerPackage = 'BASIC' ORDER BY s.approvedAt DESC")
     List<Server> findNormalServers();
+
     @Query("SELECT s FROM Server s " +
             "JOIN s.serverStat ss " +
             "WHERE s.isActive = true " +
@@ -71,4 +76,16 @@ public interface ServerRepository extends JpaRepository<Server, Long> {
             "s.approvedAt DESC")
     List<Server> searchServers(@Param("resetId") Integer resetId,
                                @Param("versionIds") List<Integer> versionIds);
+
+
+    // ==========================================
+    // PHẦN 2: BỔ SUNG THÊM (CHO LOGIC EXPIRED)
+    // ==========================================
+
+    /**
+     * Hàm này dùng cho ServerService.autoExpireServers()
+     * Mục đích: Tìm chính xác các server đang ở trạng thái 'status' (ví dụ APPROVED)
+     * mà thời gian 'expiredAt' nhỏ hơn thời gian hiện tại 'now'.
+     */
+    List<Server> findByStatusAndExpiredAtBefore(Status status, LocalDateTime now);
 }

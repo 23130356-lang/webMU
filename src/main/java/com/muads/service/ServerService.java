@@ -3,8 +3,9 @@ package com.muads.service;
 import com.muads.dto.ServerRegisterDTO;
 import com.muads.entity.*;
 import com.muads.repository.*;
-import jakarta.transaction.Transactional;
+import jakarta.transaction.Transactional; // Dùng Jakarta cho Spring Boot 3
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -13,23 +14,17 @@ import java.util.List;
 @Service
 public class ServerService {
 
-    @Autowired
-    private ServerScheduleRepository scheduleRepository;
-    @Autowired
-    private ServerRepository serverRepository;
-    @Autowired
-    private MuVersionRepository versionRepo;
-    @Autowired
-    private ResetTypeRepository resetRepo;
-    @Autowired
-    private PointTypeRepository pointRepo;
+    @Autowired private ServerScheduleRepository scheduleRepository;
+    @Autowired private ServerRepository serverRepository;
+    @Autowired private MuVersionRepository versionRepo;
+    @Autowired private ResetTypeRepository resetRepo;
+    @Autowired private PointTypeRepository pointRepo;
 
-    // [THAY ĐỔI]: Không cần đường dẫn UPLOAD_DIR ở đây nữa vì Controller đã xử lý
-
+    // --- 1. ĐĂNG KÝ SERVER (Logic của bạn) ---
     @Transactional
-    public void registerServer(ServerRegisterDTO dto, User owner) { // Bỏ throws IOException
+    public void registerServer(ServerRegisterDTO dto, User owner) {
 
-        // --- 1. XỬ LÝ GÓI & CHECK SLOT (30 SuperVIP / 8 VIP) ---
+        // Xử lý gói & Check Slot (30 SuperVIP / 8 VIP)
         Server.BannerPackage selectedPackage;
         try {
             if (dto.getBannerPackage() != null && !dto.getBannerPackage().isEmpty()) {
@@ -41,17 +36,13 @@ public class ServerService {
             selectedPackage = Server.BannerPackage.BASIC;
         }
 
-        // Logic check slot (Chỉ đếm các server ĐÃ DUYỆT và ĐANG CHẠY)
+        // Logic check slot: Chỉ đếm các server APPROVED
         if (selectedPackage == Server.BannerPackage.SUPER_VIP) {
             long count = serverRepository.countByBannerPackageAndStatusAndIsActiveTrue(Server.BannerPackage.SUPER_VIP, Server.Status.APPROVED);
-            if (count >= 30) {
-                selectedPackage = Server.BannerPackage.BASIC; // Hết chỗ -> về thường
-            }
+            if (count >= 30) selectedPackage = Server.BannerPackage.BASIC;
         } else if (selectedPackage == Server.BannerPackage.VIP) {
             long count = serverRepository.countByBannerPackageAndStatusAndIsActiveTrue(Server.BannerPackage.VIP, Server.Status.APPROVED);
-            if (count >= 8) {
-                selectedPackage = Server.BannerPackage.BASIC; // Hết chỗ -> về thường
-            }
+            if (count >= 8) selectedPackage = Server.BannerPackage.BASIC;
         }
 
         Server server = new Server();
@@ -63,38 +54,33 @@ public class ServerService {
         server.setFanpageUrl(dto.getFanpageUrl());
         server.setDescription(dto.getDescription());
         server.setStatus(Server.Status.PENDING);
-        server.setIsActive(false); // [THÊM DÒNG NÀY]: Đảm bảo server mới tạo chưa được kích hoạt
+        server.setIsActive(false);
         server.setUser(owner);
 
-        // --- 2. XỬ LÝ ẢNH BANNER (ĐÃ THAY ĐỔI) ---
-        // Controller đã xử lý file upload và gán đường dẫn vào dto.getBannerUrl()
-        // Service chỉ việc lấy ra và lưu
+        // Ảnh Banner
         if (dto.getBannerUrl() != null && !dto.getBannerUrl().trim().isEmpty()) {
             server.setBannerImage(dto.getBannerUrl().trim());
         } else {
-            // Có thể set null hoặc ảnh mặc định nếu muốn
             server.setBannerImage(null);
         }
 
-        // Lưu sơ bộ để có ID cho các bảng con
         server = serverRepository.save(server);
 
-        // --- 3. LƯU SCHEDULE ---
+        // Lưu Schedule
         ServerSchedule schedule = new ServerSchedule();
-        schedule.setAlphaDate(dto.getAlphaDate()); // Đảm bảo DTO của bạn trả về LocalDate
-        schedule.setAlphaTime(dto.getAlphaTime()); // String time
-        schedule.setBetaDate(dto.getBetaDate());   // LocalDate
-        schedule.setBetaTime(dto.getBetaTime());   // String time
+        schedule.setAlphaDate(dto.getAlphaDate());
+        schedule.setAlphaTime(dto.getAlphaTime());
+        schedule.setBetaDate(dto.getBetaDate());
+        schedule.setBetaTime(dto.getBetaTime());
         schedule.setServer(server);
         scheduleRepository.save(schedule);
 
-        // --- 4. LƯU STAT ---
+        // Lưu Stat
         ServerStat stat = new ServerStat();
         stat.setExpRate(dto.getExpRate());
         stat.setDropRate(dto.getDropRate());
         stat.setAntiHack(dto.getAntiHack());
 
-        // Kiểm tra null trước khi find
         if (dto.getVersionId() != null) stat.setMuVersion(versionRepo.findById(dto.getVersionId()).orElse(null));
         if (dto.getResetId() != null) stat.setResetType(resetRepo.findById(dto.getResetId()).orElse(null));
         if (dto.getPointId() != null) stat.setPointType(pointRepo.findById(dto.getPointId()).orElse(null));
@@ -102,28 +88,30 @@ public class ServerService {
         stat.setServer(server);
         server.setServerStat(stat);
 
-        // Lưu lại server lần cuối để update các quan hệ (nếu CascadeType.ALL hoạt động tốt thì bước save ở trên đã đủ, nhưng save lại cho chắc chắn)
         serverRepository.save(server);
     }
 
-    // --- HÀM DUYỆT SERVER ---
+    // --- 2. DUYỆT SERVER (Kèm logic tính ngày hết hạn) ---
     @Transactional
     public void approveServer(Long serverId) {
         Server server = getServerById(serverId);
+
+        // Cập nhật trạng thái
         server.setStatus(Server.Status.APPROVED);
         server.setIsActive(true);
 
         LocalDateTime now = LocalDateTime.now();
         server.setApprovedAt(now);
 
-        // Logic ngày hết hạn: Dựa vào gói
-        int days = server.getBannerPackage().getDurationDays(); // Lấy số ngày từ Enum (ví dụ 10)
+        // Tự động tính ngày hết hạn dựa vào Enum BannerPackage
+        // SuperVIP = 14 ngày, còn lại = 10 ngày
+        int days = server.getBannerPackage().getDurationDays();
         server.setExpiredAt(now.plusDays(days));
 
         serverRepository.save(server);
     }
 
-    // --- HÀM TỪ CHỐI SERVER ---
+    // --- 3. TỪ CHỐI SERVER ---
     @Transactional
     public void rejectServer(Long serverId) {
         Server server = getServerById(serverId);
@@ -132,8 +120,36 @@ public class ServerService {
         serverRepository.save(server);
     }
 
+    // --- 4. [MỚI] TỰ ĐỘNG QUÉT SERVER HẾT HẠN ---
+    // Chạy mỗi 30 phút (1800000 ms)
+    @Scheduled(fixedRate = 1800000)
+    @Transactional
+    public void autoExpireServers() {
+        LocalDateTime now = LocalDateTime.now();
+
+        // Tìm các server đang APPROVED mà expiredAt < hiện tại
+        List<Server> expiredServers = serverRepository.findByStatusAndExpiredAtBefore(Server.Status.APPROVED, now);
+
+        if (!expiredServers.isEmpty()) {
+            for (Server s : expiredServers) {
+                s.setStatus(Server.Status.EXPIRED); // Chuyển sang EXPIRED
+                s.setIsActive(false);               // Tắt hiển thị
+
+                // (Tuỳ chọn) Có thể reset về gói BASIC để lần sau họ gia hạn
+                // s.setBannerPackage(Server.BannerPackage.BASIC);
+            }
+            serverRepository.saveAll(expiredServers);
+            System.out.println("CronJob: Đã chuyển " + expiredServers.size() + " server sang trạng thái EXPIRED.");
+        }
+    }
+
+    // Helpers
     public List<Server> getApprovedServers() {
         return serverRepository.findByStatusOrderByCreatedAtDesc(Server.Status.APPROVED);
+    }
+
+    public List<Server> getPendingServers() {
+        return serverRepository.findByStatusOrderByCreatedAtDesc(Server.Status.PENDING);
     }
 
     public Server getServerById(Long id) {

@@ -99,7 +99,7 @@
         <div class="row gy-4">
 
             <div class="col-lg-4 col-md-6">
-                <h5 class="footer-title"><i class="fa-solid fa-dragon me-2"></i> MUXUA.CO PORTAL</h5>
+                <h5 class="footer-title"><i class="fa-solid fa-dragon me-2"></i> MUNORIA.MOBILE PORTAL</h5>
                 <p class="footer-desc">
                     Cổng thông tin Mu Online hàng đầu Việt Nam. Nơi cập nhật lịch ra mắt các máy chủ mới nhất, uy tín nhất và đông người chơi nhất.
                 </p>
@@ -127,13 +127,13 @@
                     <li>
                         <div class="d-flex text-secondary">
                             <i class="fa-solid fa-envelope mt-1 me-2 text-danger"></i>
-                            <span>ads.muxua@gmail.com</span>
+                            <span>ads.munoria@gmail.com</span>
                         </div>
                     </li>
                     <li>
                         <div class="d-flex text-secondary">
                             <i class="fa-brands fa-telegram mt-1 me-2 text-info"></i>
-                            <span>@MuxuaSupport (Telegram)</span>
+                            <span>@MunoriaSupport (Telegram)</span>
                         </div>
                     </li>
                     <li class="mt-3">
@@ -148,7 +148,7 @@
         </div>
 
         <div class="copyright-bar">
-            &copy; 2025 <strong>Muxua.co</strong>. All Rights Reserved. <br>
+            &copy; 2025 <strong>MuNoria.mobile</strong>. All Rights Reserved. <br>
             <span style="font-size: 0.75rem;">Designed for true MU Fans.</span>
         </div>
     </div>

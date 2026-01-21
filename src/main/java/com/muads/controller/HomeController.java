@@ -23,20 +23,10 @@ import java.util.stream.Collectors;
 @Controller
 public class HomeController {
 
-    @Autowired
-    private HomeBannerService bannerService;
-
-    @Autowired
-    private ServerRepository serverRepository;
-
-    @Autowired
-    private MuVersionRepository versionRepo;
-
-    @Autowired
-    private ResetTypeRepository resetRepo;
-
-    @Autowired
-    private HomeBannerRepository bannerRepo;
+    @Autowired private HomeBannerService bannerService;
+    @Autowired private ServerRepository serverRepository;
+    @Autowired private MuVersionRepository versionRepo;
+    @Autowired private ResetTypeRepository resetRepo;
 
     @GetMapping("/")
     public String home(Model model,
@@ -44,124 +34,97 @@ public class HomeController {
                        @RequestParam(name = "reset", required = false) Integer resetId,
                        @RequestParam(name = "versionId", required = false) Integer versionId) {
 
-        // --- 1. DỮ LIỆU CỐ ĐỊNH (HEADER/BANNER) ---
-        // Load danh sách cho Menu Header và Select box
+        // --- 1. DATA HEADER & BANNER ---
         model.addAttribute("menuVersions", versionRepo.findAll());
         model.addAttribute("menuTypes", resetRepo.findAll());
 
-        // Load Banner (Left, Right, Hero, Standard)
         Map<String, List<HomeBanner>> banners = bannerService.getBannersForHomePage();
         model.addAttribute("bannersLeft", banners.get("LEFT_SIDEBAR"));
         model.addAttribute("bannersRight", banners.get("RIGHT_SIDEBAR"));
         model.addAttribute("bannersHero", banners.get("HERO"));
         model.addAttribute("bannersStd", banners.get("STD"));
 
-
-        // --- 2. XỬ LÝ LOGIC "AUTO-MAPPING" ---
-        // Nếu người dùng chọn Version cụ thể từ Header, ta cần xác định nó thuộc nhóm nào
-        // để hiển thị đúng trên thanh tìm kiếm (Select Box).
+        // --- 2. LOGIC GROUP VERSION ---
         if (versionId != null && versionId > 0) {
             Optional<MuVersion> verOpt = versionRepo.findById(versionId);
             if (verOpt.isPresent()) {
                 String verName = verOpt.get().getVersionName().toLowerCase();
-                // Logic tự động gán Group dựa trên tên version
-                if (matchesSeason(verName, 1, 5)) {
-                    groupVer = "1-5";
-                } else if (verName.contains("season 6") || verName.contains("ss6") || verName.contains("ss 6")) {
-                    groupVer = "6";
-                } else if (matchesSeasonAbove(verName, 7)) {
-                    groupVer = "7+";
-                }
+                if (matchesSeason(verName, 1, 5)) groupVer = "1-5";
+                else if (verName.contains("season 6") || verName.contains("ss6")) groupVer = "6";
+                else if (matchesSeasonAbove(verName, 7)) groupVer = "7+";
             }
         }
 
-        // --- 3. LOGIC TÌM KIẾM / LỌC SERVER ---
+        // --- 3. LẤY DỮ LIỆU THÔ (RAW DATA) ---
         boolean isSearching = (groupVer != null && !groupVer.isEmpty())
                 || (resetId != null && resetId > 0)
                 || (versionId != null && versionId > 0);
 
-        List<Server> searchResults = new ArrayList<>();
+        List<Server> rawCandidates;
 
         if (isSearching) {
-            // == TRƯỜNG HỢP CÓ TÌM KIẾM ==
+            // Trường hợp tìm kiếm
             List<Integer> targetVersionIds = null;
-
-            // Ưu tiên 1: Tìm chính xác theo ID (Click từ Header)
             if (versionId != null && versionId > 0) {
-                targetVersionIds = new ArrayList<>();
-                targetVersionIds.add(versionId);
-            }
-            // Ưu tiên 2: Tìm theo Nhóm (Chọn từ Search Bar)
-            else if (groupVer != null && !groupVer.isEmpty()) {
+                targetVersionIds = List.of(versionId);
+            } else if (groupVer != null && !groupVer.isEmpty()) {
                 targetVersionIds = getVersionIdsByGroup(groupVer);
             }
-
-            // Gọi Repository tìm kiếm
-            searchResults = serverRepository.searchServers(resetId, targetVersionIds);
-
-            // Đánh dấu là đang search để hiển thị tiêu đề phù hợp ở View
+            // Gọi search (có thể hàm này trong Repository quên lọc active = 1)
+            rawCandidates = serverRepository.searchServers(resetId, targetVersionIds);
             model.addAttribute("isSearching", true);
-
         } else {
-            // == TRƯỜNG HỢP MẶC ĐỊNH (TRANG CHỦ) ==
-            // Nếu không search, lấy toàn bộ server (sau đó lọc theo gói banner ở dưới)
-            // Hoặc dùng các hàm findSuperVip riêng lẻ nếu muốn tối ưu query
-            searchResults = serverRepository.findByStatusOrderByCreatedAtDesc(Server.Status.APPROVED);            // Lưu ý: Nếu findAll() quá nặng, bạn có thể quay lại cách gọi 3 hàm riêng như code cũ.
-            // Ở đây tôi dùng findAll() rồi filter stream cho code gọn gàng đồng bộ với logic search.
+            // Trường hợp mặc định
+            // Lấy TẤT CẢ server (kể cả chưa duyệt) để đưa xuống bộ lọc bên dưới xử lý
+            rawCandidates = serverRepository.findAll();
         }
 
-        // --- 4. PHÂN LOẠI LIST (SUPER VIP / VIP / NORMAL) ---
-        List<Server> superVipList = searchResults.stream()
+        // --- 4. BỘ LỌC "CHỐT CHẶN" (QUAN TRỌNG NHẤT) ---
+        // Tại đây, ta lọc bỏ tất cả các server có trạng thái không phải APPROVED (is_active != 1).
+        // Đây là lớp bảo vệ cuối cùng trước khi hiển thị.
+        List<Server> approvedServers = rawCandidates.stream()
+                .filter(s -> s.getStatus() == Server.Status.APPROVED)
+                // LƯU Ý: Nếu entity của bạn có trường isActive riêng, hãy dùng:
+                // .filter(s -> s.getIsActive() == 1)
+                .collect(Collectors.toList());
+
+        // --- 5. PHÂN LOẠI LIST (Chỉ dùng danh sách approvedServers đã lọc sạch) ---
+        List<Server> superVipList = approvedServers.stream()
                 .filter(s -> s.getBannerPackage() == Server.BannerPackage.SUPER_VIP)
                 .collect(Collectors.toList());
 
-        List<Server> vipList = searchResults.stream()
+        List<Server> vipList = approvedServers.stream()
                 .filter(s -> s.getBannerPackage() == Server.BannerPackage.VIP)
                 .collect(Collectors.toList());
 
-        List<Server> normalList = searchResults.stream()
+        List<Server> normalList = approvedServers.stream()
                 .filter(s -> s.getBannerPackage() == Server.BannerPackage.BASIC)
                 .collect(Collectors.toList());
 
-        // --- 5. ĐẨY DỮ LIỆU RA VIEW ---
-
-        // List chính dùng cho giao diện mới
+        // --- 6. TRẢ VỀ VIEW ---
         model.addAttribute("superVips", superVipList);
         model.addAttribute("vips", vipList);
         model.addAttribute("normals", normalList);
 
-        // List phụ (Legacy) để tránh lỗi nếu JSP cũ còn sót code dùng biến này
+        // Các biến cũ (Legacy)
         model.addAttribute("vipServers", vipList);
         model.addAttribute("listServers", normalList);
 
-        // Trả về tham số form để giữ trạng thái (Selected)
         model.addAttribute("selectedGroup", groupVer);
         model.addAttribute("selectedReset", resetId);
 
         return "home";
     }
 
-    /**
-     * Lấy danh sách ID của các version thuộc nhóm (1-5, 6, 7+)
-     */
+    // --- CÁC HÀM HỖ TRỢ (GIỮ NGUYÊN) ---
     private List<Integer> getVersionIdsByGroup(String group) {
         List<MuVersion> allVersions = versionRepo.findAll();
         List<Integer> ids = new ArrayList<>();
-
         for (MuVersion v : allVersions) {
             String name = v.getVersionName().toLowerCase();
-
-            if ("1-5".equals(group)) {
-                if (matchesSeason(name, 1, 5)) ids.add(v.getId());
-            } else if ("6".equals(group)) {
-                // Nhóm Season 6 (6.0 -> 6.15...)
-                if (name.contains("season 6") || name.contains("ss6") || name.contains("ss 6")) {
-                    ids.add(v.getId());
-                }
-            } else if ("7+".equals(group)) {
-                // Nhóm Season 7 trở lên
-                if (matchesSeasonAbove(name, 7)) ids.add(v.getId());
-            }
+            if ("1-5".equals(group) && matchesSeason(name, 1, 5)) ids.add(v.getId());
+            else if ("6".equals(group) && (name.contains("season 6") || name.contains("ss6"))) ids.add(v.getId());
+            else if ("7+".equals(group) && matchesSeasonAbove(name, 7)) ids.add(v.getId());
         }
         if (ids.isEmpty()) ids.add(-1);
         return ids;
@@ -169,19 +132,14 @@ public class HomeController {
 
     private boolean matchesSeason(String name, int min, int max) {
         for (int i = min; i <= max; i++) {
-            // Check các biến thể tên gọi phổ biến
-            if (name.contains("season " + i) || name.contains("ss" + i) || name.contains("ss " + i)) {
-                return true;
-            }
+            if (name.contains("season " + i) || name.contains("ss" + i)) return true;
         }
         return false;
     }
 
     private boolean matchesSeasonAbove(String name, int min) {
         for (int i = min; i <= 30; i++) {
-            if (name.contains("season " + i) || name.contains("ss" + i) || name.contains("ss " + i)) {
-                return true;
-            }
+            if (name.contains("season " + i) || name.contains("ss" + i)) return true;
         }
         return false;
     }
@@ -193,7 +151,7 @@ public class HomeController {
         return "guide";
     }
 
-    @GetMapping( "/register/login")
+    @GetMapping("/register/login")
     public String login(Model model) {
         model.addAttribute("menuVersions", versionRepo.findAll());
         model.addAttribute("menuTypes", resetRepo.findAll());

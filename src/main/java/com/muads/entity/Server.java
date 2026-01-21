@@ -39,6 +39,7 @@ public class Server {
     @Column(name = "banner_image")
     private String bannerImage;
 
+    // --- TRẠNG THÁI ---
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = false;
 
@@ -49,18 +50,19 @@ public class Server {
     @Column(name = "banner_package")
     private BannerPackage bannerPackage = BannerPackage.BASIC;
 
+    // --- THỜI GIAN HỆ THỐNG ---
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // --- QUẢN LÝ THỜI GIAN ---
+    // --- QUẢN LÝ THỜI GIAN HIỂN THỊ ---
     @Column(name = "approved_at")
     private LocalDateTime approvedAt; // Thời điểm Admin bấm nút duyệt
 
     @Column(name = "expired_at")
-    private LocalDateTime expiredAt; // Thời điểm server sẽ tự động bị tắt
+    private LocalDateTime expiredAt; // Thời điểm server sẽ tự động bị tắt (EXPIRED)
     // -------------------------
 
     @OneToOne(mappedBy = "server", cascade = CascadeType.ALL)
@@ -73,6 +75,7 @@ public class Server {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         if (isActive == null) isActive = false;
+        if (status == null) status = Status.PENDING;
     }
 
     @PreUpdate
@@ -80,15 +83,20 @@ public class Server {
         updatedAt = LocalDateTime.now();
     }
 
+    // --- 1. ENUM STATUS (Đã thêm EXPIRED) ---
     public enum Status {
-        PENDING, APPROVED, REJECTED
+        PENDING,  // Chờ duyệt
+        APPROVED, // Đang hoạt động
+        REJECTED, // Từ chối
+        EXPIRED   // Hết hạn
     }
 
+    // --- 2. ENUM BANNER PACKAGE (Đã cập nhật ngày) ---
     @Getter
     public enum BannerPackage {
         BASIC(0, "Cơ bản (Miễn phí)", 10),       // 10 Ngày
         VIP(5000, "VIP (5.000 Xu)", 10),           // 10 Ngày
-        SUPER_VIP(10000, "Super VIP (10.000 Xu)", 10); // 10 Ngày
+        SUPER_VIP(10000, "Super VIP (10.000 Xu)", 14); // 14 Ngày
 
         private final int price;
         private final String label;

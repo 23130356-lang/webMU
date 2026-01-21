@@ -159,8 +159,8 @@
 
         <a href="/" class="mh-logo-link">
             <div class="mh-brand-main">
-                <span class="mh-brand-gold metal-text">MU</span>
-                <span class="mh-brand-platinum metal-text">XUA.CO</span>
+                <span class="mh-brand-gold metal-text">MUNORIA</span>
+                <span class="mh-brand-platinum metal-text">.MOBILE</span>
             </div>
             <div class="mh-brand-desc">Huyền Thoại Trở Lại</div>
         </a>
