@@ -8,9 +8,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 
     <style>
-        /* === GLOBAL THEME (Copy từ Profile) === */
+        /* === GLOBAL THEME === */
         :root { --mu-bg: #050505; --mu-gold: #cfaa56; --mu-red: #8b0000; --mu-red-bright: #dc3545; --mu-glass: rgba(15, 15, 15, 0.95); --mu-border: #3d2b1f; }
         body { background-color: var(--mu-bg); color: #d1d1d1; font-family: 'Rajdhani', sans-serif; background-image: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.95)), url('https://wallpaperaccess.com/full/1524368.jpg'); background-size: cover; background-attachment: fixed; background-position: center; }
         h1, h2, h3, h4, h5 { font-family: 'Cinzel', serif; text-transform: uppercase; letter-spacing: 1px; }
@@ -39,24 +40,20 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
-        .server-thumb {
-            width: 100%;
-            height: 100px;
-            object-fit: fill;
-            border-bottom: 1px solid #333;
-        }
-        .status-badge {
-            position: absolute; top: 10px; right: 10px;
-            font-size: 0.7rem; font-weight: bold; padding: 4px 8px; border-radius: 2px;
-            text-transform: uppercase; font-family: 'Cinzel', serif;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
+        .server-thumb { width: 100%; height: 100px; object-fit: fill; border-bottom: 1px solid #333; }
+
+        /* Badges */
+        .status-badge { position: absolute; top: 10px; right: 10px; font-size: 0.7rem; font-weight: bold; padding: 4px 8px; border-radius: 2px; text-transform: uppercase; font-family: 'Cinzel', serif; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         .status-approved { background: #198754; color: white; border: 1px solid #146c43; }
         .status-pending { background: #ffc107; color: black; border: 1px solid #d39e00; }
         .status-rejected { background: var(--mu-red); color: white; border: 1px solid #5c0000; }
+        .status-expired { background: #6c757d; color: white; border: 1px solid #495057; }
 
         .meta-info { font-size: 0.9rem; color: #aaa; }
         .meta-info i { width: 20px; text-align: center; color: var(--mu-gold); margin-right: 5px; }
+
+        /* Custom SweetAlert Popup Style */
+        .swal2-popup.mu-popup { border: 1px solid var(--mu-gold) !important; box-shadow: 0 0 20px rgba(207, 170, 86, 0.2); }
     </style>
 </head>
 <body>
@@ -86,9 +83,6 @@
                     <a href="/server-register" class="btn btn-gold btn-sm"><i class="fa-solid fa-plus-circle me-1"></i> Đăng Mới</a>
                 </div>
 
-                <c:if test="${not empty successMessage}"><div class="alert alert-success bg-dark text-success border-success mb-3"><i class="fa-solid fa-check me-2"></i> ${successMessage}</div></c:if>
-                <c:if test="${not empty errorMessage}"><div class="alert alert-danger bg-dark text-danger border-danger mb-3"><i class="fa-solid fa-bug me-2"></i> ${errorMessage}</div></c:if>
-
                 <div class="row g-3">
                     <c:forEach var="sv" items="${servers}">
                         <div class="col-md-6">
@@ -97,6 +91,7 @@
                                     <c:when test="${sv.status == 'APPROVED'}"><span class="status-badge status-approved">Đang chạy</span></c:when>
                                     <c:when test="${sv.status == 'PENDING'}"><span class="status-badge status-pending">Chờ duyệt</span></c:when>
                                     <c:when test="${sv.status == 'REJECTED'}"><span class="status-badge status-rejected">Từ chối</span></c:when>
+                                    <c:when test="${sv.status == 'EXPIRED'}"><span class="status-badge status-expired">Hết hạn</span></c:when>
                                 </c:choose>
 
                                 <img src="${sv.bannerImage}" class="server-thumb" alt="Banner">
@@ -113,18 +108,18 @@
                                         </span>
                                     </div>
                                     <div class="meta-info mb-3">
-                                        <i class="fa-solid fa-crown"></i> Gói: <span class="text-warning">${sv.bannerPackage}</span>
+                                        <i class="fa-solid fa-crown"></i> Gói: <span class="text-warning">${sv.bannerPackage.label}</span>
                                     </div>
 
                                     <div class="d-flex gap-2">
                                         <a href="/manage/servers/edit/${sv.id}" class="btn btn-outline-light btn-sm w-50" style="border-color: #555;">
                                             <i class="fa-solid fa-pen-nib"></i> Sửa
                                         </a>
-                                        <a href="/manage/servers/renew/${sv.id}"
-                                           class="btn btn-outline-warning btn-sm w-50 text-gold border-warning"
-                                           onclick="return confirm('Gia hạn gói ${sv.bannerPackage.label}?\nGiá: ${sv.bannerPackage.price} Xu / 10 Ngày\nBạn có chắc chắn muốn tiếp tục?');">
+
+                                        <button onclick="confirmRenew(${sv.id}, '${sv.bannerPackage.label}', ${sv.bannerPackage.price}, ${sv.bannerPackage.durationDays})"
+                                                class="btn btn-outline-warning btn-sm w-50 text-gold border-warning">
                                             <i class="fa-solid fa-cart-arrow-down"></i> Gia Hạn
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -144,5 +139,87 @@
 </div>
 
 <jsp:include page="../footer.jsp" />
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // 1. Hàm hiển thị Popup Xác nhận Gia hạn
+    function confirmRenew(serverId, packLabel, packPrice, packDays) {
+        Swal.fire({
+            title: '<span style="color: #cfaa56; font-family: Cinzel, serif; font-weight: 700;">XÁC NHẬN GIA HẠN</span>',
+            html: `
+                <div style="color: #ccc; font-family: Rajdhani, sans-serif; font-size: 16px;">
+                    Bạn đang chọn gia hạn gói <b style="color: #fff; text-transform: uppercase;">` + packLabel + `</b><br>
+                    <div style="margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.4); border: 1px dashed #555; border-radius: 6px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 8px; margin-bottom: 8px;">
+                            <span>Chi phí:</span>
+                            <span style="color: #cfaa56; font-size: 18px; font-weight: bold;">` + packPrice.toLocaleString() + ` Xu</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Thời gian cộng thêm:</span>
+                            <span style="color: #fff; font-weight: bold;">+` + packDays + ` Ngày</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 14px; color: #888;">Hành động này sẽ trừ Xu trực tiếp vào tài khoản.</div>
+                </div>
+            `,
+            icon: 'question',
+            iconColor: '#cfaa56',
+            background: 'rgba(15, 15, 15, 0.98)', // Nền tối
+            showCancelButton: true,
+            confirmButtonText: '<i class="fa-solid fa-check"></i> ĐỒNG Ý',
+            cancelButtonText: '<i class="fa-solid fa-xmark"></i> HỦY BỎ',
+            confirmButtonColor: '#8b0000', // Đỏ đậm
+            cancelButtonColor: '#333',
+            buttonsStyling: true,
+            customClass: {
+                popup: 'mu-popup border border-warning' // Thêm viền vàng
+            },
+            focusConfirm: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Chuyển hướng đến URL xử lý gia hạn
+                window.location.href = "/manage/servers/renew/" + serverId;
+            }
+        });
+    }
+
+    // 2. Kiểm tra URL để hiển thị thông báo kết quả (Success/Error)
+    document.addEventListener("DOMContentLoaded", function() {
+        // Lấy tham số 'status' và 'message' từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');
+        const message = urlParams.get('message'); // Lấy thông báo lỗi cụ thể (nếu có)
+
+        if (status === 'success') {
+            Swal.fire({
+                title: '<span style="color: #cfaa56; font-family: Cinzel, serif;">THÀNH CÔNG!</span>',
+                html: '<span style="color: #ccc;">Thao tác của bạn đã được thực hiện thành công.<br>Hệ thống đã cập nhật dữ liệu mới.</span>',
+                icon: 'success',
+                background: 'rgba(15, 15, 15, 0.95)',
+                confirmButtonText: 'TUYỆT VỜI',
+                confirmButtonColor: '#8b0000',
+                customClass: { popup: 'border border-warning' }
+            }).then(() => {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        }
+
+        if (status === 'error') {
+            Swal.fire({
+                icon: 'error',
+                title: '<span style="color: #dc3545;">CÓ LỖI XẢY RA!</span>',
+                html: '<span style="color: #ccc;">' + (message ? message : 'Thao tác thất bại. Vui lòng kiểm tra lại số dư hoặc thử lại sau.') + '</span>',
+                background: '#1a1a1a',
+                confirmButtonText: 'ĐÓNG',
+                confirmButtonColor: '#444',
+                customClass: { popup: 'border border-danger' }
+            }).then(() => {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        }
+    });
+</script>
+
 </body>
 </html>

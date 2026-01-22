@@ -49,7 +49,7 @@ public class BannerRegisterController {
     private Map<String, Integer> getPriceList() {
         Map<String, Integer> priceList = new HashMap<>();
         priceList.put("HERO", 500000);
-        priceList.put("STD", 100000);
+        priceList.put("STD", 100);
         priceList.put("LEFT_SIDEBAR", 50000);
         priceList.put("RIGHT_SIDEBAR", 50000);
         return priceList;

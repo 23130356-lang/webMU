@@ -89,9 +89,9 @@ public class Server {
 
     @Getter
     public enum BannerPackage {
-        BASIC(0, "Cơ bản (Miễn phí)", 7),
+        BASIC(0, "Cơ bản (Miễn phí)", 10),
         VIP(100, "VIP (100 Xu)", 10),
-        SUPER_VIP(200, "Super VIP (2000 Xu)", 14);
+        SUPER_VIP(200, "Super VIP (200 Xu)", 14);
 
         private final int price;
         private final String label;

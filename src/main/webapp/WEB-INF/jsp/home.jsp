@@ -3,6 +3,18 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
+<jsp:useBean id="now" class="java.util.Date" />
+<fmt:formatDate var="todayStr" value="${now}" pattern="dd/MM/yyyy" />
+<%
+    java.util.Calendar cal = java.util.Calendar.getInstance();
+    cal.add(java.util.Calendar.DATE, -1);
+    request.setAttribute("dateYesterday", cal.getTime());
+    cal.add(java.util.Calendar.DATE, 2); // +2 vì đang ở -1
+    request.setAttribute("dateTomorrow", cal.getTime());
+%>
+<fmt:formatDate var="yesterdayStr" value="${dateYesterday}" pattern="dd/MM/yyyy" />
+<fmt:formatDate var="tomorrowStr" value="${dateTomorrow}" pattern="dd/MM/yyyy" />
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -29,6 +41,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* === GIỮ NGUYÊN 100% CSS CŨ CỦA BẠN === */
         :root {
             --mu-bg: #050505;
             --mu-panel-bg: rgba(12, 12, 12, 0.95);
@@ -45,19 +58,19 @@
             background-attachment: fixed;
             font-family: 'Rajdhani', sans-serif;
             color: var(--mu-text);
-            min-width: 1400px; /* Giữ layout chuẩn web game */
+            min-width: 1400px;
             overflow-x: auto;
             margin: 0;
         }
 
         a { text-decoration: none; transition: 0.3s; }
 
-        /* === LAYOUT CHÍNH === */
+        /* Layout */
         .main-wrapper { display: flex; justify-content: center; gap: 15px; padding: 15px; max-width: 1900px; margin: 0 auto; }
         .sidebar { width: 280px; min-width: 280px; flex-shrink: 0; display: flex; flex-direction: column; gap: 15px; }
         .content-area { flex-grow: 1; max-width: 750px; }
 
-        /* === QUẢNG CÁO (BANNER) === */
+        /* Banners */
         .mu-item-frame {
             display: block; width: 100%; border: 1px solid var(--mu-border); background: #000;
             position: relative; transition: all 0.3s ease; box-shadow: 0 0 10px rgba(0,0,0,0.8);
@@ -73,17 +86,17 @@
         .ads-placeholder { display: flex; justify-content: center; align-items: center; background: rgba(255, 255, 255, 0.03); border: 1px dashed var(--mu-gold-dark); color: #666; }
         .ads-text { font-family: 'Cinzel', serif; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; }
 
-        /* === ANIMATIONS === */
+        /* Animations */
         @keyframes spinBorder { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
         @keyframes shimmerGold { 0% { background-position: -150% 0; } 100% { background-position: 150% 0; } }
         @keyframes pulseRed { 0% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.3); } 50% { box-shadow: 0 0 25px rgba(255, 0, 0, 0.7); } 100% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.3); } }
 
-        /* === SERVER SECTION === */
+        /* Server Section */
         .server-section { background: var(--mu-panel-bg); border: 1px solid var(--mu-border); box-shadow: 0 0 30px rgba(0,0,0,0.8); margin-bottom: 15px; width: 100%; }
         .section-header { background: linear-gradient(90deg, #330000 0%, #1a0505 100%); border-bottom: 1px solid var(--mu-red); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
         .section-title { font-family: 'Cinzel', serif; font-weight: 700; color: var(--mu-gold); font-size: 1.1rem; margin: 0; }
 
-        /* CSS FILTER BAR */
+        /* Filter Bar */
         .filter-bar { padding: 10px 15px; background: rgba(0,0,0,0.5); border-bottom: 1px solid #333; display: flex; gap: 10px; align-items: center; }
         .mu-select { background-color: #000; color: #ccc; border: 1px solid #444; font-size: 0.85rem; padding: 5px 10px; font-family: 'Rajdhani', sans-serif; cursor: pointer; }
         .mu-select:focus { outline: none; border-color: var(--mu-gold); box-shadow: 0 0 5px rgba(207, 170, 86, 0.5); }
@@ -97,7 +110,7 @@
         .hdr-right { width: 70%; display: flex; justify-content: space-between; padding-right: 15px; text-align: center; }
         .hdr-item { flex: 1; }
 
-        /* === ROW STYLES === */
+        /* Row Styles */
         .srv-row-inner { display: flex; align-items: center; padding: 12px 0; position: relative; z-index: 2; width: 100%; height: 100%; }
         .col-left-identity { width: 30%; padding-left: 20px; padding-right: 10px; display: flex; flex-direction: column; justify-content: center; }
         .col-right-wrapper { width: 70%; display: flex; flex-direction: column; padding: 0 15px; justify-content: center; gap: 8px; }
@@ -106,7 +119,7 @@
         .banner-line { width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 5px; }
         .inner-banner-img { width: 100%; height: 60px; object-fit: fill; border-radius: 2px; border: 1px solid #333; }
 
-        /* SVIP, VIP, NORMAL styles (giữ nguyên như cũ) */
+        /* SVIP Wrapper */
         .svip-wrapper { position: relative; margin-bottom: 14px; border-radius: 6px; padding: 4px; overflow: hidden; animation: pulseRed 1s infinite alternate; background: #000; }
         .svip-wrapper::before, .svip-wrapper::after { content: ''; position: absolute; top: 50%; left: 50%; width: 300%; height: 1000%; background: conic-gradient(transparent 0deg, transparent 140deg, #da0000 160deg, #ff7300 170deg, #ffff00 175deg, #ffffff 180deg, #ffff00 185deg, #ff7300 190deg, #da0000 200deg, transparent 220deg); transform: translate(-50%, -50%); animation: spinBorder 2.5s linear infinite; z-index: 1; }
         .svip-wrapper::after { animation-delay: -1.25s; }
@@ -115,6 +128,7 @@
         .btn-view-svip { background: linear-gradient(180deg, #cc0000 0%, #660000 100%); border: 1px solid #ff3333; color: #fff; padding: 4px 15px; font-size: 0.75rem; }
         .btn-view-svip:hover { box-shadow: 0 0 15px red; color: #fff; transform: scale(1.05); }
 
+        /* VIP Wrapper */
         .vip-wrapper { position: relative; margin-bottom: 10px; border-radius: 4px; padding: 2px; background: linear-gradient(110deg, #333 30%, #cfaa56 45%, #fff 50%, #cfaa56 55%, #333 70%); background-size: 200% 100%; animation: shimmerGold 2.5s linear infinite; box-shadow: 0 0 5px rgba(207, 170, 86, 0.2); }
         .vip-content { position: relative; z-index: 2; background: linear-gradient(90deg, #1a1a1a 0%, #0c0c0c 100%); border-radius: 3px; }
         .name-vip { color: var(--mu-gold); font-size: 1.1rem; font-weight: 700; font-family: 'Cinzel', serif; }
@@ -122,11 +136,37 @@
         .btn-view:hover { background: var(--mu-gold); color: #000; }
         .vip-content .inner-banner-img { height: 50px; border-color: #444; }
 
+        /* Normal Wrapper */
         .normal-wrapper { border-bottom: 1px solid #222; transition: 0.2s; }
         .normal-wrapper:hover { background-color: rgba(255, 255, 255, 0.02); }
         .name-normal { color: #ccc; font-weight: 600; font-size: 0.95rem; }
         .badge-ver { background: #222; border: 1px solid #444; color: #aaa; padding: 2px 6px; font-size: 0.7rem; }
         .badge-svip { background: #d00; color: #fff; font-size: 0.7rem; padding: 1px 5px; font-weight: bold; border-radius: 2px; }
+
+        /* === [NEW] CSS BỔ SUNG CHO WIDGET LỊCH & BADGE NGÀY === */
+        .schedule-widget { margin-top: 20px; border: 1px solid var(--mu-border); background: #000; padding: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
+        .sw-header { color: #fff; font-family: 'Cinzel'; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; font-size: 1rem; font-weight: bold; }
+        .sw-grid { display: flex; gap: 15px; }
+        .sw-col { flex: 1; }
+        .sw-btn-big { display: block; width: 100%; padding: 20px 0; text-align: center; text-decoration: none; transition: 0.3s; border: 1px solid #333; }
+        .sw-btn-big:hover { transform: translateY(-3px); box-shadow: 0 5px 20px rgba(0,0,0,0.6); }
+
+        .open-btn { background: linear-gradient(180deg, #2b1d00 0%, #000 100%); border-bottom: 3px solid var(--mu-gold); }
+        .open-btn .big-title { color: var(--mu-gold); font-family: 'Cinzel'; font-size: 1.2rem; font-weight: bold; text-shadow: 0 0 10px rgba(207, 170, 86, 0.3); }
+        .open-btn:hover { border-color: #ffd700; background: linear-gradient(180deg, #3d2b05 0%, #050505 100%); }
+
+        .test-btn { background: linear-gradient(180deg, #001a2b 0%, #000 100%); border-bottom: 3px solid #00eaff; }
+        .test-btn .big-title { color: #00eaff; font-family: 'Cinzel'; font-size: 1.2rem; font-weight: bold; text-shadow: 0 0 10px rgba(0, 234, 255, 0.3); }
+        .test-btn:hover { border-color: #fff; background: linear-gradient(180deg, #002a45 0%, #050505 100%); }
+
+        .big-sub { color: #888; font-size: 0.8rem; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .sw-btn-big:hover .big-sub { color: #ccc; }
+
+        /* Badge Ngày */
+        .day-badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; margin-left: 8px; text-transform: uppercase; font-weight: bold; display: inline-block; vertical-align: middle; position: relative; top: -1px; }
+        .day-today { background: #008000; color: #fff; box-shadow: 0 0 5px #00ff00; border: 1px solid #00ff00; }
+        .day-tomorrow { background: #0056b3; color: #fff; border: 1px solid #00aaff; }
+        .day-yesterday { background: #333; color: #999; border: 1px solid #555; }
     </style>
 </head>
 <body>
@@ -266,7 +306,12 @@
                 <div class="hdr-right">
                     <div class="hdr-item">Phiên bản</div>
                     <div class="hdr-item">Reset</div>
-                    <div class="hdr-item">Open Beta</div>
+                    <div class="hdr-item">
+                        <c:choose>
+                            <c:when test="${currentFilterType == 'test'}">Alpha Test</c:when>
+                            <c:otherwise>Open Beta</c:otherwise>
+                        </c:choose>
+                    </div>
                     <div class="hdr-item">Chi tiết</div>
                 </div>
             </div>
@@ -274,6 +319,17 @@
             <div style="padding: 15px;">
 
                 <c:forEach var="sv" items="${superVips}">
+                    <c:set var="svDate" value="${not empty currentFilterType && currentFilterType == 'test' ? sv.schedule.alphaDate : sv.schedule.betaDate}" />
+                    <c:set var="badgeHtml" value="" />
+
+                    <c:if test="${not empty currentFilterDay}">
+                        <c:choose>
+                            <c:when test="${svDate == todayStr}"><c:set var="badgeHtml" value="<span class='day-badge day-today'>HÔM NAY</span>"/></c:when>
+                            <c:when test="${svDate == tomorrowStr}"><c:set var="badgeHtml" value="<span class='day-badge day-tomorrow'>NGÀY MAI</span>"/></c:when>
+                            <c:when test="${svDate == yesterdayStr}"><c:set var="badgeHtml" value="<span class='day-badge day-yesterday'>HÔM QUA</span>"/></c:when>
+                        </c:choose>
+                    </c:if>
+
                     <div class="svip-wrapper">
                         <div class="svip-content">
                             <div class="srv-row-inner">
@@ -281,6 +337,7 @@
                                     <div class="d-flex align-items-center mb-1">
                                         <span class="badge badge-svip me-2">HOT</span>
                                         <a href="/server/detail/${sv.id}" class="name-super-vip">${sv.serverName}</a>
+                                            ${badgeHtml}
                                     </div>
                                     <div style="font-size: 0.8rem; color: #ddd; line-height: 1.2;">
                                         <img src="https://cdn.pixabay.com/animation/2025/11/03/21/48/21-48-26-427_512.gif" style="width: 20px; margin-right: 5px;" alt="icon">
@@ -294,7 +351,11 @@
                                     <div class="stats-line">
                                         <div class="stat-box"><span class="badge-ver text-warning">${sv.serverStat.muVersion.versionName}</span></div>
                                         <div class="stat-box text-light fw-bold">${sv.serverStat.resetType.resetName}</div>
-                                        <div class="stat-box text-danger fw-bold" style="font-size: 1rem;">${sv.schedule.betaDate}</div>
+
+                                        <div class="stat-box text-danger fw-bold" style="font-size: 1rem;">
+                                                ${svDate}
+                                        </div>
+
                                         <div class="stat-box"><a href="/server/detail/${sv.id}" class="btn-view btn-view-svip">XEM NGAY</a></div>
                                     </div>
                                     <div class="banner-line">
@@ -314,6 +375,17 @@
                 </c:forEach>
 
                 <c:forEach var="sv" items="${vips}">
+                    <c:set var="svDate" value="${not empty currentFilterType && currentFilterType == 'test' ? sv.schedule.alphaDate : sv.schedule.betaDate}" />
+                    <c:set var="badgeHtml" value="" />
+
+                    <c:if test="${not empty currentFilterDay}">
+                        <c:choose>
+                            <c:when test="${svDate == todayStr}"><c:set var="badgeHtml" value="<span class='day-badge day-today'>HÔM NAY</span>"/></c:when>
+                            <c:when test="${svDate == tomorrowStr}"><c:set var="badgeHtml" value="<span class='day-badge day-tomorrow'>NGÀY MAI</span>"/></c:when>
+                            <c:when test="${svDate == yesterdayStr}"><c:set var="badgeHtml" value="<span class='day-badge day-yesterday'>HÔM QUA</span>"/></c:when>
+                        </c:choose>
+                    </c:if>
+
                     <div class="vip-wrapper">
                         <div class="vip-content">
                             <div class="srv-row-inner">
@@ -321,6 +393,7 @@
                                     <div class="d-flex align-items-center mb-1">
                                         <i class="fa-solid fa-star text-warning me-2" style="font-size: 0.7rem;"></i>
                                         <a href="/server/detail/${sv.id}" class="name-vip">${sv.serverName}</a>
+                                            ${badgeHtml}
                                     </div>
                                     <div style="font-size: 0.75rem; color: #888;">${sv.muName}</div>
                                 </div>
@@ -329,7 +402,7 @@
                                     <div class="stats-line">
                                         <div class="stat-box"><span class="badge-ver">${sv.serverStat.muVersion.versionName}</span></div>
                                         <div class="stat-box text-secondary">${sv.serverStat.resetType.resetName}</div>
-                                        <div class="stat-box text-light">${sv.schedule.betaDate}</div>
+                                        <div class="stat-box text-light">${svDate}</div>
                                         <div class="stat-box"><a href="/server/detail/${sv.id}" class="btn-view">XEM</a></div>
                                     </div>
                                     <div class="banner-line">
@@ -347,10 +420,23 @@
                 </c:forEach>
 
                 <c:forEach var="sv" items="${normals}">
+                    <c:set var="svDate" value="${not empty currentFilterType && currentFilterType == 'test' ? sv.schedule.alphaDate : sv.schedule.betaDate}" />
+                    <c:set var="badgeHtml" value="" />
+                    <c:if test="${not empty currentFilterDay}">
+                        <c:choose>
+                            <c:when test="${svDate == todayStr}"><c:set var="badgeHtml" value="<span class='day-badge day-today'>HÔM NAY</span>"/></c:when>
+                            <c:when test="${svDate == tomorrowStr}"><c:set var="badgeHtml" value="<span class='day-badge day-tomorrow'>NGÀY MAI</span>"/></c:when>
+                            <c:when test="${svDate == yesterdayStr}"><c:set var="badgeHtml" value="<span class='day-badge day-yesterday'>HÔM QUA</span>"/></c:when>
+                        </c:choose>
+                    </c:if>
+
                     <div class="normal-wrapper">
                         <div class="srv-row-inner">
                             <div class="col-left-identity">
-                                <a href="/server/detail/${sv.id}" class="name-normal mb-1">${sv.serverName}</a>
+                                <div class="d-flex align-items-center">
+                                    <a href="/server/detail/${sv.id}" class="name-normal mb-1">${sv.serverName}</a>
+                                        ${badgeHtml}
+                                </div>
                                 <div style="font-size: 0.75rem; color: #555;">${sv.muName}</div>
                             </div>
 
@@ -360,7 +446,7 @@
                                         <span class="badge-ver" style="border:none; background:transparent;">${sv.serverStat.muVersion.versionName}</span>
                                     </div>
                                     <div class="stat-box text-secondary small">${sv.serverStat.resetType.resetName}</div>
-                                    <div class="stat-box text-secondary small">${sv.schedule.betaDate}</div>
+                                    <div class="stat-box text-secondary small">${svDate}</div>
                                     <div class="stat-box">
                                         <a href="/server/detail/${sv.id}" class="btn-view" style="color: #666; border-color: #444;">Xem</a>
                                     </div>
@@ -387,6 +473,25 @@
 
             </div>
         </div>
+
+        <div class="schedule-widget">
+            <div class="sw-header"><i class="fa-regular fa-calendar-days me-2"></i> Lịch Ra Mắt Server (Hôm qua - Nay - Mai)</div>
+            <div class="sw-grid">
+                <div class="sw-col">
+                    <a href="/?filterType=open&filterDay=3days" class="sw-btn-big open-btn">
+                        <div class="big-title">LỊCH OPEN BETA</div>
+                        <div class="big-sub">Danh sách 3 ngày gần nhất</div>
+                    </a>
+                </div>
+                <div class="sw-col">
+                    <a href="/?filterType=test&filterDay=3days" class="sw-btn-big test-btn">
+                        <div class="big-title">LỊCH ALPHA TEST</div>
+                        <div class="big-sub">Danh sách 3 ngày gần nhất</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <aside class="sidebar">

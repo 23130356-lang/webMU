@@ -3,7 +3,7 @@ package com.muads.service;
 import com.muads.dto.ServerRegisterDTO;
 import com.muads.entity.*;
 import com.muads.repository.*;
-import jakarta.transaction.Transactional; // Dùng Jakarta cho Spring Boot 3
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -12,8 +12,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ServerService {
@@ -24,11 +26,12 @@ public class ServerService {
     @Autowired private ResetTypeRepository resetRepo;
     @Autowired private PointTypeRepository pointRepo;
 
-    // --- 1. ĐĂNG KÝ SERVER (Logic của bạn) ---
+    // =========================================================================
+    // 1. ĐĂNG KÝ SERVER (Đã sửa: Dùng LocalDate trực tiếp)
+    // =========================================================================
     @Transactional
     public void registerServer(ServerRegisterDTO dto, User owner) {
-
-        // Xử lý gói & Check Slot (30 SuperVIP / 8 VIP)
+        // --- A. Xử lý gói Banner & Check Slot ---
         Server.BannerPackage selectedPackage;
         try {
             if (dto.getBannerPackage() != null && !dto.getBannerPackage().isEmpty()) {
@@ -40,7 +43,7 @@ public class ServerService {
             selectedPackage = Server.BannerPackage.BASIC;
         }
 
-        // Logic check slot: Chỉ đếm các server APPROVED
+        // Check giới hạn slot
         if (selectedPackage == Server.BannerPackage.SUPER_VIP) {
             long count = serverRepository.countByBannerPackageAndStatusAndIsActiveTrue(Server.BannerPackage.SUPER_VIP, Server.Status.APPROVED);
             if (count >= 30) selectedPackage = Server.BannerPackage.BASIC;
@@ -49,6 +52,7 @@ public class ServerService {
             if (count >= 8) selectedPackage = Server.BannerPackage.BASIC;
         }
 
+        // --- B. Tạo Entity Server ---
         Server server = new Server();
         server.setBannerPackage(selectedPackage);
         server.setServerName(dto.getServerName());
@@ -61,7 +65,7 @@ public class ServerService {
         server.setIsActive(false);
         server.setUser(owner);
 
-        // Ảnh Banner
+        // Xử lý ảnh Banner
         if (dto.getBannerUrl() != null && !dto.getBannerUrl().trim().isEmpty()) {
             server.setBannerImage(dto.getBannerUrl().trim());
         } else {
@@ -70,16 +74,20 @@ public class ServerService {
 
         server = serverRepository.save(server);
 
-        // Lưu Schedule
+        // --- C. Lưu Lịch (FIX LỖI: Gán trực tiếp LocalDate) ---
         ServerSchedule schedule = new ServerSchedule();
+
+        // Không cần format String nữa, gán thẳng LocalDate từ DTO sang Entity
         schedule.setAlphaDate(dto.getAlphaDate());
         schedule.setAlphaTime(dto.getAlphaTime());
+
         schedule.setBetaDate(dto.getBetaDate());
         schedule.setBetaTime(dto.getBetaTime());
+
         schedule.setServer(server);
         scheduleRepository.save(schedule);
 
-        // Lưu Stat
+        // --- D. Lưu Thông Số ---
         ServerStat stat = new ServerStat();
         stat.setExpRate(dto.getExpRate());
         stat.setDropRate(dto.getDropRate());
@@ -95,27 +103,27 @@ public class ServerService {
         serverRepository.save(server);
     }
 
-    // --- 2. DUYỆT SERVER (Kèm logic tính ngày hết hạn) ---
+    // =========================================================================
+    // 2. DUYỆT SERVER
+    // =========================================================================
     @Transactional
     public void approveServer(Long serverId) {
         Server server = getServerById(serverId);
-
-        // Cập nhật trạng thái
         server.setStatus(Server.Status.APPROVED);
         server.setIsActive(true);
 
         LocalDateTime now = LocalDateTime.now();
         server.setApprovedAt(now);
 
-        // Tự động tính ngày hết hạn dựa vào Enum BannerPackage
-        // SuperVIP = 14 ngày, còn lại = 10 ngày
         int days = server.getBannerPackage().getDurationDays();
         server.setExpiredAt(now.plusDays(days));
 
         serverRepository.save(server);
     }
 
-    // --- 3. TỪ CHỐI SERVER ---
+    // =========================================================================
+    // 3. TỪ CHỐI & XÓA SERVER
+    // =========================================================================
     @Transactional
     public void rejectServer(Long serverId) {
         Server server = getServerById(serverId);
@@ -124,27 +132,101 @@ public class ServerService {
         serverRepository.save(server);
     }
 
-    // --- 4. [MỚI] TỰ ĐỘNG QUÉT SERVER HẾT HẠN ---
-    // Chạy mỗi 30 phút (1800000 ms)
+    @Transactional
+    public void deleteServer(Long serverId) {
+        Server server = getServerById(serverId);
+        if (server.getBannerImage() != null && !server.getBannerImage().isEmpty()) {
+            try {
+                Path imagePath = Paths.get("src/main/webapp/uploads").resolve(server.getBannerImage());
+                Files.deleteIfExists(imagePath);
+            } catch (IOException e) {
+                System.err.println("Lỗi xóa ảnh: " + e.getMessage());
+            }
+        }
+        serverRepository.delete(server);
+    }
+
+    // =========================================================================
+    // 4. CRON JOB
+    // =========================================================================
     @Scheduled(fixedRate = 1800000)
     @Transactional
     public void autoExpireServers() {
         LocalDateTime now = LocalDateTime.now();
-
-        // Tìm các server đang APPROVED mà expiredAt < hiện tại
         List<Server> expiredServers = serverRepository.findByStatusAndExpiredAtBefore(Server.Status.APPROVED, now);
 
         if (!expiredServers.isEmpty()) {
             for (Server s : expiredServers) {
-                s.setStatus(Server.Status.EXPIRED); // Chuyển sang EXPIRED
-                s.setIsActive(false);               // Tắt hiển thị
-
-                // (Tuỳ chọn) Có thể reset về gói BASIC để lần sau họ gia hạn
-                // s.setBannerPackage(Server.BannerPackage.BASIC);
+                s.setStatus(Server.Status.EXPIRED);
+                s.setIsActive(false);
             }
             serverRepository.saveAll(expiredServers);
             System.out.println("CronJob: Đã chuyển " + expiredServers.size() + " server sang trạng thái EXPIRED.");
         }
+    }
+
+    // =========================================================================
+    // 5. LỌC SERVER THEO NGÀY (Đã sửa: So sánh LocalDate)
+    // =========================================================================
+    public List<Server> filterServersByTime(String filterType, String filterDay) {
+        // 1. Lấy tất cả server ACTIVE
+        List<Server> activeServers = serverRepository.findByStatusOrderByCreatedAtDesc(Server.Status.APPROVED).stream()
+                .filter(s -> Boolean.TRUE.equals(s.getIsActive()))
+                .collect(Collectors.toList());
+
+        // 2. Lấy danh sách các NGÀY (LocalDate) cần tìm
+        List<LocalDate> targetDates = getTargetDates(filterDay);
+
+        // 3. Lọc trong Java (So sánh LocalDate)
+        return activeServers.stream()
+                .filter(s -> {
+                    if (s.getSchedule() == null) return false;
+
+                    LocalDate serverDate;
+                    if ("test".equalsIgnoreCase(filterType)) {
+                        serverDate = s.getSchedule().getAlphaDate();
+                    } else {
+                        serverDate = s.getSchedule().getBetaDate(); // Mặc định Open
+                    }
+
+                    if (serverDate == null) return false;
+
+                    // So sánh: Ngày server có nằm trong danh sách cần tìm không?
+                    return targetDates.contains(serverDate);
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Helper: Tạo danh sách LocalDate dựa trên filterDay
+     */
+    private List<LocalDate> getTargetDates(String filterDay) {
+        List<LocalDate> dates = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        if (filterDay == null) filterDay = "today";
+
+        switch (filterDay.toLowerCase()) {
+            case "yesterday":
+                dates.add(today.minusDays(1));
+                break;
+
+            case "tomorrow":
+                dates.add(today.plusDays(1));
+                break;
+
+            case "3days":
+                dates.add(today.minusDays(1)); // Qua
+                dates.add(today);              // Nay
+                dates.add(today.plusDays(1));  // Mai
+                break;
+
+            case "today":
+            default:
+                dates.add(today);
+                break;
+        }
+        return dates;
     }
 
     // Helpers
@@ -159,23 +241,5 @@ public class ServerService {
     public Server getServerById(Long id) {
         return serverRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy Server ID: " + id));
-    }
-    @Transactional
-    public void deleteServer(Long serverId) {
-        Server server = getServerById(serverId);
-
-        // 1. Xóa ảnh Banner vật lý (nếu có) để giải phóng dung lượng
-        if (server.getBannerImage() != null && !server.getBannerImage().isEmpty()) {
-            try {
-
-                Path imagePath = Paths.get("src/main/webapp/uploads").resolve(server.getBannerImage());
-
-                Files.deleteIfExists(imagePath);
-            } catch (IOException e) {
-                System.err.println("Lỗi xóa ảnh (có thể bỏ qua nếu chỉ muốn xóa DB): " + e.getMessage());
-            }
-        }
-
-        serverRepository.delete(server);
     }
 }

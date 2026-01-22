@@ -8,6 +8,7 @@ import com.muads.repository.MuVersionRepository;
 import com.muads.repository.ResetTypeRepository;
 import com.muads.repository.ServerRepository;
 import com.muads.service.HomeBannerService;
+import com.muads.service.ServerService;
 import com.muads.util.SlugUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,19 +28,24 @@ public class HomeController {
 
     @Autowired private HomeBannerService bannerService;
     @Autowired private ServerRepository serverRepository;
+    @Autowired private ServerService serverService;
     @Autowired private MuVersionRepository versionRepo;
     @Autowired private ResetTypeRepository resetRepo;
 
     // ========================================================================
-    // 1. TRANG CHỦ & ĐIỀU HƯỚNG
+    // 1. TRANG CHỦ & ĐIỀU HƯỚNG & BỘ LỌC (HỖ TRỢ 3DAYS)
     // ========================================================================
     @GetMapping("/")
     public String home(Model model,
+                       // Params cũ
                        @RequestParam(name = "group", required = false) String groupVer,
                        @RequestParam(name = "reset", required = false) Integer resetId,
-                       @RequestParam(name = "versionId", required = false) Integer versionId) {
+                       @RequestParam(name = "versionId", required = false) Integer versionId,
+                       // [NEW] Params mới cho tính năng lọc ngày
+                       @RequestParam(name = "filterType", required = false) String filterType, // 'test' hoặc 'open'
+                       @RequestParam(name = "filterDay", required = false) String filterDay) { // '3days', 'today', ...
 
-        // Auto-Redirect: Chuyển link tham số (?versionId=1) sang link đẹp (/mu/season-1)
+        // 1. Auto-Redirect: Chuyển link tham số (?versionId=1) sang link đẹp (/mu/season-1)
         if (versionId != null && versionId > 0) {
             Optional<MuVersion> v = versionRepo.findById(versionId);
             if (v.isPresent()) {
@@ -53,11 +59,50 @@ public class HomeController {
             }
         }
 
+        // 2. [NEW] LOGIC XỬ LÝ KHI NGƯỜI DÙNG BẤM LỌC LỊCH (WIDGET)
+        if (filterType != null && filterDay != null) {
+            // Load Menu & Banner (Bắt buộc phải có để trang không bị vỡ layout)
+            populateGlobalData(model);
+
+            // Gọi Service để lấy list theo ngày (Bạn cần đảm bảo Service xử lý được "3days")
+            List<Server> filteredServers = serverService.filterServersByTime(filterType, filterDay);
+
+            // Phân loại VIP/Normal và đẩy vào Model
+            classifyAndAddToModel(model, filteredServers);
+
+            // Tạo tiêu đề trang động
+            String typeLabel = "test".equals(filterType) ? "Alpha Test" : "Open Beta";
+            String dayLabel = "";
+
+            switch (filterDay) {
+                case "3days": dayLabel = "(Hôm qua - Nay - Mai)"; break;
+                case "yesterday": dayLabel = "Hôm Qua"; break;
+                case "today": dayLabel = "Hôm Nay"; break;
+                case "tomorrow": dayLabel = "Ngày Mai"; break;
+                default: dayLabel = "";
+            }
+
+            String displayTitle = "Lịch " + typeLabel + " " + dayLabel;
+
+            model.addAttribute("filterDisplay", displayTitle);
+            model.addAttribute("pageTitle", displayTitle + " | Munoria");
+
+            // Cờ này báo cho JSP biết đang ở chế độ xem kết quả tìm kiếm/lọc
+            model.addAttribute("isSearching", true);
+
+            // Trả về params để giữ trạng thái active cho nút bấm ở JSP hoặc xử lý logic hiển thị
+            model.addAttribute("currentFilterType", filterType);
+            model.addAttribute("currentFilterDay", filterDay);
+
+            return "home";
+        }
+
+        // 3. Logic mặc định (Trang chủ khi chưa lọc gì cả)
         return loadHomeData(model, null, null, null, "Mu Mới Ra - Cổng Game Munoria", "https://munoria.mobile/");
     }
 
     // ========================================================================
-    // 2. TRANG LỌC SEO
+    // 2. TRANG LỌC SEO (/mu/season-6, /mu/non-reset...)
     // ========================================================================
     @GetMapping("/mu/{slug}")
     public String seoFilter(@PathVariable("slug") String slug, Model model) {
@@ -108,43 +153,29 @@ public class HomeController {
     }
 
     // ========================================================================
-    // 3. CORE LOGIC: XỬ LÝ GỘP NHÓM SEASON
+    // 3. CORE LOGIC: XỬ LÝ LOAD DỮ LIỆU CŨ (THEO VERSION/RESET)
     // ========================================================================
     private String loadHomeData(Model model, String groupVer, Integer resetId, Integer versionId, String pageTitle, String canonicalUrl) {
 
         // --- A. MENU & BANNER ---
-        model.addAttribute("menuVersions", versionRepo.findAll());
-        model.addAttribute("menuTypes", resetRepo.findAll());
+        populateGlobalData(model);
 
-        Map<String, List<HomeBanner>> banners = bannerService.getBannersForHomePage();
-        model.addAttribute("bannersLeft", banners.get("LEFT_SIDEBAR"));
-        model.addAttribute("bannersRight", banners.get("RIGHT_SIDEBAR"));
-        model.addAttribute("bannersHero", banners.get("HERO"));
-        model.addAttribute("bannersStd", banners.get("STD"));
-
-        // --- B. XỬ LÝ LOGIC LỌC (CẬP NHẬT MỚI TẠI ĐÂY) ---
+        // --- B. XỬ LÝ LOGIC LỌC VERSION / RESET ---
         List<Integer> targetVersionIds = null;
         String filterDisplayName = "";
 
         if (versionId != null && versionId > 0) {
-
-            // --- NHÓM 1: CLASSIC (SS 0-1, SS 2, SS 3-5) ---
-            // ID tương ứng: 1, 2, 3
+            // Logic nhóm version
             if (versionId == 1 || versionId == 2 || versionId == 3) {
                 targetVersionIds = List.of(1, 2, 3);
                 filterDisplayName = "Season 1 - 5 (Classic)";
                 pageTitle = "Danh sách Mu Online Season 1, 2, 3, 4, 5 Mới Nhất";
             }
-
-            // --- NHÓM 2: MODERN (SS 7+, SS 16+, SS 21) ---
-            // ID tương ứng: 5, 6, 7
             else if (versionId == 5 || versionId == 6 || versionId == 7) {
                 targetVersionIds = List.of(5, 6, 7);
                 filterDisplayName = "Season 7 - Mới Nhất";
                 pageTitle = "Danh sách Mu Online Season cao (SS7 đến SS21) Mới Nhất";
             }
-
-            // --- NHÓM 3: RIÊNG LẺ (Ví dụ: SS6 - ID 4) ---
             else {
                 targetVersionIds = List.of(versionId);
                 Optional<MuVersion> v = versionRepo.findById(versionId);
@@ -157,7 +188,6 @@ public class HomeController {
             targetVersionIds = getVersionIdsByGroup(groupVer);
         }
 
-        // Xử lý tên hiển thị khi lọc theo Reset
         if (resetId != null && resetId > 0) {
             Optional<ResetType> r = resetRepo.findById(resetId);
             if (r.isPresent()) {
@@ -179,27 +209,59 @@ public class HomeController {
             rawCandidates = serverRepository.findAll();
         }
 
-        // --- D. LỌC KẾT QUẢ & PHÂN LOẠI VIP ---
-        List<Server> approvedServers = rawCandidates.stream()
-                .filter(s -> s.getStatus() == Server.Status.APPROVED)
-                .collect(Collectors.toList());
-
-        model.addAttribute("superVips", approvedServers.stream().filter(s -> s.getBannerPackage() == Server.BannerPackage.SUPER_VIP).collect(Collectors.toList()));
-        model.addAttribute("vips", approvedServers.stream().filter(s -> s.getBannerPackage() == Server.BannerPackage.VIP).collect(Collectors.toList()));
-        model.addAttribute("normals", approvedServers.stream().filter(s -> s.getBannerPackage() == Server.BannerPackage.BASIC).collect(Collectors.toList()));
+        // --- D. PHÂN LOẠI & ADD VÀO MODEL ---
+        classifyAndAddToModel(model, rawCandidates);
 
         // --- E. META DATA ---
         model.addAttribute("pageTitle", pageTitle);
         model.addAttribute("metaDescription", "Danh sách Mu Online " + (filterDisplayName.isEmpty() ? "Mới Ra" : filterDisplayName) + ".");
         model.addAttribute("canonicalUrl", canonicalUrl);
-        model.addAttribute("selectedVersion", versionId); // Để select box giữ đúng phiên bản đang chọn
+        model.addAttribute("selectedVersion", versionId);
         model.addAttribute("selectedReset", resetId);
         return "home";
     }
 
     // ========================================================================
-    // 4. HELPER METHODS
+    // 4. HELPER METHODS (HÀM HỖ TRỢ)
     // ========================================================================
+
+    /**
+     * Load Menu và Banner chung cho tất cả các trang
+     */
+    private void populateGlobalData(Model model) {
+        model.addAttribute("menuVersions", versionRepo.findAll());
+        model.addAttribute("menuTypes", resetRepo.findAll());
+
+        Map<String, List<HomeBanner>> banners = bannerService.getBannersForHomePage();
+        model.addAttribute("bannersLeft", banners.get("LEFT_SIDEBAR"));
+        model.addAttribute("bannersRight", banners.get("RIGHT_SIDEBAR"));
+        model.addAttribute("bannersHero", banners.get("HERO"));
+        model.addAttribute("bannersStd", banners.get("STD"));
+    }
+
+    /**
+     * Lọc danh sách APPROVED và chia thành 3 nhóm: SuperVIP, VIP, Normal
+     */
+    private void classifyAndAddToModel(Model model, List<Server> servers) {
+        // Chỉ lấy server đã duyệt và đang active
+        List<Server> approvedServers = servers.stream()
+                .filter(s -> s.getStatus() == Server.Status.APPROVED && Boolean.TRUE.equals(s.getIsActive()))
+                .collect(Collectors.toList());
+
+        // Chia nhóm theo gói Banner
+        model.addAttribute("superVips", approvedServers.stream()
+                .filter(s -> s.getBannerPackage() == Server.BannerPackage.SUPER_VIP)
+                .collect(Collectors.toList()));
+
+        model.addAttribute("vips", approvedServers.stream()
+                .filter(s -> s.getBannerPackage() == Server.BannerPackage.VIP)
+                .collect(Collectors.toList()));
+
+        model.addAttribute("normals", approvedServers.stream()
+                .filter(s -> s.getBannerPackage() == Server.BannerPackage.BASIC)
+                .collect(Collectors.toList()));
+    }
+
     private List<Integer> getVersionIdsByGroup(String group) {
         List<Integer> ids = new ArrayList<>();
         List<MuVersion> allVersions = versionRepo.findAll();
@@ -235,16 +297,14 @@ public class HomeController {
     // --- STATIC PAGES ---
     @GetMapping("/huong-dan")
     public String guide(Model model) {
-        model.addAttribute("pageTitle", "Hướng Dẫn | Munoria");
-        model.addAttribute("menuVersions", versionRepo.findAll());
-        model.addAttribute("menuTypes", resetRepo.findAll());
+        model.addAttribute("pageTitle", "Hướng Dẫn | Munoria Portal");
+        populateGlobalData(model);
         return "guide";
     }
 
     @GetMapping("/register/login")
     public String login(Model model) {
-        model.addAttribute("menuVersions", versionRepo.findAll());
-        model.addAttribute("menuTypes", resetRepo.findAll());
+        populateGlobalData(model);
         return "login";
     }
 }

@@ -62,4 +62,28 @@ public interface ServerRepository extends JpaRepository<Server, Long> {
             "s.approvedAt DESC")
     List<Server> searchServers(@Param("resetId") Integer resetId,
                                @Param("versionIds") List<Integer> versionIds);
+    @Query("SELECT s FROM Server s " +
+            "JOIN s.schedule sch " + // Join với bảng lịch trình
+            "WHERE s.isActive = true " +
+            "AND s.status = 'APPROVED' " +
+            "AND sch.alphaDate = :date " + // So sánh ngày
+            "ORDER BY " +
+            "CASE WHEN s.bannerPackage = 'SUPER_VIP' THEN 1 " +
+            "WHEN s.bannerPackage = 'VIP' THEN 2 " +
+            "ELSE 3 END ASC, " +
+            "s.approvedAt DESC")
+    List<Server> findByAlphaTestDate(@Param("date") java.time.LocalDate date);
+
+    // 2. Tìm server có ngày Open Beta trùng khớp
+    @Query("SELECT s FROM Server s " +
+            "JOIN s.schedule sch " +
+            "WHERE s.isActive = true " +
+            "AND s.status = 'APPROVED' " +
+            "AND sch.betaDate = :date " +
+            "ORDER BY " +
+            "CASE WHEN s.bannerPackage = 'SUPER_VIP' THEN 1 " +
+            "WHEN s.bannerPackage = 'VIP' THEN 2 " +
+            "ELSE 3 END ASC, " +
+            "s.approvedAt DESC")
+    List<Server> findByOpenBetaDate(@Param("date") java.time.LocalDate date);
 }

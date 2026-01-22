@@ -1,5 +1,6 @@
 package com.muads.service;
 
+import com.muads.dto.AdminBannerDto;
 import com.muads.entity.HomeBanner;
 import com.muads.entity.User;
 import com.muads.repository.HomeBannerRepository;
@@ -27,7 +28,7 @@ public class HomeBannerService {
     private static final Map<String, Integer> BANNER_PRICES = new HashMap<>();
     static {
         BANNER_PRICES.put("HERO", 500000);
-        BANNER_PRICES.put("STD", 100000);
+        BANNER_PRICES.put("STD", 100);
         BANNER_PRICES.put("LEFT_SIDEBAR", 50000);
         BANNER_PRICES.put("RIGHT_SIDEBAR", 50000);
     }
@@ -36,27 +37,21 @@ public class HomeBannerService {
         return BANNER_PRICES.getOrDefault(positionCode, 0);
     }
 
-    // === 1. MUA VÀ TỰ ĐỘNG KÍCH HOẠT (Logic cho User) ===
+    // === 1. MUA VÀ TỰ ĐỘNG KÍCH HOẠT (Logic cho User - Giữ nguyên) ===
     @Transactional(rollbackFor = Exception.class)
     public void purchaseAndActivateBanner(HomeBanner banner, Long userId) throws Exception {
-        // A. Lấy giá
         Integer price = getPriceByPosition(banner.getPositionCode());
-
-        // B. Lấy User
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new Exception("User không tồn tại"));
 
-        // C. Check tiền
         Integer currentCoin = (user.getCoin() == null) ? 0 : user.getCoin();
         if (currentCoin < price) {
             throw new Exception("Số dư không đủ! Cần " + price + " coin.");
         }
 
-        // D. Trừ tiền
         user.setCoin(currentCoin - price);
         userRepository.save(user);
 
-        // E. Kích hoạt banner ngay lập tức (7 ngày)
         banner.setUser(user);
         banner.setActive(true);
         banner.setCreatedAt(LocalDateTime.now());
@@ -66,19 +61,15 @@ public class HomeBannerService {
         bannerRepository.save(banner);
     }
 
-    // === 2. CÁC HÀM LẤY DỮ LIỆU (Logic cho Admin & Trang chủ) ===
-
-    // Hàm bạn đang bị thiếu đây:
+    // === 2. CÁC HÀM LẤY DỮ LIỆU ===
     public List<HomeBanner> getActiveBanners() {
         return bannerRepository.findByActive(true);
     }
 
-    // Lấy toàn bộ banner (sắp xếp mới nhất lên đầu) - Dùng cho Admin xem lịch sử
     public List<HomeBanner> getAllBanners() {
         return bannerRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
-    // Lấy banner hiển thị ra trang chủ (phân loại theo vị trí)
     public Map<String, List<HomeBanner>> getBannersForHomePage() {
         Map<String, List<HomeBanner>> map = new HashMap<>();
         map.put("HERO", bannerRepository.findByPositionCodeAndActiveTrueOrderByDisplayOrderAsc("HERO"));
@@ -88,40 +79,51 @@ public class HomeBannerService {
         return map;
     }
 
-    // Đếm số lượng banner đang chạy (để check full slot)
     public long countActiveBanners(String positionCode) {
         return bannerRepository.countByPositionCodeAndActiveTrue(positionCode);
     }
 
-    // Xóa banner
     public void deleteBanner(Long id) {
         bannerRepository.deleteById(id);
     }
 
-    // Tìm theo ID
     public HomeBanner findById(Long id) {
         return bannerRepository.findById(id).orElse(null);
     }
-    // Trong HomeBannerService.java
 
     public String getNextAvailableDate(String positionCode, int limit) {
         long count = countActiveBanners(positionCode);
-
-        if (count < limit) {
-            return null;
-        }
+        if (count < limit) return null;
 
         List<HomeBanner> list = bannerRepository.findByPositionCodeAndActiveTrueOrderByEndDateAsc(positionCode);
-
         if (list.isEmpty()) return null;
 
-        // Lấy ngày kết thúc
         java.time.LocalDateTime endDate = list.get(0).getEndDate();
-        if (endDate == null) return null;
-
-        // --- SỬA ĐOẠN NÀY ---
-        // Trả về định dạng ISO-8601 (Ví dụ: 2026-01-15T10:30:00) để JS dễ xử lý
-        return endDate.toString();
+        return (endDate == null) ? null : endDate.toString();
     }
 
+    // === 3. LOGIC MỚI: TẠO BANNER CHO ADMIN (THÊM VÀO ĐÂY) ===
+    public void createAdminBanner(AdminBannerDto dto, String finalImageUrl) {
+        HomeBanner banner = new HomeBanner();
+
+        // Set thông tin từ Form
+        banner.setImageUrl(finalImageUrl);
+        banner.setTargetUrl(dto.getTargetUrl());
+        banner.setPositionCode(dto.getPositionCode());
+        banner.setDisplayOrder(dto.getDisplayOrder());
+
+        // Kích hoạt ngay
+        banner.setActive(true);
+        banner.setCreatedAt(LocalDateTime.now());
+
+        // Tính ngày hết hạn theo số ngày Admin nhập
+        LocalDateTime now = LocalDateTime.now();
+        banner.setStartDate(now);
+        banner.setEndDate(now.plusDays(dto.getDurationDays()));
+
+        // User là null (để đánh dấu là banner của hệ thống/admin)
+        banner.setUser(null);
+
+        bannerRepository.save(banner);
+    }
 }

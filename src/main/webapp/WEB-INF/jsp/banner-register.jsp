@@ -469,45 +469,36 @@
                     <div>
                         <div class="slot-title">Banner Trái</div>
                         <div class="text-center px-2">
-                            <div class="slot-price-tag">
-                                <i class="fa-solid fa-tag"></i>
-                                <fmt:formatNumber value="${prices['LEFT_SIDEBAR'] != null ? prices['LEFT_SIDEBAR'] : 0}" pattern="#,###"/> Coin
-                            </div>
-                            <div class="slot-info">
-                                <i class="bi bi-aspect-ratio me-1"></i> <span class="slot-size">280 x 500 px</span>
+                            <div class="slot-info mt-4"> <i class="bi bi-aspect-ratio me-1"></i> <span class="slot-size">280 x 500 px</span>
                             </div>
                             <div class="slot-info">
                                 Đã đặt: <span class="qty-badge">${qtyInfo['LEFT_SIDEBAR']}</span>
                             </div>
+
                             <div class="slot-status-label mt-3">Tình trạng</div>
                             <div class="slot-status-text ${isFullLeft ? 'status-full' : 'status-available'}">
                                 ${availability['LEFT_SIDEBAR']}
                             </div>
+
+                            <c:if test="${isFullLeft}">
+                                <div class="mt-2">
+                                    <small class="text-secondary" style="font-size: 0.75rem">Trống sau:</small>
+                                    <div class="countdown-timer fw-bold text-warning" style="font-size: 0.9rem"
+                                         data-countdown="${nextAvailableMap['LEFT_SIDEBAR']}">
+                                        Calculating...
+                                    </div>
+                                </div>
+                            </c:if>
                         </div>
                     </div>
 
                     <div class="w-100 mt-4 px-2">
-                        <c:choose>
-                            <c:when test="${not empty currentUser && !isFullLeft}">
-                                <button class="btn btn-mu-action w-100 py-2"
-                                        onclick="openRegisterModal('LEFT_SIDEBAR', 'Banner Trái', ${prices['LEFT_SIDEBAR'] != null ? prices['LEFT_SIDEBAR'] : 0})">
-                                    Thuê Ngay
-                                </button>
-                            </c:when>
-                            <c:when test="${not empty currentUser && isFullLeft}">
-                                <button class="btn btn-locked w-100 py-2" disabled>
-                                    <i class="fa-solid fa-lock"></i> Đã Hết Slot
-                                </button>
-                                <div class="text-center mt-2">
-                                    <small class="text-secondary">Trống sau:</small>
-                                    <div class="countdown-timer fw-bold text-warning fs-6"
-                                         data-countdown="${nextAvailableMap['LEFT_SIDEBAR']}">
-                                        Đang tính toán...
-                                    </div>
-                                </div>
-                            </c:when>
-                            <c:otherwise><a href="/login" class="btn btn-mu-login w-100">Đăng nhập</a></c:otherwise>
-                        </c:choose>
+                        <a href="https://zalo.me/SDT_CUA_BAN" target="_blank" class="btn btn-outline-warning w-100 py-2 fw-bold" style="border: 1px solid var(--mu-gold); color: var(--mu-gold);">
+                            <i class="fa-solid fa-comments me-2"></i> LIÊN HỆ ADMIN
+                        </a>
+                        <div class="text-center mt-2">
+                            <small class="text-secondary" style="font-size: 0.75rem">Liên hệ để đặt quảng cáo vị trí này</small>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -521,45 +512,37 @@
                         <div>
                             <div class="slot-title">BANNER GIỮA (VIP)</div>
                             <div class="text-center px-4">
-                                <div class="slot-price-tag border-danger text-warning">
-                                    <i class="fa-solid fa-gem"></i>
-                                    <fmt:formatNumber value="${prices['HERO'] != null ? prices['HERO'] : 0}" pattern="#,###"/> Coin
-                                </div>
-                                <div class="slot-info text-light">
+                                <div class="slot-info text-light mt-4">
                                     <i class="bi bi-aspect-ratio me-1"></i> <span class="slot-size text-warning" style="font-size: 1.1rem">1200 x 250 px</span>
                                 </div>
                                 <div class="slot-info">
                                     Đã đặt: <span class="qty-badge bg-danger border-danger">${qtyInfo['HERO']}</span>
                                 </div>
+
                                 <div class="slot-status-label mt-3 text-warning">Tình trạng</div>
                                 <div class="slot-status-text ${isFullHero ? 'status-full' : 'status-vip'}">
                                     ${availability['HERO']}
                                 </div>
+
+                                <c:if test="${isFullHero}">
+                                    <div class="mt-2">
+                                        <small class="text-secondary">Trống sau:</small>
+                                        <div class="countdown-timer fw-bold text-warning"
+                                             data-countdown="${nextAvailableMap['HERO']}">
+                                            Calculating...
+                                        </div>
+                                    </div>
+                                </c:if>
                             </div>
                         </div>
 
                         <div class="w-75 mx-auto mt-3">
-                            <c:choose>
-                                <c:when test="${not empty currentUser && !isFullHero}">
-                                    <button class="btn btn-mu-action w-100 py-3 fs-5"
-                                            onclick="openRegisterModal('HERO', 'Banner VIP Center', ${prices['HERO'] != null ? prices['HERO'] : 0})">
-                                        THUÊ VỊ TRÍ VIP
-                                    </button>
-                                </c:when>
-                                <c:when test="${not empty currentUser && isFullHero}">
-                                    <button class="btn btn-locked w-100 py-3 fs-5" disabled>
-                                        <i class="fa-solid fa-lock"></i> TẠM HẾT SLOT
-                                    </button>
-                                    <div class="text-center mt-2">
-                                        <small class="text-secondary">Trống sau:</small>
-                                        <div class="countdown-timer fw-bold text-warning fs-6"
-                                             data-countdown="${nextAvailableMap['HERO']}">
-                                            Đang tính toán...
-                                        </div>
-                                    </div>
-                                </c:when>
-                                <c:otherwise><a href="/login" class="btn btn-mu-login w-100">Đăng nhập</a></c:otherwise>
-                            </c:choose>
+                            <a href="https://zalo.me/0372229527_blank" class="btn btn-mu-action w-100 py-3 fs-5">
+                                <i class="fa-solid fa-phone-volume me-2"></i> LIÊN HỆ ĐẶT VIP
+                            </a>
+                            <div class="text-center mt-2">
+                                <small class="text-secondary">Vui lòng inbox trực tiếp BQT</small>
+                            </div>
                         </div>
                     </div>
 
@@ -595,7 +578,7 @@
                                             <small class="text-secondary">Trống sau:</small>
                                             <div class="countdown-timer fw-bold text-warning fs-6"
                                                  data-countdown="${nextAvailableMap['STD']}">
-                                                Đang tính toán...
+                                                Calculating...
                                             </div>
                                         </div>
                                     </c:when>
@@ -610,7 +593,6 @@
                             <div class="me-3">
                                 <i class="fa-solid fa-gem vip-nav-icon"></i>
                             </div>
-
                             <div class="flex-grow-1">
                                 <div class="vip-nav-title">
                                     ĐĂNG MU VIP TẠI ĐÂY
@@ -620,7 +602,6 @@
                                     <i class="bi bi-stars text-warning me-1"></i> Tổng hợp các máy chủ Alpha Test & Open Beta đáng chơi nhất
                                 </div>
                             </div>
-
                             <div class="ms-3">
                                 <i class="fa-solid fa-chevron-right fa-lg vip-nav-arrow"></i>
                             </div>
@@ -634,53 +615,37 @@
                     <div>
                         <div class="slot-title">Banner Phải</div>
                         <div class="text-center px-2">
-                            <div class="slot-price-tag">
-                                <i class="fa-solid fa-tag"></i>
-                                <fmt:formatNumber value="${prices['RIGHT_SIDEBAR'] != null ? prices['RIGHT_SIDEBAR'] : 0}" pattern="#,###"/> Coin
-                            </div>
-                            <div class="slot-info">
+                            <div class="slot-info mt-4">
                                 <i class="bi bi-aspect-ratio me-1"></i> <span class="slot-size">280 x 500 px</span>
                             </div>
                             <div class="slot-info">
                                 Đã đặt: <span class="qty-badge">${qtyInfo['RIGHT_SIDEBAR']}</span>
                             </div>
+
                             <div class="slot-status-label mt-3">Tình trạng</div>
                             <div class="slot-status-text ${isFullRight ? 'status-full' : 'status-available'}">
                                 ${availability['RIGHT_SIDEBAR']}
                             </div>
+
+                            <c:if test="${isFullRight}">
+                                <div class="mt-2">
+                                    <small class="text-secondary" style="font-size: 0.75rem">Trống sau:</small>
+                                    <div class="countdown-timer fw-bold text-warning" style="font-size: 0.9rem"
+                                         data-countdown="${nextAvailableMap['RIGHT_SIDEBAR']}">
+                                        Calculating...
+                                    </div>
+                                </div>
+                            </c:if>
                         </div>
                     </div>
 
                     <div class="w-100 mt-4 px-2">
-                        <c:choose>
-                            <%-- TRƯỜNG HỢP 1: CÒN SLOT --%>
-                            <c:when test="${not empty currentUser && !isFullRight}">
-                                <button class="btn btn-mu-action w-100 py-2"
-                                        onclick="openRegisterModal('RIGHT_SIDEBAR', 'Banner Phải', ${prices['RIGHT_SIDEBAR'] != null ? prices['RIGHT_SIDEBAR'] : 0})">
-                                    Thuê Ngay
-                                </button>
-                            </c:when>
-
-                            <%-- TRƯỜNG HỢP 2: FULL SLOT -> HIỆN ĐẾM NGƯỢC --%>
-                            <c:when test="${not empty currentUser && isFullRight}">
-                                <button class="btn btn-locked w-100 py-2" disabled>
-                                    <i class="fa-solid fa-lock"></i> Hết Slot
-                                </button>
-
-                                <div class="text-center mt-2">
-                                    <small class="text-secondary" style="font-size: 0.75rem">Sẽ trống sau:</small>
-                                    <div class="countdown-timer fw-bold text-warning small w-100"
-                                         data-countdown="${nextAvailableMap['RIGHT_SIDEBAR']}">
-                                        <i class="fas fa-spinner fa-spin"></i> ...
-                                    </div>
-                                </div>
-                            </c:when>
-
-                            <%-- TRƯỜNG HỢP 3: CHƯA ĐĂNG NHẬP --%>
-                            <c:otherwise>
-                                <a href="/login" class="btn btn-mu-login w-100">Đăng nhập</a>
-                            </c:otherwise>
-                        </c:choose>
+                        <a href="https://zalo.me/SDT_CUA_BAN" target="_blank" class="btn btn-outline-warning w-100 py-2 fw-bold" style="border: 1px solid var(--mu-gold); color: var(--mu-gold);">
+                            <i class="fa-solid fa-comments me-2"></i> LIÊN HỆ ADMIN
+                        </a>
+                        <div class="text-center mt-2">
+                            <small class="text-secondary" style="font-size: 0.75rem">Liên hệ để đặt quảng cáo vị trí này</small>
+                        </div>
                     </div>
                 </div>
             </div>

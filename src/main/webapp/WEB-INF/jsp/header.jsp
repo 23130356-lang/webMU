@@ -172,9 +172,38 @@
         <nav class="mh-nav">
             <ul class="mh-menu-list">
                 <li class="mh-menu-item">
+                <li class="mh-menu-item">
                     <a href="/" class="mh-menu-link">
                         <i class="fa-solid fa-house-chimney"></i> Trang Chủ
+                        <i class="fa-solid fa-caret-down" style="margin-left: 5px; font-size: 10px;"></i>
                     </a>
+
+                    <ul class="mh-dropdown">
+                        <li>
+                            <a class="mh-dropdown-item" href="/?filterType=open&filterDay=today">
+                                <i class="fa-solid fa-fire me-2" style="color: #ff4444; width: 20px;"></i> Open Beta Hôm Nay
+                            </a>
+                        </li>
+                        <li>
+                            <a class="mh-dropdown-item" href="/?filterType=test&filterDay=today">
+                                <i class="fa-solid fa-flask me-2" style="color: #44ff44; width: 20px;"></i> Alpha Test Hôm Nay
+                            </a>
+                        </li>
+
+                        <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 5px 0;"></li>
+
+                        <li>
+                            <a class="mh-dropdown-item" href="/?filterType=open&filterDay=3days">
+                                <i class="fa-solid fa-calendar-days me-2" style="color: #ffca28; width: 20px;"></i> Open Beta Gần Đây
+                            </a>
+                        </li>
+                        <li>
+                            <a class="mh-dropdown-item" href="/?filterType=test&filterDay=3days">
+                                <i class="fa-solid fa-calendar-check me-2" style="color: #42a5f5; width: 20px;"></i> Alpha Test Gần đây
+                            </a>
+                        </li>
+                    </ul>
+                </li>
                 </li>
 
                 <li class="mh-menu-item">
